@@ -37,6 +37,10 @@ $settings = $category;
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
     get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
 
+// Add page to manage the coin rules.
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_rules',
+    get_string('coinrules', 'block_motrain'), new moodle_url('/blocks/motrain/settings_rules.php')));
+
 // Add the admin settings.
 if ($hassiteconfig) {
 

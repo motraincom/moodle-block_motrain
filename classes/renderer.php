@@ -36,4 +36,50 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_motrain_renderer extends plugin_renderer_base {
+
+    /**
+     * Output a JSON script.
+     *
+     * @param mixed $data The data.
+     * @param string $id The HTML ID to use.
+     * @return string
+     */
+    public function json_script($data, $id) {
+        $jsondata = json_encode($data, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
+        return html_writer::tag('script', $jsondata, ['id' => $id, 'type' => 'application/json']);
+    }
+
+    /**
+     * Initialise a react module.
+     *
+     * @param string $module The AMD name of the module.
+     * @param object|array $props The props.
+     * @return void
+     */
+    public function react_module($module, $props) {
+        $id = html_writer::random_id('block_motrain-react-app');
+        $propsid = html_writer::random_id('block_motrain-react-app-props');
+        $iconname = 'y/loading';
+
+        $o = '';
+        $o .= html_writer::start_div('block_motrain-react', ['id' => $id]);
+        $o .= html_writer::start_div('block_motrain-react-loading');
+        $o .= html_writer::start_div();
+        $o .= $this->render(new pix_icon($iconname, 'loading'));
+        $o .= ' ' . get_string('loadinghelp', 'core');
+        $o .= html_writer::end_div();
+        $o .= html_writer::end_div();
+        $o .= html_writer::end_div();
+
+        $o .= $this->json_script($props, $propsid);
+
+        $this->page->requires->js_amd_inline("
+            require(['block_motrain/launcher'], function(launcher) {
+                launcher('$module', '$id', '$propsid');
+            });
+        ");
+
+        return $o;
+    }
+
 }

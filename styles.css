@@ -1,0 +1,122 @@
+/* Fixes issue with react-select dropdown. */
+.path-admin-blocks-motrain #region-main {
+    overflow-x: visible;
+}
+
+.block_motrain-selector {
+    display: flex;
+}
+.block_motrain-react-select-container {
+    max-width: 308px;
+    width: 100%;
+    margin-right: 5px;
+}
+.block_motrain-react-select__control {
+    border-radius: 0 !important; /* stylelint-disable-line */
+}
+.block_motrain-react-select__menu {
+    border-radius: 0 !important; /* stylelint-disable-line */
+    margin-top: 0 !important; /* stylelint-disable-line */
+}
+
+.block_motrain-rule-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+}
+.block_motrain-rule-container label {
+    margin: 0;
+}
+.block_motrain-rule-mingrade,
+.block_motrain-rule-maxgrade,
+.block_motrain-rule-coins {
+    width: 100px;
+    margin-right: 4px;
+}
+.block_motrain-rule-remove {
+    width: 20px;
+}
+
+.block_motrain-rule-legend {
+    font-size: x-small;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+.block_motrain-rule-legend > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.block_motrain-section {
+    margin-bottom: 16px;
+}
+.block_motrain-section.block_motrain-section-collapsed {
+    border-bottom: 1px solid #efefef;
+    padding-bottom: 4px;
+}
+
+.block_motrain-section-title {
+    display: block;
+    font-weight: bold;
+    font-size: large;
+}
+.block_motrain-section-title:hover {
+    cursor: pointer;
+}
+.block_motrain-section-title .icon {
+    margin-right: 4px;
+}
+.block_motrain-section-content {
+    border-left: 3px solid #efefef;
+    padding-left: 16px;
+    margin-top: 4px;
+}
+.block_motrain-section-content label {
+    margin: 0;
+}
+
+.block_motrain-item {
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #efefef;
+}
+.block_motrain-item-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.block_motrain-item-name {
+    font-weight: bold;
+}
+.block_motrain-item-info {
+    font-size: x-small;
+    color: #666;
+    margin-left: 12px;
+}
+.block_motrain-item-add {
+    font-size: small;
+}
+
+.block_motrain-form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+}
+
+.block_motrain-coin-condition,
+.block_motrain-coin-condition .amount {
+    display: flex;
+    align-items: center;
+}
+.block_motrain-coin-condition {
+    margin-bottom: 0.5rem;
+}
+.block_motrain-coin-condition .condition {
+    margin: 0 1rem;
+}
+.block_motrain-coin-condition .amount input {
+    width: 8rem;
+    margin-right: 0.5rem;
+}

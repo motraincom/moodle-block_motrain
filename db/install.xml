@@ -32,5 +32,20 @@
         <INDEX NAME="cohortaccount" UNIQUE="true" FIELDS="cohortid, accountid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="block_motrain_comprules" COMMENT="The completion rules.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course ID, of 0."/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The course module ID, or 0."/>
+        <FIELD NAME="modname" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="The module name, or null."/>
+        <FIELD NAME="coins" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of coins."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="coursecmmod" UNIQUE="true" FIELDS="courseid, cmid, modname"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
