@@ -1,21 +1,29 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import Select from 'react-select';
+import React, { useEffect, useState } from 'react';
+import Select, { OptionTypeBase } from 'react-select';
+import { useString } from '../lib/hooks';
 
-import type { GetOptionValue, GetOptionLabel, SingleValue, ActionMeta } from 'react-select';
-import { genClassName } from '../lib/style';
-
-type Option = { value: any; label: string };
-const defaultGetOptionLabel = (option: Option) => option.label;
-const defaultGetOptionValue = (option: Option) => option.value;
+type Option = OptionTypeBase;
+type Value = string | number;
+const defaultGetOptionLabel = (option: any) => option.label || '';
+const defaultGetOptionValue = (option: any) => option.value || '';
 
 const Selector: React.FC<{
     options: Option[];
-    onAdd: (value: any) => void;
-    getOptionLabel?: GetOptionLabel<Option>;
-    getOptionValue?: GetOptionValue<Option>;
-    placeholder?: ReactNode;
-}> = ({ options, onAdd, getOptionLabel = defaultGetOptionLabel, getOptionValue = defaultGetOptionValue, placeholder }) => {
-    const [selected, setSelected] = useState<Option | null>(null);
+    onAdd: (value: Value) => void;
+    getOptionLabel?: (option: any) => Value;
+    getOptionValue?: (option: any) => Value;
+    placeholder?: string;
+    disabled?: boolean;
+}> = ({
+    options,
+    onAdd,
+    disabled,
+    getOptionLabel = defaultGetOptionLabel,
+    getOptionValue = defaultGetOptionValue,
+    placeholder,
+}) => {
+    const noOptionsStr = useString('nooptions');
+    const [selected, setSelected] = useState<Option | null>();
 
     useEffect(() => {
         setSelected(null);
@@ -23,19 +31,22 @@ const Selector: React.FC<{
 
     const handleAdd = (option: Option) => onAdd(getOptionValue(option));
 
-    const handleChange = (v: SingleValue<Option>) => {
-        setSelected(v);
-        if (v) handleAdd(v);
+    const handleChange = (v: Option | null) => {
+        setSelected(v || null);
+        if (!v) return;
+        handleAdd(v);
     };
 
     return (
-        <div className={genClassName('selector')}>
+        <div className="block_motrain-selector">
             <Select
-                className={genClassName('react-select-container')}
-                classNamePrefix={genClassName('react-select')}
+                className="block_motrain-react-select-container"
+                classNamePrefix="block_motrain-react-select"
                 getOptionLabel={getOptionLabel || defaultGetOptionLabel}
                 getOptionValue={getOptionValue || defaultGetOptionValue}
                 menuShouldScrollIntoView={false}
+                noOptionsMessage={() => noOptionsStr}
+                isDisabled={disabled}
                 onChange={handleChange}
                 options={options}
                 placeholder={placeholder}

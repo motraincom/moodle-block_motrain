@@ -1,14 +1,16 @@
 import React from 'react';
-import { getString, imageUrl } from '../lib/moodle';
+import { useStrings } from '../lib/hooks';
+import { imageUrl } from '../lib/moodle';
 import { genClassName } from '../lib/style';
 
-const SectionTitle: React.FC<{ expanded: boolean; title: string; onExpandedChange: (expanded: boolean) => void }> = ({
+const SectionTitle: React.FC<{ expanded: boolean; title: React.ReactNode; onExpandedChange: (expanded: boolean) => void }> = ({
     expanded,
     title,
     onExpandedChange,
 }) => {
+    const getString = useStrings(['collapse', 'expand'], 'core');
     const imgUrl = imageUrl(expanded ? 't/expanded' : 't/collapsed', 'core');
-    const alt = expanded ? getString('collapse', 'core') : getString('expand', 'core');
+    const alt = expanded ? getString('collapse') : getString('expand');
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         e.stopPropagation();

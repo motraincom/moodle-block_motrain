@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version.
+ * External services.
  *
  * @package    block_motrain
  * @copyright  2022 Mootivation Technologies Corp.
@@ -25,9 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2022050403;
-$plugin->requires = 2017051500;     // Moodle 3.3.0.
-$plugin->release = '1.0.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'block_motrain';
-
+$functions = [
+    'block_motrain_get_activities_with_completion' => [
+        'classname' => 'block_motrain\external',
+        'methodname' => 'get_activities_with_completion',
+        'description' => 'List the activities with completion enabled.',
+        'type' => 'read',
+        'ajax' => true
+    ],
+];

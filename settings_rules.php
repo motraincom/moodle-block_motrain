@@ -40,7 +40,7 @@ $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();
 
 // Get the list of courses (performance can be improved).
-$courses = $DB->get_records('course', [], 'shortname, fullname, id', 'id, shortname, fullname');
+$courses = $DB->get_records('course', ['enablecompletion' => 1], 'shortname, fullname, id', 'id, shortname, fullname');
 $courses = array_values(array_map(function($course) {
     $context = context_course::instance($course->id);
     return (object) [
