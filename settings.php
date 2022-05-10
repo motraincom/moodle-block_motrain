@@ -58,6 +58,9 @@ if ($hassiteconfig) {
     $settingspage->add(new admin_setting_configpasswordunmask('block_motrain/apikey', get_string('apikey', 'block_motrain'),
         get_string('apikey_desc', 'block_motrain'), ''));
 
+    $settingspage->add(new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),
+        get_string('usecohorts_help', 'block_motrain'), true));
+
     $settingspage->add(new admin_setting_configcheckbox('block_motrain/adminscanearn',
         get_string('adminscanearn', 'block_motrain'), get_string('adminscanearn_desc', 'block_motrain'), false));
 

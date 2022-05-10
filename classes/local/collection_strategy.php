@@ -30,7 +30,6 @@ use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
 use core_user;
-use course_modinfo;
 use local_mootivated\local\lang_reason;
 
 defined('MOODLE_INTERNAL') || die();
@@ -50,14 +49,20 @@ class collection_strategy {
     protected $adminscanearn = false;
     /** @var array Allowed contexts. */
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
+    /** @var completion_coins_calculator The calculator. */
+    protected $completioncoinscalculator;
+    /** @var team_resolver The team resolver. */
+    protected $teamresolver;
     /** @var array Ignore modules. */
     protected $ignoredmodules = ['local_mootivated', 'block_mootivated', 'block_motrain'];
 
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct($teamresolver) {
         $this->adminscanearn = (bool) get_config('block_motrain', 'adminscanearn');
+        $this->completioncoinscalculator = new completion_coins_calculator();
+        $this->teamresolver = $teamresolver;
     }
 
     /**
@@ -101,9 +106,12 @@ class collection_strategy {
         }
 
         // Resolve the team.
-        $teamid = 'b059d3dd-d8ea-40b9-9f2e-3acceb049f2f';
+        $teamid = $this->teamresolver->get_team_id_for_user($userid);
+        if (!$teamid) {
+            return;
+        }
 
-        return $this->award_coins($userid, 1);
+        return $this->award_coins($teamid, $userid, 1);
 
         if ($event instanceof course_module_completion_updated) {
 
@@ -121,6 +129,7 @@ class collection_strategy {
                 // $modinfo = course_modinfo::instance($courseid);
                 // $cminfo = $modinfo->get_cm($cmid);
                 // $calculator = $school->get_completion_points_calculator_by_mod();
+                $coins = $this->completioncoinscalculator->get_module_coins($courseid, $cmid);
                 // $coins = (int) $calculator->get_for_module($cminfo->modname);
 
                 // $school->capture_event($userid, $event, $coins);
@@ -147,12 +156,13 @@ class collection_strategy {
             // }
 
             // // Ok, here you can have some coins.
+            $coins = $this->completioncoinscalculator->get_course_coins($event->courseid);
             // $school->capture_event($userid, $event, (int) $school->get_course_completion_reward());
             // $school->log_user_was_rewarded_for_completion($userid, $event->courseid, 0, COMPLETION_COMPLETE);
         }
     }
 
-    protected function award_coins($userid, $coins) {
+    protected function award_coins($teamid, $userid, $coins) {
         global $DB, $USER;
 
         // Safety check.
@@ -173,7 +183,6 @@ class collection_strategy {
             return;
         }
 
-        $teamid = 'b059d3dd-d8ea-40b9-9f2e-3acceb049f2f';
         $mapping = $DB->get_record('block_motrain_player', ['accountid' => $manager->get_account_id(), 'userid' => $userid]);
         if (empty($mapping) || empty($mapping->playerid)) {
             $player = $client->get_player_by_email($teamid, $user->email);

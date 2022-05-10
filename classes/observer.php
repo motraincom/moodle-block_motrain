@@ -48,7 +48,12 @@ class observer {
      * @param \core\event\base $event The event.
      */
     public static function catch_all(\core\event\base $event) {
-        $strategy = new collection_strategy();
+        $manager = manager::instance();
+        if (!$manager->is_setup()) {
+            return;
+        }
+
+        $strategy = $manager->get_collection_strategy();
         $strategy->collect_event($event);
     }
 

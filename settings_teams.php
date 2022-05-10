@@ -68,10 +68,12 @@ $teamsbyid = array_reduce($teams, function($carry, $item) {
     return $carry;
 }, []);
 
+$isusingcohorts = $manager->is_using_cohorts();
 $globalassociation = $manager->get_global_team_association();
 
 // Process the form submission.
-$form = new team_form($currenturl->out(false), ['globalassociation' => $globalassociation, 'teams' => $teamsbyid]);
+$form = new team_form($currenturl->out(false), ['isusingcohorts' => $isusingcohorts, 'globalassociation' => $globalassociation,
+    'teams' => $teamsbyid]);
 if ($manager->is_setup() && $motrainteamid !== null) {
 
     if ($motrainteamid) {
@@ -91,12 +93,12 @@ if ($manager->is_setup() && $motrainteamid !== null) {
         if (empty($association->id)) {
             $association->id = $DB->insert_record('block_motrain_team', $association);
         } else {
+            // TODO We do not support updates yet.
             // $DB->update_record('block_motrain_team', $association);
         }
         redirect($PAGE->url, get_string('teamassociationcreated', 'block_motrain'));
 
     } else if ($form->is_cancelled()) {
-        // TODO Put in DB.
         redirect($PAGE->url);
     }
 }
@@ -112,7 +114,6 @@ if (!$manager->is_setup()) {
     die();
 }
 
-
 if ($motrainteamid !== null) {
     if ($motrainteamid) {
         echo $output->heading(get_string('editassociation', 'block_motrain'));
@@ -124,9 +125,13 @@ if ($motrainteamid !== null) {
 } else {
     echo $output->heading(get_string('teamassociations', 'block_motrain'));
 
-    if (!$globalassociation) {
+    if (!$globalassociation || $isusingcohorts) {
         echo html_writer::div(
-            $output->single_button(new moodle_url($PAGE->url, ['id' => 0]), get_string('createassociation', 'block_motrain')),
+            $output->single_button(
+                new moodle_url($PAGE->url, ['id' => 0]),
+                get_string('createassociation', 'block_motrain'),
+                'get'
+            ),
             '',
             ['style' => 'margin: 0 0 1rem']
         );
@@ -136,9 +141,15 @@ if ($motrainteamid !== null) {
               FROM {block_motrain_team} mt
          LEFT JOIN {cohort} c
                 ON c.id = mt.cohortid
-             WHERE mt.accountid = ?
-          ORDER BY c.name";
-    $records = $DB->get_records_sql($sql, [$manager->get_account_id()]);
+             WHERE mt.accountid = ?";
+    $params = [$manager->get_account_id()];
+    if ($isusingcohorts) {
+        $sql .= ' AND mt.cohortid > 0';
+    } else {
+        $sql .= ' AND mt.cohortid < 0';
+    }
+    $sql .= " ORDER BY c.name";
+    $records = $DB->get_records_sql($sql, $params);
 
     $table = new html_table();
     $table->head = [get_string('cohort', 'block_motrain'), get_string('team', 'block_motrain'), ''];

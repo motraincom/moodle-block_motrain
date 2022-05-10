@@ -24,6 +24,9 @@
  */
 
 namespace block_motrain;
+
+use block_motrain\local\collection_strategy;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,8 +39,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 class manager {
 
-    /** @var client The client. */
+    /** @var client|null The client. */
     protected $client;
+    /** @var collection_strategy|null The collection strategy. */
+    protected $collectionstrategy;
+    /** @var team_resolver|null The team resolver. */
+    protected $teamresolver;
     /** @var static The singleton. */
     protected static $instance;
 
@@ -58,10 +65,35 @@ class manager {
         return $this->client;
     }
 
+    /**
+     * Get the collection strategy.
+     *
+     * @return collection_strategy
+     */
+    public function get_collection_strategy() {
+        if (!$this->collectionstrategy) {
+            $this->collectionstrategy = new collection_strategy($this->get_team_resolver());
+        }
+        return $this->collectionstrategy;
+    }
+
     public function get_global_team_association() {
         global $DB;
         $accountid = get_config('block_motrain', 'accountid');
         return $DB->get_record('block_motrain_team', ['accountid' => $accountid, 'cohortid' => -1]);
+    }
+
+    /**
+     * Get the team resolver.
+     *
+     * @return team_resolver
+     */
+    protected function get_team_resolver() {
+        if (!$this->teamresolver) {
+            $accountid = get_config('block_motrain', 'accountid');
+            $this->teamresolver = new team_resolver($this->is_using_cohorts(), $accountid);
+        }
+        return $this->teamresolver;
     }
 
     public function has_team_associations() {
@@ -75,6 +107,10 @@ class manager {
         $apihost = get_config('block_motrain', 'apihost');
         $accountid = get_config('block_motrain', 'accountid');
         return !empty($apikey) && !empty($apihost) && !empty($accountid);
+    }
+
+    public function is_using_cohorts() {
+        return (bool) get_config('block_motrain', 'usecohorts');
     }
 
     /**

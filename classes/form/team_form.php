@@ -65,6 +65,18 @@ class team_form extends moodleform {
     }
 
     /**
+     * Definition after data.
+     */
+    public function definition_after_data() {
+        $mform = $this->_form;
+        $cohortid = $mform->getElementValue('cohortid');
+        if ($cohortid === -1 || !($this->_customdata['isusingcohorts'] && !$cohortid)) {
+            $mform->setConstant('cohortid', -1);
+            $mform->freeze('cohortid');
+        }
+    }
+
+    /**
      * Validation.
      *
      * @param array $data The data.
@@ -97,7 +109,7 @@ class team_form extends moodleform {
 
         // We can't create an "all associations" if there are other associations.
         $data = [];
-        if (empty($exceptids)) {
+        if (empty($this->_customdata['globalassociation'])) {
             $data[-1] = get_string('nocohortallusers', 'block_motrain');
         }
         $data[0] = '---';

@@ -24,6 +24,7 @@
  */
 
 use block_motrain\form\team_form;
+use block_motrain\local\completion_coins_calculator;
 use block_motrain\manager;
 use core\output\notification;
 
@@ -58,64 +59,8 @@ foreach (get_module_types_names() as $mod => $modname) {
     ];
 }
 
-// Recommended defaults.
-$defaults =  [
-    'course' => 30,
-    'modules' => [
-        'quiz' => 15,
-        'lesson' => 15,
-        'scorm' => 15,
-        'assign' => 15,
-        'forum' => 15,
-
-        'feedback' => 10,
-        'questionnaire' => 10,
-        'workshop' => 10,
-        'glossary' => 10,
-        'database' => 10,
-        'journal' => 10,
-        'hotpot' => 10,
-
-        'book' => 2,
-        'resource' => 2,
-        'folder' => 2,
-        'imscp' => 2,
-        'label' => 2,
-        'page' => 2,
-        'url' => 2
-    ]
-];
-
-$globalrules = (object) ['course' => null, 'modules' => []];
-$rules = [];
-
-$recordset = $DB->get_recordset('block_motrain_comprules', []);
-foreach ($recordset as $record) {
-    if (empty($record->courseid)) {
-        if (empty($record->modname)) {
-            $globalrules->course = (int) $record->coins;
-        } else {
-            $globalrules->modules[] = [
-                'module' => $record->modname,
-                'coins' => (int) $record->coins,
-            ];
-        }
-        continue;
-    }
-
-    if (empty($rules[$record->courseid])) {
-        $rules[$record->courseid] = (object) ['id' => (int) $record->courseid, 'coins' => null, 'cms' => []];
-    }
-    if (empty($record->cmid)) {
-        $rules[$record->courseid]->coins = (int) $record->coins;
-    } else {
-        $rules[$record->courseid]->cms[] = [
-            'id' => (int) $record->cmid,
-            'coins' => (int) $record->coins
-        ];
-    }
-}
-$recordset->close();
+// Load the rules.
+$allrules = completion_coins_calculator::get_all_rules();
 
 // Display the page.
 echo $output->header();
@@ -124,12 +69,9 @@ echo $output->heading(get_string('coinrules', 'block_motrain'));
 echo $output->react_module('block_motrain/ui-completion-rules-lazy', [
     'courses' => $courses,
     'modules' => $modules,
-    'defaults' => $defaults,
-    'globalRules' => [
-        'course' => $globalrules->course,
-        'modules' => array_values($globalrules->modules),
-    ],
-    'rules' => array_values($rules),
+    'defaults' => completion_coins_calculator::get_recommended(),
+    'globalRules' => $allrules->global,
+    'rules' => $allrules->rules,
 ]);
 
 echo $output->footer();
