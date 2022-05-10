@@ -29,7 +29,6 @@ use block_motrain\manager;
 use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
-use core_user;
 use local_mootivated\local\lang_reason;
 
 defined('MOODLE_INTERNAL') || die();
@@ -51,6 +50,8 @@ class collection_strategy {
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
     /** @var completion_coins_calculator The calculator. */
     protected $completioncoinscalculator;
+    /** @var player_mapper The player mapper. */
+    protected $playermapper;
     /** @var team_resolver The team resolver. */
     protected $teamresolver;
     /** @var array Ignore modules. */
@@ -59,10 +60,11 @@ class collection_strategy {
     /**
      * Constructor.
      */
-    public function __construct($teamresolver) {
+    public function __construct($teamresolver, $playermapper) {
         $this->adminscanearn = (bool) get_config('block_motrain', 'adminscanearn');
         $this->completioncoinscalculator = new completion_coins_calculator();
         $this->teamresolver = $teamresolver;
+        $this->playermapper = $playermapper;
     }
 
     /**
@@ -111,8 +113,7 @@ class collection_strategy {
             return;
         }
 
-        return $this->award_coins($teamid, $userid, 1);
-
+        $coins = 1;
         if ($event instanceof course_module_completion_updated) {
 
             // The user may have completed an activity.
@@ -160,50 +161,35 @@ class collection_strategy {
             // $school->capture_event($userid, $event, (int) $school->get_course_completion_reward());
             // $school->log_user_was_rewarded_for_completion($userid, $event->courseid, 0, COMPLETION_COMPLETE);
         }
+
+        return $this->award_coins($teamid, $userid, $coins);
     }
 
+    /**
+     * Award coins.
+     *
+     * @param string $teamid The team ID.
+     * @param int $userid The user ID.
+     * @param int $coins The number of coins.
+     */
     protected function award_coins($teamid, $userid, $coins) {
-        global $DB, $USER;
 
         // Safety check.
         if ($coins <= 0) {
             return;
         }
 
-        $manager = manager::instance();
-        $client = $manager->get_client();
-
-        $user = $USER;
-        if ($USER->id != $userid) {
-            $user = core_user::get_user($userid, '*');
-        }
-
-        // Weird, the user was not found!
-        if (!$user) {
+        // TODO Save failures.
+        $playerid = $this->playermapper->get_player_id($userid, $teamid);
+        if (!$playerid) {
             return;
         }
 
-        $mapping = $DB->get_record('block_motrain_player', ['accountid' => $manager->get_account_id(), 'userid' => $userid]);
-        if (empty($mapping) || empty($mapping->playerid)) {
-            $player = $client->get_player_by_email($teamid, $user->email);
-            if (!$player) {
-                // TODO Handle exception where user already exists.
-                $player = $client->create_player($teamid, [
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'email' => $user->email,
-                ]);
-            }
-            if (!empty($mapping)) {
-                $mapping->playerid = $player->id;
-                $DB->update_record('block_motrain_player', $mapping);
-            } else {
-                $mapping = (object) ['accountid' => $manager->get_account_id(), 'userid' => $userid, 'playerid' => $player->id];
-                $mapping->id = $DB->insert_record('block_motrain_player', $mapping);
-            }
-        }
+        $this->client->add_coins($playerid, $coins, new lang_reason('transaction:credit.activityxcompleted', (object) [
+            'name' => 'Test'
+        ]));
 
-        $client->add_coins($mapping->playerid, $coins, new lang_reason('transaction:credit.activityxcompleted', (object) ['name' => 'Test']));
+        // TODO Save awards.
     }
 
     /**

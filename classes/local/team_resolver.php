@@ -23,9 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_motrain;
-
-use block_motrain\local\collection_strategy;
+namespace block_motrain\local;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -207,7 +207,7 @@ class completion_coins_calculator {
                 'questionnaire' => 10,
                 'workshop' => 10,
                 'glossary' => 10,
-                'database' => 10,
+                'data' => 10,
                 'journal' => 10,
                 'hotpot' => 10,
                 'book' => 2,

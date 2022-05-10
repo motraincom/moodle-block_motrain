@@ -26,6 +26,8 @@
 namespace block_motrain;
 
 use block_motrain\local\collection_strategy;
+use block_motrain\local\player_mapper;
+use block_motrain\local\team_resolver;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -72,7 +74,10 @@ class manager {
      */
     public function get_collection_strategy() {
         if (!$this->collectionstrategy) {
-            $this->collectionstrategy = new collection_strategy($this->get_team_resolver());
+            $accountid = $this->get_account_id();
+            $teamresolver = new team_resolver($this->is_using_cohorts(), $accountid);
+            $playermapper = new player_mapper($this->get_client(), $accountid);
+            $this->collectionstrategy = new collection_strategy($teamresolver, $playermapper);
         }
         return $this->collectionstrategy;
     }
@@ -81,19 +86,6 @@ class manager {
         global $DB;
         $accountid = get_config('block_motrain', 'accountid');
         return $DB->get_record('block_motrain_team', ['accountid' => $accountid, 'cohortid' => -1]);
-    }
-
-    /**
-     * Get the team resolver.
-     *
-     * @return team_resolver
-     */
-    protected function get_team_resolver() {
-        if (!$this->teamresolver) {
-            $accountid = get_config('block_motrain', 'accountid');
-            $this->teamresolver = new team_resolver($this->is_using_cohorts(), $accountid);
-        }
-        return $this->teamresolver;
     }
 
     public function has_team_associations() {
