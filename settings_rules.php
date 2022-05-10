@@ -86,6 +86,37 @@ $defaults =  [
     ]
 ];
 
+$globalrules = (object) ['course' => null, 'modules' => []];
+$rules = [];
+
+$recordset = $DB->get_recordset('block_motrain_comprules', []);
+foreach ($recordset as $record) {
+    if (empty($record->courseid)) {
+        if (empty($record->modname)) {
+            $globalrules->course = (int) $record->coins;
+        } else {
+            $globalrules->modules[] = [
+                'module' => $record->modname,
+                'coins' => (int) $record->coins,
+            ];
+        }
+        continue;
+    }
+
+    if (empty($rules[$record->courseid])) {
+        $rules[$record->courseid] = (object) ['id' => (int) $record->courseid, 'coins' => null, 'cms' => []];
+    }
+    if (empty($record->cmid)) {
+        $rules[$record->courseid]->coins = (int) $record->coins;
+    } else {
+        $rules[$record->courseid]->cms[] = [
+            'id' => (int) $record->cmid,
+            'coins' => (int) $record->coins
+        ];
+    }
+}
+$recordset->close();
+
 // Display the page.
 echo $output->header();
 echo $output->heading(get_string('coinrules', 'block_motrain'));
@@ -94,7 +125,11 @@ echo $output->react_module('block_motrain/ui-completion-rules-lazy', [
     'courses' => $courses,
     'modules' => $modules,
     'defaults' => $defaults,
-    'rules' => [],
+    'globalRules' => [
+        'course' => $globalrules->course,
+        'modules' => array_values($globalrules->modules),
+    ],
+    'rules' => array_values($rules),
 ]);
 
 echo $output->footer();

@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react';
+import { useMutation } from 'react-query';
+import Button from '../components/Button';
 import SectionTitle from '../components/SectionTitle';
 import Selector from '../components/Selector';
 import Str from '../components/Str';
-import { useString } from '../lib/hooks';
+import { useString, useUnloadCheck } from '../lib/hooks';
+import { getModule, getUrl } from '../lib/moodle';
 import { genClassName } from '../lib/style';
 import { AppContext } from './lib/context';
 import { useCourseActivitiesWithCompletion } from './lib/hooks';
@@ -81,10 +84,10 @@ const GlobalRulesWidget: React.FC<{
         }, {});
     }, [rules.modules]);
 
-    const courseCoinsValue = useRecommended ? defaults.course || 0 : rules.course;
+    const courseCoinsValue = (useRecommended ? defaults.course : rules.course) || 0;
 
     return (
-        <div className="">
+        <div style={{ marginTop: '1.5rem' }}>
             <div className={[genClassName('section'), isExpanded ? '' : 'expanded'].join(' ')}>
                 <SectionTitle title={<Str id="globalsettings" />} onExpandedChange={handleExpandedChange} expanded={isExpanded} />
                 {isExpanded ? (
@@ -105,6 +108,7 @@ const GlobalRulesWidget: React.FC<{
                             onChange={(coins) => updateGlobalCourseCompleted(coins || 0)}
                             value={courseCoinsValue}
                             disabled={useRecommended}
+                            allowNull={false}
                         />
                         {modules.map((mod) => {
                             const value = (useRecommended ? defaults.modules[mod.module] : modulesByName[mod.module]) || 0;
@@ -115,6 +119,7 @@ const GlobalRulesWidget: React.FC<{
                                     disabled={useRecommended}
                                     onChange={(coins) => updateGlobalModuleCompleted(mod.module, coins || 0)}
                                     value={value}
+                                    allowNull={false}
                                 />
                             );
                         })}
@@ -182,9 +187,9 @@ const CourseRules: React.FC<{
     const { addCm, updateCourseCompleted, updateCmCompleted } = useReducerAction();
 
     if (isError) {
-        return <div className="my-4">Error loading</div>;
+        return <div style={{ margin: '1rem 0' }}>Error loading</div>;
     } else if (!isSuccess) {
-        return <div className="my-4">Loading...</div>;
+        return <div style={{ margin: '1rem 0' }}>Loading...</div>;
     }
 
     const activitiesByCmId = activities.map((l) => l.cmid);
@@ -244,10 +249,12 @@ const Item = ({
     value = null,
     onChange,
     disabled,
+    allowNull = true,
 }: {
     label: React.ReactNode;
     value?: number | string | null;
     onChange: (v: number | null) => void;
+    allowNull?: boolean;
     disabled?: boolean;
 }) => {
     const defaultParensStr = useString('defaultparens');
@@ -257,7 +264,7 @@ const Item = ({
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         if (disabled) return;
         const val = parseInt(e.target.value);
-        const finalVal = isNaN(val) ? null : Math.max(0, val);
+        const finalVal = isNaN(val) ? (allowNull ? null : 0) : Math.max(0, val);
         onChange(finalVal);
         setLocalValue(finalVal);
     };
@@ -280,7 +287,7 @@ const Item = ({
                         value={displayValue}
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        placeholder={isDefault ? defaultParensStr : ''}
+                        placeholder={allowNull && isDefault ? defaultParensStr : ''}
                         className="form-control"
                         disabled={disabled}
                     />
@@ -293,8 +300,9 @@ const Item = ({
 type Action =
     | 'addCourse'
     | 'addCm'
-    | 'setGlobalUsesrecommended'
+    | 'setDirty'
     | 'setExpanded'
+    | 'setGlobalUsesrecommended'
     | 'setCollapsed'
     | 'updateCourseCompleted'
     | 'updateGlobalCourseCompleted'
@@ -305,7 +313,7 @@ function globalRulesReducer(state: GlobalRules, [type, payload]: [Action, any]) 
     if (type === 'setGlobalUsesrecommended') {
         let newState = state;
         const defaults = payload.defaults as Defaults;
-        if (typeof state.course === 'undefined') {
+        if (typeof newState.course === 'undefined' || newState.course === null) {
             newState = { ...newState, course: defaults.course };
         }
         const hasDefaults = Boolean(Object.keys(defaults.modules).length);
@@ -347,7 +355,6 @@ function globalRulesReducer(state: GlobalRules, [type, payload]: [Action, any]) 
 }
 
 function rulesReducer(state: CourseRules, [type, payload]: [Action, any]) {
-    console.log(type, payload);
     if (type === 'addCourse') {
         return [
             ...state,
@@ -396,6 +403,7 @@ type State = {
     globalRules: GlobalRules;
     globalUsesRecommended: boolean;
     expanded: number[];
+    isDirty: boolean;
 };
 
 function reducer(state: State, action: [Action, any]) {
@@ -404,6 +412,7 @@ function reducer(state: State, action: [Action, any]) {
         state = {
             ...state,
             rules,
+            isDirty: true,
         };
     }
 
@@ -412,6 +421,7 @@ function reducer(state: State, action: [Action, any]) {
         state = {
             ...state,
             globalRules,
+            isDirty: true,
         };
     }
 
@@ -428,10 +438,16 @@ function reducer(state: State, action: [Action, any]) {
                 ...state,
                 expanded: state.expanded.filter((id) => id !== payload),
             };
+        case 'setDirty':
+            return {
+                ...state,
+                isDirty: payload,
+            };
         case 'setGlobalUsesrecommended':
             return {
                 ...state,
                 globalUsesRecommended: payload.useRecommended,
+                isDirty: true,
             };
     }
 
@@ -467,8 +483,28 @@ const App = ({ rules = [], globalRules = {} }: { rules?: CourseRules; globalRule
                     return typeof mod.coins !== 'undefined' && mod.coins !== null;
                 }).length),
         expanded: [],
+        isDirty: false,
     });
     const { modules, courses, defaults } = useContext(AppContext);
+    useUnloadCheck(state.isDirty);
+
+    const mutation = useMutation(
+        () => {
+            return getModule('core/ajax').call([
+                {
+                    methodname: 'block_motrain_save_completion_rules',
+                    args: {
+                        global: state.globalUsesRecommended ? { userecommended: true } : state.globalRules,
+                        rules: state.rules,
+                    },
+                },
+            ])[0];
+        },
+        { onError: (err) => getModule('core/notification').exception(err), onSuccess: () => dispatch(['setDirty', false]) }
+    );
+    const handleSaveAll = () => {
+        mutation.mutate();
+    };
 
     return (
         <>
@@ -477,6 +513,7 @@ const App = ({ rules = [], globalRules = {} }: { rules?: CourseRules; globalRule
                     addCourse: (courseId: number) => dispatch(['addCourse', courseId]),
                     addCm: (courseId: number, cmId: number) => dispatch(['addCm', { courseId, cmId }]),
                     setCollapsed: (courseId: number) => dispatch(['setCollapsed', courseId]),
+
                     setExpanded: (courseId: number) => dispatch(['setExpanded', courseId]),
                     setGlobalUsesrecommended: (useRecommended: boolean, defaults: Defaults) =>
                         dispatch(['setGlobalUsesrecommended', { useRecommended, defaults }]),
@@ -497,6 +534,14 @@ const App = ({ rules = [], globalRules = {} }: { rules?: CourseRules; globalRule
                     useRecommended={state.globalUsesRecommended}
                 />
                 <CoursesRules rules={state.rules} courses={courses} expanded={state.expanded} />
+
+                <div style={{ marginTop: '1rem' }}>
+                    <div>
+                        <Button onClick={handleSaveAll} primary disabled={mutation.isLoading}>
+                            {!mutation.isLoading ? <Str id="saverules" /> : <Str id="saving" />}
+                        </Button>
+                    </div>
+                </div>
             </ReducerActionsContext.Provider>
         </>
     );
@@ -504,11 +549,13 @@ const App = ({ rules = [], globalRules = {} }: { rules?: CourseRules; globalRule
 
 const AppContainer = ({
     rules,
+    globalRules,
     courses = [],
     modules = [],
     defaults = { course: 0, modules: {} },
 }: {
     rules?: CourseRules;
+    globalRules?: GlobalRules;
     courses?: Course[];
     modules?: Module[];
     defaults: Defaults;
@@ -523,7 +570,7 @@ const AppContainer = ({
                 defaults,
             }}
         >
-            <App rules={rules} />
+            <App rules={rules} globalRules={globalRules} />
         </AppContext.Provider>
     );
 };

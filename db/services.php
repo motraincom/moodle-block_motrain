@@ -33,4 +33,11 @@ $functions = [
         'type' => 'read',
         'ajax' => true
     ],
+    'block_motrain_save_completion_rules' => [
+        'classname' => 'block_motrain\external',
+        'methodname' => 'save_completion_rules',
+        'description' => 'Save the completion rules.',
+        'type' => 'write',
+        'ajax' => true
+    ],
 ];
