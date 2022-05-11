@@ -34,7 +34,7 @@ $settingspage->visiblename = get_string('settings', 'core');
 $settings = $category;
 
 // Add page to manage the teams.
-$category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_teammaps',
     get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
 
 // Add page to manage the coin rules.
@@ -64,7 +64,8 @@ if ($hassiteconfig) {
     $settingspage->add(new admin_setting_configcheckbox('block_motrain/adminscanearn',
         get_string('adminscanearn', 'block_motrain'), get_string('adminscanearn_desc', 'block_motrain'), false));
 
-    $settingspage->add(new admin_setting_configcheckbox('block_motrain/autopush', get_string('autopush', 'block_motrain'),
-        get_string('autopush_help', 'block_motrain'), false));
+    $setting = new admin_setting_configcheckbox('block_motrain/autopush', get_string('autopush', 'block_motrain'),
+        get_string('autopush_help', 'block_motrain'), false);
+    $settingspage->add($setting);
 
 }

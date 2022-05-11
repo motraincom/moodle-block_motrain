@@ -25,11 +25,12 @@
 
 namespace block_motrain\local;
 
+use block_motrain\client;
+use block_motrain\local\reason\lang_reason;
 use block_motrain\manager;
 use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
-use local_mootivated\local\lang_reason;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,6 +49,8 @@ class collection_strategy {
     protected $adminscanearn = false;
     /** @var array Allowed contexts. */
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
+    /** @var client The client. */
+    protected $client;
     /** @var completion_coins_calculator The calculator. */
     protected $completioncoinscalculator;
     /** @var player_mapper The player mapper. */
@@ -60,9 +63,10 @@ class collection_strategy {
     /**
      * Constructor.
      */
-    public function __construct($teamresolver, $playermapper) {
+    public function __construct($teamresolver, $playermapper, client $client) {
         $this->adminscanearn = (bool) get_config('block_motrain', 'adminscanearn');
         $this->completioncoinscalculator = new completion_coins_calculator();
+        $this->client = $client;
         $this->teamresolver = $teamresolver;
         $this->playermapper = $playermapper;
     }
@@ -73,6 +77,8 @@ class collection_strategy {
      * @param \core\event\base $event The event.
      */
     public function collect_event(\core\event\base $event) {
+        global $DB;
+
         if (!manager::instance()->is_setup()) {
             return;
         }
@@ -94,6 +100,8 @@ class collection_strategy {
             return;
         }
 
+        $context = $event->get_context();
+
         // We only handle two events at the moment.
         if (!($event instanceof course_module_completion_updated) && !($event instanceof course_completed)) {
             return;
@@ -103,7 +111,7 @@ class collection_strategy {
         $userid = $this->get_event_target_user($event);
 
         // Check if can earn coins.
-        if (!$this->can_user_earn_coins($userid, $event->get_context())) {
+        if (!$this->can_user_earn_coins($userid, $context)) {
             return;
         }
 
@@ -113,56 +121,95 @@ class collection_strategy {
             return;
         }
 
-        $coins = 1;
         if ($event instanceof course_module_completion_updated) {
 
             // The user may have completed an activity.
             $data = $event->get_record_snapshot('course_modules_completion', $event->objectid);
             if ($data->completionstate == COMPLETION_COMPLETE || $data->completionstate == COMPLETION_COMPLETE_PASS) {
                 $courseid = $event->courseid;
-                $cmid = $event->get_context()->instanceid;
+                $cmid = $context->instanceid;
 
-                // $school = self::get_school_resolver()->get_by_member($userid);
-                // if ($school->was_user_rewarded_for_completion($userid, $courseid, $cmid)) {
-                //     return;
-                // }
+                $actionname = 'cm_completed';
+                $actionhash = sha1($cmid);
 
-                // $modinfo = course_modinfo::instance($courseid);
-                // $cminfo = $modinfo->get_cm($cmid);
-                // $calculator = $school->get_completion_points_calculator_by_mod();
+                $params = [
+                    'userid' => $userid,
+                    'contextid' => $context->id,
+                    'actionname' => $actionname,
+                    'actionhash' => $actionhash
+                ];
+
+                if ($DB->record_exists('block_motrain_log', $params)) {
+                    return;
+                }
+
                 $coins = $this->completioncoinscalculator->get_module_coins($courseid, $cmid);
-                // $coins = (int) $calculator->get_for_module($cminfo->modname);
 
-                // $school->capture_event($userid, $event, $coins);
-                // $school->log_user_was_rewarded_for_completion($userid, $courseid, $cmid, $data->completionstate);
+                try {
+                    $modinfo = get_fast_modinfo($courseid);
+                    $cminfo = $modinfo->get_cm($cmid);
+                    $cmname = format_string($cminfo->name, true, ['context' => $context]);
+                    $reasonstr = 'transaction:credit.activityxcompleted';
+                    $reasonargs = (object) ['name' => $cmname];
+                } catch (\moodle_exception $e) {
+                    $reasonstr = null;
+                    $reasonargs = null;
+                }
+                if (empty($reasonstr)) {
+                    $reasonstr = 'transaction:credit.activitycompleted';
+                    $reasonargs = null;
+                }
+                $reason = new lang_reason($reasonstr, $reasonargs);
+
+                $this->award_coins($teamid, $userid, $coins, $reason);
+
+                $DB->insert_record('block_motrain_log', array_merge($params, [
+                    'coins' => $coins,
+                    'timecreated' => time(),
+                    'timebroadcasted' => time()
+                ]));
             }
 
         } else if ($event instanceof course_completed) {
-            // // Check their school.
-            // $school = self::get_school_resolver()->get_by_member($userid);
-            // if (!$school || !$school->is_setup()) {
-            //     // No school, no chocolate.
-            //     return;
-            // }
+            $courseid = $event->courseid;
+            $actionname = 'course_completed';
+            $actionhash = sha1($courseid);
 
-            // if (!$school->is_course_completion_reward_enabled()) {
-            //     // Sorry mate, no pocket money for you.
-            //     return;
-            // }
+            $params = [
+                'userid' => $userid,
+                'contextid' => $context->id,
+                'actionname' => $actionname,
+                'actionhash' => $actionhash
+            ];
 
-            // if ($school->was_user_rewarded_for_completion($userid, $event->courseid, 0)) {
-            //     // The course completion state must have been reset. If we do not ignore this
-            //     // then we will have issue when logging the event due to unique indexes.
-            //     return;
-            // }
+            if ($DB->record_exists('block_motrain_log', $params)) {
+                return;
+            }
 
-            // // Ok, here you can have some coins.
+            try {
+                $modinfo = get_fast_modinfo($courseid);
+                $coursename = format_string($modinfo->get_course()->fullname, true, ['context' => $context]);
+                $reasonstr = 'transaction:credit.coursexcompleted';
+                $reasonargs = (object) ['name' => $coursename];
+            } catch (\moodle_exception $e) {
+                $reasonstr = null;
+                $reasonargs = null;
+            }
+            if (empty($reasonstr)) {
+                $reasonstr = 'transaction:credit.coursecompleted';
+                $reasonargs = null;
+            }
+            $reason = new lang_reason($reasonstr, $reasonargs);
+
             $coins = $this->completioncoinscalculator->get_course_coins($event->courseid);
-            // $school->capture_event($userid, $event, (int) $school->get_course_completion_reward());
-            // $school->log_user_was_rewarded_for_completion($userid, $event->courseid, 0, COMPLETION_COMPLETE);
-        }
+            $this->award_coins($teamid, $userid, $coins);
 
-        return $this->award_coins($teamid, $userid, $coins);
+            $DB->insert_record('block_motrain_log', array_merge($params, [
+                'coins' => $coins,
+                'timecreated' => time(),
+                'timebroadcasted' => time()
+            ]));
+        }
     }
 
     /**
@@ -171,8 +218,9 @@ class collection_strategy {
      * @param string $teamid The team ID.
      * @param int $userid The user ID.
      * @param int $coins The number of coins.
+     * @param lang_reason $reason The reason.
      */
-    protected function award_coins($teamid, $userid, $coins) {
+    protected function award_coins($teamid, $userid, $coins, lang_reason $reason = null) {
 
         // Safety check.
         if ($coins <= 0) {
@@ -185,11 +233,7 @@ class collection_strategy {
             return;
         }
 
-        $this->client->add_coins($playerid, $coins, new lang_reason('transaction:credit.activityxcompleted', (object) [
-            'name' => 'Test'
-        ]));
-
-        // TODO Save awards.
+        $this->client->add_coins($playerid, $coins, $reason);
     }
 
     /**

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Lang reason.
+ * Task.
  *
  * @package    block_motrain
  * @copyright  2022 Mootivation Technologies Corp.
@@ -23,54 +23,52 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_motrain\local\reason;
-
-use stdClass;
-
+namespace block_motrain\task;
 defined('MOODLE_INTERNAL') || die();
 
+use block_motrain\manager;
+
 /**
- * Lang reason.
+ * Task.
  *
  * @package    block_motrain
  * @copyright  2022 Mootivation Technologies Corp.
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lang_reason {
-
-    /** @var object|null $args */
-    protected $args;
-    /** @var string $string */
-    protected $string;
+class users_push extends \core\task\scheduled_task {
 
     /**
-     * Constructor.
+     * Execute.
      *
-     * @param string $string The lang string.
-     * @param stdClass $args The arguments.
+     * @return void
      */
-    public function __construct($string, stdClass $args = null) {
-        $this->string = $string;
-        $this->args = $args;
+    public function execute() {
+
+        $manager = manager::instance();
+        if (!$manager->is_setup()) {
+            mtrace('Motrain is not setup.');
+            return;
+        }
+
+        $userpusher = $manager->get_user_pusher();
+        $queuesize = $userpusher->count_queue();
+        if (!$queuesize) {
+            mtrace('Push users queue is empty.');
+            return;
+        }
+
+        mtrace('Pushing chunk of ' . $userpusher->get_chunk_size() . ' out of ' . $queuesize . ' users.');
+        $userpusher->push_chunk();
     }
 
     /**
-     * Get args.
-     *
-     * @return object|null
-     */
-    public function get_args() {
-        return $this->args;
-    }
-
-    /**
-     * Get string.
+     * Get name.
      *
      * @return string
      */
-    public function get_string() {
-        return $this->string;
+    public function get_name() {
+        return get_string('taskpushusers', 'block_motrain');
     }
 
 }

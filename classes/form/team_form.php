@@ -70,7 +70,10 @@ class team_form extends moodleform {
     public function definition_after_data() {
         $mform = $this->_form;
         $cohortid = $mform->getElementValue('cohortid');
-        if ($cohortid === -1 || !($this->_customdata['isusingcohorts'] && !$cohortid)) {
+        if (is_array($cohortid)) {
+            $cohortid = reset($cohortid);
+        }
+        if ($cohortid === -1 || (!$this->_customdata['isusingcohorts'] && !$cohortid)) {
             $mform->setConstant('cohortid', -1);
             $mform->freeze('cohortid');
         }
@@ -105,7 +108,7 @@ class team_form extends moodleform {
         $manager = manager::instance();
         $context = context_system::instance();
         $cohorts = cohort_get_cohorts($context->id, 0, 500)['cohorts'];
-        $exceptids = $DB->get_records('block_motrain_team', ['accountid' => $manager->get_account_id()], '', 'cohortid');
+        $exceptids = $DB->get_records('block_motrain_teammap', ['accountid' => $manager->get_account_id()], '', 'cohortid');
 
         // We can't create an "all associations" if there are other associations.
         $data = [];

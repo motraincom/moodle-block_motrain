@@ -34,7 +34,7 @@ $motrainteamid = optional_param('id', null, PARAM_INT);
 $deleteid = optional_param('delete', null, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-admin_externalpage_setup('block_motrain_teams');
+admin_externalpage_setup('block_motrain_teammaps');
 
 $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();
@@ -56,7 +56,7 @@ if ($motrainteamid !== null) {
 
 // Handle deletion.
 if ($deleteid && confirm_sesskey()) {
-    $DB->delete_records('block_motrain_team', ['id' => $deleteid]);
+    $DB->delete_records('block_motrain_teammap', ['id' => $deleteid]);
     redirect($PAGE->url);
 }
 
@@ -73,28 +73,34 @@ $globalassociation = $manager->get_global_team_association();
 
 // Process the form submission.
 $form = new team_form($currenturl->out(false), ['isusingcohorts' => $isusingcohorts, 'globalassociation' => $globalassociation,
-    'teams' => $teamsbyid]);
+    'teams' => $teamsbyid, 'isedit' => (bool) $motrainteamid]);
 if ($manager->is_setup() && $motrainteamid !== null) {
 
     if ($motrainteamid) {
-        $association = $DB->get_record('block_motrain_team', ['id' => $motrainteamid], '*', MUST_EXIST);
+        $association = $DB->get_record('block_motrain_teammap', ['id' => $motrainteamid], '*', MUST_EXIST);
     } else {
         $association = (object) ['accountid' => $manager->get_account_id()];
     }
     $form->set_data($association);
 
     if ($data = $form->get_data()) {
-        if ($globalassociation && !$motrainteamid) {
+        if (!$isusingcohorts && $globalassociation && !$motrainteamid) {
             throw new coding_exception('cannotcreatenewassociations');
         }
 
         $association->cohortid = $data->cohortid;
         $association->teamid = $data->teamid;
         if (empty($association->id)) {
-            $association->id = $DB->insert_record('block_motrain_team', $association);
+            $association->id = $DB->insert_record('block_motrain_teammap', $association);
+
+            // Schedule for the users to be pushed.
+            if ($manager->is_automatic_push_enabled() && $association->cohortid > 0) {
+                $manager->schedule_cohort_sync($association->cohortid);
+            }
+
         } else {
             // TODO We do not support updates yet.
-            // $DB->update_record('block_motrain_team', $association);
+            // $DB->update_record('block_motrain_teammap', $association);
         }
         redirect($PAGE->url, get_string('teamassociationcreated', 'block_motrain'));
 
@@ -138,7 +144,7 @@ if ($motrainteamid !== null) {
     }
 
     $sql = "SELECT mt.*, c.name AS cohortname
-              FROM {block_motrain_team} mt
+              FROM {block_motrain_teammap} mt
          LEFT JOIN {cohort} c
                 ON c.id = mt.cohortid
              WHERE mt.accountid = ?";

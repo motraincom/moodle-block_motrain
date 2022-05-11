@@ -25,15 +25,7 @@
 
 namespace block_motrain\local;
 
-use block_motrain\manager;
 use cache;
-use cache_store;
-use context;
-use core\event\course_completed;
-use core\event\course_module_completion_updated;
-use core_user;
-use course_modinfo;
-use local_mootivated\local\lang_reason;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -106,7 +98,7 @@ class completion_coins_calculator {
      */
     protected function get_course_rule($courseid) {
         $courseid = max(1, (int) $courseid); // Prevent 0, as reserved for global.
-        if ($rule = $this->cache->get($courseid) === false) {
+        if (($rule = $this->cache->get($courseid)) === false) {
             $rule = $this->load_course_rule($courseid);
             $this->cache->set($courseid, $rule);
         }
@@ -120,7 +112,7 @@ class completion_coins_calculator {
      */
     protected function get_global_rule() {
         $courseid = 0;
-        if ($rule = $this->cache->get($courseid) === false) {
+        if (($rule = $this->cache->get($courseid)) === false) {
             $rule = $this->load_global_rule();
             $this->cache->set($courseid, $rule);
         }

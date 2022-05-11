@@ -68,7 +68,7 @@ class player_mapper {
             $userid = $user->id;
         }
 
-        $mapping = $DB->get_record('block_motrain_player', ['accountid' => $this->accountid, 'userid' => $userid]);
+        $mapping = $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
         if (empty($mapping) || empty($mapping->playerid)) {
             $user = $user ? $user : $this->get_user($userid);
 
@@ -85,10 +85,10 @@ class player_mapper {
 
             if (!empty($mapping)) {
                 $mapping->playerid = $player->id;
-                $DB->update_record('block_motrain_player', $mapping);
+                $DB->update_record('block_motrain_playermap', $mapping);
             } else {
                 $mapping = (object) ['accountid' => $this->accountid, 'userid' => $userid, 'playerid' => $player->id];
-                $mapping->id = $DB->insert_record('block_motrain_player', $mapping);
+                $mapping->id = $DB->insert_record('block_motrain_playermap', $mapping);
             }
         }
 

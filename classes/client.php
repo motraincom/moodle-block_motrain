@@ -25,8 +25,8 @@
 
 namespace block_motrain;
 
+use block_motrain\local\reason\lang_reason;
 use curl;
-use local_mootivated\local\lang_reason;
 use moodle_exception;
 use moodle_url;
 

@@ -63,7 +63,7 @@ class team_resolver {
     protected function get_global_team_id() {
         global $DB;
         if ($this->globalteamid === null) {
-            $this->globalteamid = $DB->get_field('block_motrain_team', 'teamid', ['cohortid' => -1]);
+            $this->globalteamid = $DB->get_field('block_motrain_teammap', 'teamid', ['cohortid' => -1]);
         }
         return $this->globalteamid ? $this->globalteamid : null;
     }
@@ -82,7 +82,7 @@ class team_resolver {
 
         $sql = 'SELECT t.teamid
                   FROM {cohort_members} cm
-                  JOIN {block_motrain_team} t
+                  JOIN {block_motrain_teammap} t
                     ON t.cohortid = cm.cohortid
                  WHERE cm.userid = :userid
               ORDER BY cm.cohortid ASC';
