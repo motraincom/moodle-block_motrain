@@ -66,6 +66,7 @@ class players_mapping_table extends table_sql {
         $columns = [
             'fullname' => get_string('fullname', 'core'),
             'playerid' => get_string('playerid', 'block_motrain'),
+            'blocked' => '',
             'actions' => ''
         ];
         $this->define_columns(array_keys($columns));
@@ -73,7 +74,8 @@ class players_mapping_table extends table_sql {
 
         // Define SQL.
         $this->sql = new stdClass();
-        $this->sql->fields = 'u.id, pm.playerid, ' . user_utils::name_fields('u');
+        $this->sql->fields = 'u.id, pm.playerid AS pmplayerid, pm.blocked AS pmblocked, pm.blockedreason AS pmblockedreason, '
+                             . user_utils::name_fields('u');
         $this->sql->from = '{block_motrain_playermap} pm JOIN {user} u ON pm.userid = u.id';
         $this->sql->where = 'pm.accountid = :accountid';
         $this->sql->params = ['accountid' => $manager->get_account_id()];
@@ -91,15 +93,8 @@ class players_mapping_table extends table_sql {
      * @param stdClass $row Table row.
      * @return string Output produced.
      */
-    protected function col_playerid($row) {
-        if (empty($row->playerid)) {
-            return '-';
-        }
-        return \html_writer::link(
-            $this->manager->get_dashboard_url('/player/' . $row->playerid),
-            $row->playerid,
-            ['target' => '_blank']
-        );
+    protected function col_actions($row) {
+        return '';
     }
 
     /**
@@ -108,8 +103,28 @@ class players_mapping_table extends table_sql {
      * @param stdClass $row Table row.
      * @return string Output produced.
      */
-    protected function col_actions($row) {
-        return '';
+    protected function col_blocked($row) {
+        if (empty($row->pmblocked)) {
+            return '';
+        }
+        return '⚠ ' . $row->pmblockedreason;
+    }
+
+    /**
+     * Column.
+     *
+     * @param stdClass $row Table row.
+     * @return string Output produced.
+     */
+    protected function col_playerid($row) {
+        if (empty($row->pmplayerid)) {
+            return '-';
+        }
+        return \html_writer::link(
+            $this->manager->get_dashboard_url('/player/' . $row->pmplayerid),
+            $row->pmplayerid,
+            ['target' => '_blank']
+        );
     }
 
     /**

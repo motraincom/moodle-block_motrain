@@ -25,6 +25,8 @@
 
 namespace block_motrain;
 
+use block_motrain\local\api_error;
+use block_motrain\local\client_exception;
 use block_motrain\local\reason\lang_reason;
 use curl;
 use moodle_exception;
@@ -117,16 +119,16 @@ class client {
         }
 
         if ($curl->error) {
-            throw new moodle_exception('request_error', 'block_motrain', '', null, $response);
+            throw new client_exception('request_error', $curl, $response);
         } else if ($curl->info['http_code'] >= 300) {
-            throw new moodle_exception('request_failed', 'block_motrain', '', null, $response);
+            throw new api_error($curl, $response);
         }
 
         $data = null;
         if ($curl->info['http_code'] !== 204) {
             $data = json_decode($response);
             if ($data === null) {
-                throw new moodle_exception('JSON decode failed', 'block_motrain', '', null, $response);
+                throw new client_exception('json_expected', $curl, $response);
             }
         }
 

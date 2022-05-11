@@ -69,30 +69,51 @@ class player_mapper {
         }
 
         $mapping = $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
-        if (empty($mapping) || empty($mapping->playerid)) {
+        if (empty($mapping) || (empty($mapping->playerid) && !$mapping->blocked)) {
             $user = $user ? $user : $this->get_user($userid);
+            $playerid = null;
+            $blockedreason = null;
 
             // Attempt to resolve user on dashboard.
             $player = $this->client->get_player_by_email($teamid, $user->email);
-            if (!$player) {
-                // TODO Handle exception where user already exists.
-                $player = $this->client->create_player($teamid, [
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'email' => $user->email,
-                ]);
+            if ($player) {
+                $playerid = $player->id;
             }
 
-            if (!empty($mapping)) {
-                $mapping->playerid = $player->id;
+            // Attempt to create the user on the dashboard.
+            if (empty($playerid)) {
+                try {
+                    $player = $this->client->create_player($teamid, [
+                        'firstname' => $user->firstname,
+                        'lastname' => $user->lastname,
+                        'email' => $user->email,
+                    ]);
+                    $playerid = $player->id;
+                } catch (api_error $e) {
+                    $blockedreason = $e->get_error_code();
+                } catch (client_exception $e) {
+                    $blockedreason = $e->errorcode;
+                }
+            }
+
+            if (empty($mapping)) {
+                $mapping = (object) [
+                    'accountid' => $this->accountid,
+                    'userid' => $userid
+                ];
+            }
+
+            $mapping->playerid = $playerid;
+            $mapping->blocked = !empty($blockedreason);
+            $mapping->blockedreason = $blockedreason;
+            if (!empty($mapping->id)) {
                 $DB->update_record('block_motrain_playermap', $mapping);
             } else {
-                $mapping = (object) ['accountid' => $this->accountid, 'userid' => $userid, 'playerid' => $player->id];
                 $mapping->id = $DB->insert_record('block_motrain_playermap', $mapping);
             }
         }
 
-        return $mapping->playerid;
+        return $mapping ? $mapping->playerid : null;
     }
 
     /**
