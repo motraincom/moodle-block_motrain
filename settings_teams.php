@@ -34,7 +34,7 @@ $motrainteamid = optional_param('id', null, PARAM_INT);
 $deleteid = optional_param('delete', null, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-admin_externalpage_setup('block_motrain_teammaps');
+admin_externalpage_setup('block_motrain_teams');
 
 $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();

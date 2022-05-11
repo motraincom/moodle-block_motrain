@@ -30,6 +30,7 @@ use block_motrain\local\player_mapper;
 use block_motrain\local\team_resolver;
 use block_motrain\local\user_pusher;
 use block_motrain\task\adhoc_queue_cohort_members_for_push;
+use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -49,6 +50,8 @@ class manager {
     protected $client;
     /** @var collection_strategy|null The collection strategy. */
     protected $collectionstrategy;
+    /** @var string|null The dashboard URL. */
+    protected $dashboardurl;
     /** @var player_mapper|null The player mapper. */
     protected $playermapper;
     /** @var team_resolver|null The team resolver. */
@@ -64,6 +67,7 @@ class manager {
     public function get_account_id() {
         return get_config('block_motrain', 'accountid');
     }
+
 
     public function get_client() {
         if (!isset($this->client)) {
@@ -86,6 +90,23 @@ class manager {
                 $this->get_client());
         }
         return $this->collectionstrategy;
+    }
+
+    /**
+     * Get the dashboard URL.
+     *
+     * @param string $uri The path on the dashboard.
+     */
+    public function get_dashboard_url($uri = '/') {
+        if (!$this->dashboardurl) {
+            $dashboardurl = get_config('block_motrain', 'dashboardurl');
+            $apihost = get_config('block_motrain', 'apihost');
+            if (empty($dashboardurl) && !empty($apihost) && strpos($apihost, '://api.') > 0) {
+                $dashboardurl = str_replace('://api.', '://dashboard.', $apihost);
+            }
+            $this->dashboardurl = rtrim($dashboardurl ? $dashboardurl : 'https://dashboard.motrainapp.com', '/');
+        }
+        return new moodle_url($this->dashboardurl . $uri);
     }
 
     public function get_global_team_association() {

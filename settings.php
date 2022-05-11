@@ -34,12 +34,16 @@ $settingspage->visiblename = get_string('settings', 'core');
 $settings = $category;
 
 // Add page to manage the teams.
-$category->add('block_motrain_category', new admin_externalpage('block_motrain_teammaps',
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
     get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
 
 // Add page to manage the coin rules.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_rules',
     get_string('coinrules', 'block_motrain'), new moodle_url('/blocks/motrain/settings_rules.php')));
+
+// Add page to view the player mapping.
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
+    get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php')));
 
 // Add the admin settings.
 if ($hassiteconfig) {
