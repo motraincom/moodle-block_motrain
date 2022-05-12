@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\addons;
 use block_motrain\manager;
 
 defined('MOODLE_INTERNAL') || die();
@@ -108,11 +109,11 @@ class block_motrain extends block_base {
         $this->content->text = $renderer->main_block_content($manager, null, $config);
 
         // Extend block content hook.
-        // $plugins = get_plugin_list_with_function('mootivatedaddon', 'extend_block_mootivated_content');
-        // foreach ($plugins as $pluginname => $functionname) {
-        //     $this->content->text .= component_callback($pluginname, 'extend_block_mootivated_content',
-        //         [$manager, $school, $renderer], '');
-        // }
+        $plugins = addons::get_list_with_function('extend_block_motrain_content');
+        foreach ($plugins as $pluginname => $functionname) {
+            $this->content->text .= component_callback($pluginname, 'extend_block_motrain_content',
+                [$manager, $renderer, $teamid], '');
+        }
 
         // Include the footer.
         if (!empty($config->footercontent) && !empty($config->footercontent['text'])) {

@@ -238,6 +238,15 @@ class manager {
     }
 
     /**
+     * Whether admins can earn.
+     *
+     * @return bool
+     */
+    public function is_admin_earning_enabled() {
+        return (bool) get_config('block_motrain', 'adminscanearn');
+    }
+
+    /**
      * Whether we should automatically push users.
      *
      * @return bool

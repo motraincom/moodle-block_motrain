@@ -24,27 +24,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\addons;
+
 require_once(__DIR__ . ' /../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
-admin_externalpage_setup('block_motrain_addons');
+admin_externalpage_setup('block_motrain_manageaddons');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('motrainaddons', 'block_motrain'));
 
-$addons = core_plugin_manager::instance()->get_plugins_of_type('motrainaddon');
+$addons = addons::get_addons();
 if (empty($addons)) {
     echo $OUTPUT->notification(get_string('noaddoninstalled', 'block_motrain'), 'nofityinfo');
     echo $OUTPUT->footer();
     die();
 }
 
-$table = new flexible_table('motrainaddons_administration_table');
+$table = new flexible_table('block_motrain_addons_administration_table');
 $table->define_columns(['name', 'enabled', 'settings']);
 $table->define_headers([
-    get_string('subplugintype_mootivatedaddon', 'block_motrain'),
-    get_string('subpluginstate', 'block_motrain'),
+    get_string('addon', 'block_motrain'),
+    get_string('addonstate', 'block_motrain'),
     '',
 ]);
 $table->define_baseurl($PAGE->url);
@@ -61,12 +63,12 @@ core_collator::ksort($plugins);
 foreach ($plugins as $name => $plugin) {
 
     $settingslink = '';
-    $settingsurl = $plugin->get_settings_url();
+    $settingsurl = $plugin->settingsurl;
     if (!empty($settingsurl)) {
         $settingslink = html_writer::link($settingsurl, get_string('setup', 'block_motrain'));
     }
 
-    $enabledstr = $plugin->is_enabled() ? get_string('enabled', 'block_motrain') : get_string('disabled', 'block_motrain');
+    $enabledstr = $plugin->enabled ? get_string('enabled', 'block_motrain') : get_string('disabled', 'block_motrain');
     $summary = html_writer::div($name) . html_writer::div( html_writer::tag('small',
         get_string('plugindescription', $plugin->component)), 'mt-1 text-muted'
     );
@@ -74,7 +76,6 @@ foreach ($plugins as $name => $plugin) {
     $table->add_data([$summary, $enabledstr, $settingslink]);
 }
 
-$table->start_output();
 $table->finish_output();
 
 echo $OUTPUT->footer();

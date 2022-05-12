@@ -37,6 +37,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class block_motrain_renderer extends plugin_renderer_base {
 
+    /** @var bool Whether we already retrieved the appearance page requirements. */
+    protected $appearancepagerequirementset;
+
     /**
      * Coin amount.
      *
@@ -50,14 +53,41 @@ class block_motrain_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Get appearance PAGE requirements.
+     *
+     * Call this when you know that an AMD module will be using the appearance settings,
+     * and append the returned value to tyour
+     *
+     * @return string
+     */
+    public function get_appearance_page_requirements() {
+        if ($this->appearancepagerequirementset) {
+            return '';
+        }
+        $this->appearancepagerequirementset = true;
+
+        $id = html_writer::random_id();
+        $data = $this->get_appearance_settings();
+        $this->page->requires->js_amd_inline('
+            require(["jquery", "block_motrain/appearance"], function($, Appearance) {
+                var data = JSON.parse($("#' . $id . '").text());
+                Appearance.setup(data);
+            });
+        ');
+
+        return $this->json_script($data, $id);
+    }
+
+    /**
      * Get all the appearance settings.
      *
      * @return object
      */
-    public function get_appearance_settings(manager $manager) {
+    public function get_appearance_settings() {
+        $manager = manager::instance();
         return (object) [
             'thousandssep' => get_string('thousandssep', 'langconfig'),
-            'coinsimageurl' => $manager->get_coins_image_url()->out(false),
+            'pointsimageurl' => $manager->get_coins_image_url()->out(false),
         ];
     }
 
@@ -231,7 +261,7 @@ class block_motrain_renderer extends plugin_renderer_base {
         global $USER;
         $coins = $manager->get_balance_proxy()->get_balance($USER);
         return $this->render_from_template('block_motrain/wallet', (object) array_merge(
-            (array) $this->get_appearance_settings($manager),
+            (array) $this->get_appearance_settings(),
             [
                 'coins' => $this->coin_amount($coins),
             ]
