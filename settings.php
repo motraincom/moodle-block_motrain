@@ -48,6 +48,15 @@ $category->add('block_motrain_category', new admin_externalpage('block_motrain_t
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
     get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php')));
 
+// Add the add-ons settings.
+$addoncategory = new admin_category('motrainaddons', new lang_string('motrainaddons', 'block_motrain'));
+$addoncategory->add('motrainaddons', new admin_externalpage('block_motrain_addons', new lang_string('manageaddons',
+    'block_motrain'), new moodle_url('/blocks/motrain/settings_addons.php')));
+$category->add('block_motrain_category', $addoncategory);
+foreach (core_plugin_manager::instance()->get_plugins_of_type('motrainaddon') as $plugin) {
+    $plugin->load_settings($ADMIN, 'root', $hassiteconfig);
+}
+
 // Add the admin settings.
 if ($hassiteconfig) {
 
