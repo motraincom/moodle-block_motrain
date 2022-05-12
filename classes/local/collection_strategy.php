@@ -82,7 +82,7 @@ class collection_strategy {
     public function collect_event(\core\event\base $event) {
         global $DB;
 
-        if (!manager::instance()->is_setup()) {
+        if (!manager::instance()->is_enabled()) {
             return;
         }
 

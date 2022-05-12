@@ -46,8 +46,8 @@ class users_push extends \core\task\scheduled_task {
     public function execute() {
 
         $manager = manager::instance();
-        if (!$manager->is_setup()) {
-            mtrace('Motrain is not setup.');
+        if (!$manager->is_enabled()) {
+            mtrace('Motrain is not enabled.');
             return;
         }
 

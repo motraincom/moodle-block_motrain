@@ -66,6 +66,10 @@ $allrules = completion_coins_calculator::get_all_rules();
 echo $output->header();
 echo $output->heading(get_string('coinrules', 'block_motrain'));
 
+if (!$manager->is_enabled()) {
+    echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
+}
+
 echo $output->react_module('block_motrain/ui-completion-rules-lazy', [
     'courses' => $courses,
     'modules' => $modules,

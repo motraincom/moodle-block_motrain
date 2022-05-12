@@ -89,8 +89,14 @@ class manager {
         return $this->balanceproxy;
     }
 
-    public function get_client() {
-        if (!isset($this->client)) {
+    /**
+     * Get the client.
+     *
+     * @param bool $reload Whether to reload the client.
+     * @return client The client.
+     */
+    public function get_client($reload = false) {
+        if (!isset($this->client) || $reload) {
             $apikey = get_config('block_motrain', 'apikey');
             $apihost = get_config('block_motrain', 'apihost');
             $accountid = get_config('block_motrain', 'accountid');
@@ -167,6 +173,20 @@ class manager {
     }
 
     /**
+     * Get setup hash.
+     *
+     * This is used to check whether the settings have changed.
+     *
+     * @return string
+     */
+    public function get_setup_hash() {
+        $apikey = (string) get_config('block_motrain', 'apikey');
+        $apihost = (string) get_config('block_motrain', 'apihost');
+        $accountid = (string) get_config('block_motrain', 'accountid');
+        return sha1(implode('|', [$apikey, $apihost, $accountid]));
+    }
+
+    /**
      * Get the team resolver.
      *
      * @return team_resolver
@@ -214,9 +234,20 @@ class manager {
      * @return bool
      */
     public function is_enabled() {
-        return true;
+        $isenabled = (bool) get_config('block_motrain', 'isenabled');
+        if (!$isenabled) {
+            return false;
+        }
+        return $this->is_setup();
     }
 
+    /**
+     * Whether the plugin seems setup.
+     *
+     * As in, its settings have been provided.
+     *
+     * @return bool
+     */
     public function is_setup() {
         $apikey = get_config('block_motrain', 'apikey');
         $apihost = get_config('block_motrain', 'apihost');

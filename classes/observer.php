@@ -49,7 +49,7 @@ class observer {
      */
     public static function catch_all(\core\event\base $event) {
         $manager = manager::instance();
-        if (!$manager->is_setup()) {
+        if (!$manager->is_enabled()) {
             return;
         }
 
@@ -78,7 +78,7 @@ class observer {
         global $DB;
 
         $manager = manager::instance();
-        if (!$manager->is_setup()) {
+        if (!$manager->is_enabled()) {
             return;
         } else if (!$manager->is_using_cohorts()) {
             return;
@@ -112,7 +112,7 @@ class observer {
         global $DB;
 
         $manager = manager::instance();
-        if (!$manager->is_setup()) {
+        if (!$manager->is_enabled()) {
             return;
         } else if (!$manager->is_using_cohorts()) {
             return;

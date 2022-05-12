@@ -25,6 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+require_once($CFG->dirroot . '/blocks/motrain/lib.php');
+
 $category = new admin_category('block_motrain_category', get_string('pluginname', 'block_motrain'));
 $category->add('block_motrain_category', $settings);
 
@@ -48,22 +51,31 @@ $category->add('block_motrain_category', new admin_externalpage('block_motrain_p
 // Add the admin settings.
 if ($hassiteconfig) {
 
-    $settingspage->add(new admin_setting_configtext('block_motrain/accountid', get_string('accountid', 'block_motrain'),
-        get_string('accountid_desc', 'block_motrain'), ''));
+    $settingspage->add(new block_motrain\local\setting\is_enabled());
+
+    $setting = new admin_setting_configtext('block_motrain/accountid', get_string('accountid', 'block_motrain'),
+        get_string('accountid_desc', 'block_motrain'), '');
+    $setting->set_updatedcallback('block_motrain_check_enabled_state');
+    $settingspage->add($setting);
 
     $hosts = [
         'https://api.motrainapp.com' => 'api.motrainapp.com',
         'https://api.eu.motrainapp.com' => 'api.eu.motrainapp.com',
         'https://api.dev.motrainapp.com' => 'api.dev.motrainapp.com',
     ];
-    $settingspage->add(new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
-        get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts));
+    $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
+        get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts);
+    $setting->set_updatedcallback('block_motrain_check_enabled_state');
+    $settingspage->add($setting);
 
-    $settingspage->add(new admin_setting_configpasswordunmask('block_motrain/apikey', get_string('apikey', 'block_motrain'),
-        get_string('apikey_desc', 'block_motrain'), ''));
+    $setting = new admin_setting_configpasswordunmask('block_motrain/apikey', get_string('apikey', 'block_motrain'),
+        get_string('apikey_desc', 'block_motrain'), '');
+    $setting->set_updatedcallback('block_motrain_check_enabled_state');
+    $settingspage->add($setting);
 
-    $settingspage->add(new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),
-        get_string('usecohorts_help', 'block_motrain'), true));
+    $setting = new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),
+        get_string('usecohorts_help', 'block_motrain'), true);
+    $settingspage->add($setting);
 
     $settingspage->add(new admin_setting_configcheckbox('block_motrain/adminscanearn',
         get_string('adminscanearn', 'block_motrain'), get_string('adminscanearn_desc', 'block_motrain'), false));

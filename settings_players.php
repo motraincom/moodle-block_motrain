@@ -34,11 +34,10 @@ admin_externalpage_setup('block_motrain_players');
 $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();
 
-if (!$manager->is_setup()) {
+if (!$manager->is_enabled()) {
     echo $output->header();
     echo $output->heading(get_string('playersmapping', 'block_motrain'));
-    // TODO Display error when not configured.
-    // echo $output->notification('Whoops!', 'error');
+    echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
     echo $output->footer();
     die();
 }

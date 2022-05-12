@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\local\client_exception;
+use block_motrain\manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -55,3 +58,28 @@ function block_motrain_pluginfile($course, $bi, $context, $filearea, $args, $for
 
     send_stored_file($file, null, 0, true);
 }
+
+/**
+ * Check enabled state.
+ *
+ * Do not declare any parameters, this function is used as a callback. It can also be
+ * called multiple times in a row, for example when a few settings aresaved at once.
+ */
+function block_motrain_check_enabled_state() {
+    $manager = manager::instance();
+
+    if (!$manager->is_setup()) {
+        set_config('isenabled', false, 'block_motrain');
+        return;
+    }
+
+    $client = $manager->get_client(true);
+    try {
+        $account = $client->get_account();
+    } catch (client_exception $e) {
+        set_config('isenabled', false, 'block_motrain');
+        return;
+    }
+
+    set_config('isenabled', true, 'block_motrain');
+};

@@ -82,6 +82,10 @@ class client {
         return $this->post('/v2/teams/' . $teamid . '/users', $data);
     }
 
+    public function get_account() {
+        return $this->get('/v2/accounts/' . $this->accountid);
+    }
+
     public function get_balance($playerid) {
         $resp = $this->get('/v2/users/' . $playerid . '/balance');
         return $resp->coins;

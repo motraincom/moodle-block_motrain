@@ -39,11 +39,10 @@ admin_externalpage_setup('block_motrain_teams');
 $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();
 
-if (!$manager->is_setup()) {
+if (!$manager->is_enabled()) {
     echo $output->header();
     echo $output->heading(get_string('teamassociations', 'block_motrain'));
-    // TODO Display error when not configured.
-    // echo $output->notification('Whoops!', 'error');
+    echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
     echo $output->footer();
     die();
 }
@@ -74,7 +73,7 @@ $globalassociation = $manager->get_global_team_association();
 // Process the form submission.
 $form = new team_form($currenturl->out(false), ['isusingcohorts' => $isusingcohorts, 'globalassociation' => $globalassociation,
     'teams' => $teamsbyid, 'isedit' => (bool) $motrainteamid]);
-if ($manager->is_setup() && $motrainteamid !== null) {
+if ($motrainteamid !== null) {
 
     if ($motrainteamid) {
         $association = $DB->get_record('block_motrain_teammap', ['id' => $motrainteamid], '*', MUST_EXIST);
@@ -111,14 +110,6 @@ if ($manager->is_setup() && $motrainteamid !== null) {
 
 // Display the page.
 echo $output->header();
-
-if (!$manager->is_setup()) {
-    echo $output->heading(get_string('teamassociations', 'block_motrain'));
-    // TODO Display error when not configured.
-    // echo $output->notification('Whoops!', 'error');
-    echo $output->footer();
-    die();
-}
 
 if ($motrainteamid !== null) {
     if ($motrainteamid) {
