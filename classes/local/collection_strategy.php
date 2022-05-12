@@ -49,6 +49,8 @@ class collection_strategy {
     protected $adminscanearn = false;
     /** @var array Allowed contexts. */
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
+    /** @var balance_proxy The balance proxy. */
+    protected $balanceproxy;
     /** @var client The client. */
     protected $client;
     /** @var completion_coins_calculator The calculator. */
@@ -63,12 +65,13 @@ class collection_strategy {
     /**
      * Constructor.
      */
-    public function __construct($teamresolver, $playermapper, client $client) {
+    public function __construct($teamresolver, $playermapper, client $client, balance_proxy $balanceproxy) {
         $this->adminscanearn = (bool) get_config('block_motrain', 'adminscanearn');
         $this->completioncoinscalculator = new completion_coins_calculator();
         $this->client = $client;
         $this->teamresolver = $teamresolver;
         $this->playermapper = $playermapper;
+        $this->balanceproxy = $balanceproxy;
     }
 
     /**
@@ -234,6 +237,7 @@ class collection_strategy {
         }
 
         $this->client->add_coins($playerid, $coins, $reason);
+        $this->balanceproxy->invalidate_balance($userid);
     }
 
     /**

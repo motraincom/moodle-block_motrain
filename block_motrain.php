@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
@@ -36,6 +38,7 @@ require_once($CFG->dirroot . '/blocks/moodleblock.class.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_motrain extends block_base {
+
     /**
      * Applicable formats.
      *
@@ -80,30 +83,29 @@ class block_motrain extends block_base {
         $this->content->footer = '';
 
         $config = $this->config;
+        $manager = manager::instance();
+        $canmanage = has_capability('block/motrain:addinstance', $PAGE->context);
+        $canview = $canmanage || has_capability('block/motrain:view', $PAGE->context);
 
-        // $manager = new manager($USER, $PAGE->context, helper::get_school_resolver());
-        // $canmanage = $manager->can_manage();
-        // $canview = $manager->can_view() || $canmanage;
+        // Hide the block to non-logged in users, guests and those who cannot view the block.
+        if (!$USER->id || isguestuser() || !$canview) {
+            return $this->content;
+        }
 
-        // // Hide the block to non-logged in users, guests and those who cannot view the block.
-        // if (!$USER->id || isguestuser() || !$canview) {
-        //     return $this->content;
-        // }
+        // Get the user's team.
+        $teamid = $manager->get_team_resolver()->get_team_id_for_user($USER->id);
+        if (!$teamid && !$canmanage) {
+            return $this->content;
+        }
 
-        // // Get the user's school.
-        // $school = $manager->get_school();
-        // if (!$school && !$canmanage) {
-        //     return $this->content;
-        // }
+        $renderer = $this->page->get_renderer('block_motrain');
 
-        // $renderer = $this->page->get_renderer('block_mootivated');
-        // if (!$school && $canmanage) {
-        //     // Display content for managers.
-        //     $this->content->text = $renderer->main_block_content_for_managers($manager, null, $config);
-        // } else {
-        //     // Display content for everyone.
-        //     $this->content->text = $renderer->main_block_content($manager, null, $config);
-        // }
+        if (!$manager->is_enabled()) {
+            $this->content->text = $renderer->notification(get_string('notenabled', 'block_motrain'), 'info');
+            return $this->content;
+        }
+
+        $this->content->text = $renderer->main_block_content($manager, null, $config);
 
         // Extend block content hook.
         // $plugins = get_plugin_list_with_function('mootivatedaddon', 'extend_block_mootivated_content');

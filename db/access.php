@@ -27,6 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
 
+    // Whether the user can access the dashboard.
+    'block/motrain:accessdashboard' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        ),
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    ],
+
     // Whether or not the user can add the block.
     'block/motrain:addinstance' => array(
         'captype' => 'write',

@@ -82,12 +82,26 @@ class client {
         return $this->post('/v2/teams/' . $teamid . '/users', $data);
     }
 
+    public function get_balance($playerid) {
+        $resp = $this->get('/v2/users/' . $playerid . '/balance');
+        return $resp->coins;
+    }
+
     public function get_player_by_email($teamid, $email) {
         $resp = $this->get('/v2/teams/' . $teamid . '/users', ['email' => $email]);
         if (!empty($resp)) {
             return $resp[0];
         }
         return null;
+    }
+
+    public function get_store_login_url($playerid, $landingpage = null) {
+        $params = null;
+        if (in_array($landingpage, ['shop', 'info', 'leaderboards', 'purchases', 'activity'])) {
+            $params = ['landing_page' => $landingpage];
+        }
+        $resp = $this->post('/v2/users/' . $playerid . '/store_login_url', $params);
+        return $resp->url;
     }
 
     public function get_teams() {

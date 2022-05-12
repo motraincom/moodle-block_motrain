@@ -4,6 +4,7 @@
     overflow-x: visible;
 }
 
+/** React selector. */
 .block_motrain-selector {
     display: flex;
 }
@@ -20,6 +21,7 @@
     margin-top: 0 !important; /* stylelint-disable-line */
 }
 
+/** Rules */
 .block_motrain-rule-item {
     margin: 0.5rem 0;
 }
@@ -35,7 +37,6 @@
 .block_motrain-rule-item-field {
     width: 8rem;
 }
-
 .block_motrain-section {
     margin-bottom: 1rem;
 }
@@ -57,4 +58,63 @@
     border-left: 3px solid #efefef;
     padding-left: 16px;
     margin-top: 4px;
+}
+
+/** Block wallet. */
+.block_motrain-wallet {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: -10px;
+}
+.block_motrain-wallet .pic {
+    justify-content: center;
+    margin: 0 0.5rem;
+    margin-top: 10px;
+}
+.block_motrain-wallet .pic img {
+    height: 60px;
+}
+.block_motrain-wallet .coins {
+    align-self: center;
+    margin-top: 10px;
+}
+.block_motrain-wallet .amount {
+    font-size: 150%;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.block_motrain-wallet .legend {
+    font-size: 85%;
+    color: #666;
+}
+
+/** Block navigation. */
+.block_motrain nav {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    align-items: stretch;
+    margin-top: 1em;
+}
+.block_motrain nav .nav-button {
+    flex: 1;
+    align-self: auto;
+    text-decoration: none;
+    color: #333;
+    font-size: 80%;
+    padding: 5px 5px 0;
+}
+.block_motrain nav .nav-button .icon {
+    margin: 0;
+    padding: 0;
+}
+.block_motrain nav .nav-button .icon,
+.block_motrain nav .nav-button .smallicon {
+    width: 16px;
+    height: 16px;
+}
+.block_motrain nav .nav-button:hover {
+    background: #eee;
 }

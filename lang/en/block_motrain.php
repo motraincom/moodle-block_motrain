@@ -25,7 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['infopagetitle'] = 'Info';
+$string['store'] = 'Store';
+$string['purchases'] = 'My purchases';
+$string['leaderboard'] = 'Leaderboard';
+$string['dashboard'] = 'Dashboard';
 $string['editassociation'] = 'Edit association';
+$string['playeridnotfound'] = 'The player associated with the current user could not be found, please contact the adminstrator.';
+$string['userteamnotfound'] = 'The team of the current user could not be found, please contact the adminstrator.';
 $string['createassociation'] = 'Create association';
 $string['addactivityellipsis'] = 'Add activity...';
 $string['addcourseellipsis'] = 'Add course...';
@@ -41,6 +48,8 @@ $string['accountid'] = 'Account ID';
 $string['accountid_desc'] = 'The ID of the account.';
 $string['cachedef_comprules'] = 'Completion rules';
 $string['coins'] = 'Coins';
+$string['coinsimage'] = 'Coins image';
+$string['coinsimage_help'] = 'Use setting to use an alternate image representing the coins displayed in the block.';
 $string['coursecompletion'] = 'Course completion';
 $string['completingn'] = 'Completing {$a}';
 $string['completingacourse'] = 'Completing a course';
@@ -59,8 +68,10 @@ $string['motrain:addinstance'] = 'Add a new Motrain block';
 $string['motrain:myaddinstance'] = 'Add the Motrain block on the dashboard';
 $string['motrain:view'] = 'View the content of the Motrain block';
 $string['nocohortallusers'] = 'All users';
+$string['notenabled'] = 'The plugin is not enabled, please contact your administrator.';
 $string['nooptions'] = 'No options';
 $string['playerid'] = 'Player ID';
+$string['pleasewait'] = 'Please wait...';
 $string['saving'] = "Saving...";
 $string['saverules'] = "Save rules";
 $string['taskpushusers'] = 'Push users to dashboard';

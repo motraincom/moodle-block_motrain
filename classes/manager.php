@@ -25,11 +25,16 @@
 
 namespace block_motrain;
 
+use block_motrain\local\api_error;
+use block_motrain\local\balance_proxy;
+use block_motrain\local\client_exception;
 use block_motrain\local\collection_strategy;
 use block_motrain\local\player_mapper;
 use block_motrain\local\team_resolver;
 use block_motrain\local\user_pusher;
 use block_motrain\task\adhoc_queue_cohort_members_for_push;
+use cache;
+use context_system;
 use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
@@ -46,10 +51,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 class manager {
 
+    /** @var balance_proxy|null The balance proxy. */
+    protected $balanceproxy;
     /** @var client|null The client. */
     protected $client;
     /** @var collection_strategy|null The collection strategy. */
     protected $collectionstrategy;
+    /** @var cache The coins cache. */
+    protected $coinscache;
     /** @var string|null The dashboard URL. */
     protected $dashboardurl;
     /** @var player_mapper|null The player mapper. */
@@ -68,6 +77,17 @@ class manager {
         return get_config('block_motrain', 'accountid');
     }
 
+    /**
+     * Get the balance proxy.
+     *
+     * @return balance_proxy
+     */
+    public function get_balance_proxy() {
+        if (!$this->balanceproxy) {
+            $this->balanceproxy = new balance_proxy($this);
+        }
+        return $this->balanceproxy;
+    }
 
     public function get_client() {
         if (!isset($this->client)) {
@@ -80,6 +100,25 @@ class manager {
     }
 
     /**
+     * Get the coins image URL.
+     *
+     * @return moodle_url
+     */
+    public static function get_coins_image_url() {
+        global $PAGE;
+        $renderer = $PAGE->get_renderer('block_motrain');
+        $imagename = get_config('block_motrain', 'coinsimage');
+        $url = null;
+        if ($imagename) {
+            $url = moodle_url::make_pluginfile_url(SYSCONTEXTID, 'block_motrain', 'coinsimage', 0, '', $imagename);
+        }
+        if (!$url) {
+            $url = $renderer->pix_url('coins', 'block_motrain');
+        }
+        return $url;
+    }
+
+    /**
      * Get the collection strategy.
      *
      * @return collection_strategy
@@ -87,7 +126,7 @@ class manager {
     public function get_collection_strategy() {
         if (!$this->collectionstrategy) {
             $this->collectionstrategy = new collection_strategy($this->get_team_resolver(), $this->get_player_mapper(),
-                $this->get_client());
+                $this->get_client(), $this->get_balance_proxy());
         }
         return $this->collectionstrategy;
     }
@@ -158,13 +197,6 @@ class manager {
         return $DB->record_exists('block_motrain_teammap', ['accountid' => $accountid]);
     }
 
-    public function is_setup() {
-        $apikey = get_config('block_motrain', 'apikey');
-        $apihost = get_config('block_motrain', 'apihost');
-        $accountid = get_config('block_motrain', 'accountid');
-        return !empty($apikey) && !empty($apihost) && !empty($accountid);
-    }
-
     /**
      * Whether we should automatically push users.
      *
@@ -175,12 +207,51 @@ class manager {
     }
 
     /**
+     * Whether the plugin is enabled.
+     *
+     * The plugin is disabled until it is setup properly.
+     *
+     * @return bool
+     */
+    public function is_enabled() {
+        return true;
+    }
+
+    public function is_setup() {
+        $apikey = get_config('block_motrain', 'apikey');
+        $apihost = get_config('block_motrain', 'apihost');
+        $accountid = get_config('block_motrain', 'accountid');
+        return !empty($apikey) && !empty($apihost) && !empty($accountid);
+    }
+
+    /**
      * Whether we are using cohorts.
      *
      * @return bool
      */
     public function is_using_cohorts() {
         return (bool) get_config('block_motrain', 'usecohorts');
+    }
+
+    /**
+     * Require enabled.
+     *
+     * @throws \moodle_exception
+     */
+    public function require_enabled() {
+        if (!$this->is_enabled()) {
+            throw new \moodle_exception('notenabled', 'block_motrain');
+        }
+    }
+
+    /**
+     * Require view permissions.
+     *
+     * @throws \required_capability_exception
+     */
+    public function require_view() {
+        global $PAGE;
+        require_capability('block/motrain:view', $PAGE->context);
     }
 
     /**

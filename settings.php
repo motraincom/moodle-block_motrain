@@ -72,4 +72,8 @@ if ($hassiteconfig) {
         get_string('autopush_help', 'block_motrain'), false);
     $settingspage->add($setting);
 
+    $setting = new admin_setting_configstoredfile('block_motrain/coinsimage', get_string('coinsimage', 'block_motrain'),
+        get_string('coinsimage_help', 'block_motrain'), 'coinsimage', 0, ['accepted_types' => ['image']]);
+    $settingspage->add($setting);
+
 }
