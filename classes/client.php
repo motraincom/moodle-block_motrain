@@ -52,6 +52,8 @@ class client {
     protected $apihost;
     /** @var string The account ID. */
     protected $accountid;
+    /** @var object An observer. */
+    protected $observer;
 
     /**
      * Constructor.
@@ -136,10 +138,21 @@ class client {
             $response = $curl->get($url->out(false));
         }
 
-        if ($curl->error) {
-            throw new client_exception('request_error', $curl, $response);
-        } else if ($curl->info['http_code'] >= 300) {
-            throw new api_error($curl, $response);
+        try {
+            if ($curl->error) {
+                throw new client_exception('request_error', $curl, $response);
+            } else if ($curl->info['http_code'] >= 300) {
+                throw new api_error($curl, $response);
+            }
+        } catch (client_exception $e) {
+            if ($this->observer && method_exists($this->observer, 'observe_failed_request')) {
+                try {
+                    $this->observer->observe_failed_request($e);
+                } catch (\Exception $observerexception) {
+                    debugging('Client observer threw an exception: ' . $observerexception->getMessage(), DEBUG_DEVELOPER);
+                }
+            }
+            throw $e;
         }
 
         $data = null;
@@ -151,6 +164,10 @@ class client {
         }
 
         return $data;
+    }
+
+    public function set_observer($observer) {
+        $this->observer = $observer;
     }
 
 }

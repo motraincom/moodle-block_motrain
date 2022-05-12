@@ -68,13 +68,4 @@ class api_error extends client_exception {
         return is_object($this->responsedecoded) ? $this->responsedecoded->message : 'Unknown error';
     }
 
-    /**
-     * Get the HTTP code.
-     *
-     * @return int
-     */
-    public function get_http_code() {
-        return $this->curl->info['http_code'];
-    }
-
 }

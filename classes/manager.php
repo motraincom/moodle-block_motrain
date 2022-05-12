@@ -67,12 +67,35 @@ class manager {
     protected $teamresolver;
     /** @var user_pusher|null The user pusher. */
     protected $userpusher;
+
     /** @var static The singleton. */
     protected static $instance;
 
-    public function __construct() {
+    /**
+     * Check the enabled state.
+     */
+    public function check_enabled_state() {
+        if (!$this->is_setup()) {
+            set_config('isenabled', false, 'block_motrain');
+            return;
+        }
+
+        $client = $this->make_client();
+        try {
+            $account = $client->get_account();
+        } catch (client_exception $e) {
+            set_config('isenabled', false, 'block_motrain');
+            return;
+        }
+
+        set_config('isenabled', true, 'block_motrain');
     }
 
+    /**
+     * Get the account ID.
+     *
+     * @return string|false
+     */
     public function get_account_id() {
         return get_config('block_motrain', 'accountid');
     }
@@ -92,15 +115,12 @@ class manager {
     /**
      * Get the client.
      *
-     * @param bool $reload Whether to reload the client.
      * @return client The client.
      */
-    public function get_client($reload = false) {
-        if (!isset($this->client) || $reload) {
-            $apikey = get_config('block_motrain', 'apikey');
-            $apihost = get_config('block_motrain', 'apihost');
-            $accountid = get_config('block_motrain', 'accountid');
-            $this->client = new client($apihost, $apikey, $accountid);
+    public function get_client() {
+        if (!isset($this->client)) {
+            $this->client = $this->make_client();
+            $this->client->set_observer($this);
         }
         return $this->client;
     }
@@ -262,6 +282,38 @@ class manager {
      */
     public function is_using_cohorts() {
         return (bool) get_config('block_motrain', 'usecohorts');
+    }
+
+    /**
+     * Make the client.
+     *
+     * This should not attach any observer.
+     *
+     * @return client The client.
+     */
+    protected function make_client() {
+        $apikey = get_config('block_motrain', 'apikey');
+        $apihost = get_config('block_motrain', 'apihost');
+        $accountid = get_config('block_motrain', 'accountid');
+        return new client($apihost, $apikey, $accountid);
+    }
+
+    /**
+     * Observe failed requests.
+     *
+     * @param client_exception $e The exception.
+     */
+    public function observe_failed_request(client_exception $e) {
+        // Automatically disable the plugin when the API reports that it is not authenticated, or when
+        // API usage has been locked. The latter can happen when the account is in an invalid state, and
+        // should no longer interact with the API at all.
+        if ($e instanceof api_error && $e->get_http_code() === 401) {
+            debugging('Disabling block_motrain plugin due to authentication issue with API.', DEBUG_DEVELOPER);
+            set_config('enabled', false, 'block_motrain');
+        } else if ($e instanceof api_error && $e->get_http_code() === 423) {
+            debugging('Disabling block_motrain plugin: API locked.', DEBUG_DEVELOPER);
+            set_config('enabled', false, 'block_motrain');
+        }
     }
 
     /**

@@ -67,19 +67,5 @@ function block_motrain_pluginfile($course, $bi, $context, $filearea, $args, $for
  */
 function block_motrain_check_enabled_state() {
     $manager = manager::instance();
-
-    if (!$manager->is_setup()) {
-        set_config('isenabled', false, 'block_motrain');
-        return;
-    }
-
-    $client = $manager->get_client(true);
-    try {
-        $account = $client->get_account();
-    } catch (client_exception $e) {
-        set_config('isenabled', false, 'block_motrain');
-        return;
-    }
-
-    set_config('isenabled', true, 'block_motrain');
+    $manager->check_enabled_state();
 };

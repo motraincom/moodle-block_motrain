@@ -40,6 +40,8 @@ class client_exception extends moodle_exception {
 
     /** @var curl The curl. */
     protected $curl;
+    /** @var curl The HTTP error code. */
+    protected $httpcode;
     /** @var string The response. */
     protected $response;
 
@@ -60,6 +62,15 @@ class client_exception extends moodle_exception {
             'response' => $response,
         ]);
         parent::__construct($error, 'block_motrain', '', null, $debuginfo);
+    }
+
+    /**
+     * Get the HTTP code.
+     *
+     * @return int Zero when unknown.
+     */
+    public function get_http_code() {
+        return !empty($this->curl->info['http_code']) ? $this->curl->info['http_code'] : 0;
     }
 
 }
