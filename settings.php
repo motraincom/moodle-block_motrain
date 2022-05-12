@@ -36,13 +36,13 @@ $settingspage = $settings;
 $settingspage->visiblename = get_string('settings', 'core');
 $settings = $category;
 
-// Add page to manage the teams.
-$category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
-    get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
-
 // Add page to manage the coin rules.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_rules',
     get_string('coinrules', 'block_motrain'), new moodle_url('/blocks/motrain/settings_rules.php')));
+
+// Add page to manage the teams.
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
+    get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
 
 // Add page to view the player mapping.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
@@ -60,8 +60,7 @@ if ($hassiteconfig) {
 
     $hosts = [
         'https://api.motrainapp.com' => 'api.motrainapp.com',
-        'https://api.eu.motrainapp.com' => 'api.eu.motrainapp.com',
-        'https://api.dev.motrainapp.com' => 'api.dev.motrainapp.com',
+        'https://api.eu.motrainapp.com' => 'api.eu.motrainapp.com'
     ];
     $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
         get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts);
