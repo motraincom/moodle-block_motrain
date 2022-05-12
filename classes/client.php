@@ -73,9 +73,11 @@ class client {
         $data = ['coins' => $coins];
         if ($reason) {
             $data['reason'] = [
-                'string' => $reason->get_string(),
-                'args' => $reason->get_args()
+                'string' => $reason->get_string()
             ];
+            if ($reason->get_args() !== null) {
+                $data['reason']['args'] = $reason->get_args();
+            }
         }
         return $this->post('/v2/users/' . $playerid . '/balance', $data);
     }
