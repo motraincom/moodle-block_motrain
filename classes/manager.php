@@ -309,10 +309,10 @@ class manager {
         // should no longer interact with the API at all.
         if ($e instanceof api_error && $e->get_http_code() === 401) {
             debugging('Disabling block_motrain plugin due to authentication issue with API.', DEBUG_DEVELOPER);
-            set_config('enabled', false, 'block_motrain');
+            set_config('isenabled', false, 'block_motrain');
         } else if ($e instanceof api_error && $e->get_http_code() === 423) {
             debugging('Disabling block_motrain plugin: API locked.', DEBUG_DEVELOPER);
-            set_config('enabled', false, 'block_motrain');
+            set_config('isenabled', false, 'block_motrain');
         }
     }
 

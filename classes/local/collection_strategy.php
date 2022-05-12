@@ -31,6 +31,7 @@ use block_motrain\manager;
 use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -163,14 +164,7 @@ class collection_strategy {
                     $reasonargs = null;
                 }
                 $reason = new lang_reason($reasonstr, $reasonargs);
-
-                $this->award_coins($teamid, $userid, $coins, $reason);
-
-                $DB->insert_record('block_motrain_log', array_merge($params, [
-                    'coins' => $coins,
-                    'timecreated' => time(),
-                    'timebroadcasted' => time()
-                ]));
+                $this->award_coins_and_log($teamid, $userid, $coins, $params, $reason);
             }
 
         } else if ($event instanceof course_completed) {
@@ -202,16 +196,10 @@ class collection_strategy {
                 $reasonstr = 'transaction:credit.coursecompleted';
                 $reasonargs = null;
             }
+
             $reason = new lang_reason($reasonstr, $reasonargs);
-
             $coins = $this->completioncoinscalculator->get_course_coins($event->courseid);
-            $this->award_coins($teamid, $userid, $coins);
-
-            $DB->insert_record('block_motrain_log', array_merge($params, [
-                'coins' => $coins,
-                'timecreated' => time(),
-                'timebroadcasted' => time()
-            ]));
+            $this->award_coins_and_log($teamid, $userid, $coins, $params, $reason);
         }
     }
 
@@ -230,14 +218,58 @@ class collection_strategy {
             return;
         }
 
-        // TODO Save failures.
         $playerid = $this->playermapper->get_player_id($userid, $teamid);
         if (!$playerid) {
-            return;
+            throw new \moodle_exception('playeridnotfound', 'block_motrain');
         }
 
         $this->client->add_coins($playerid, $coins, $reason);
         $this->balanceproxy->invalidate_balance($userid);
+    }
+
+    /**
+     * Award coins.
+     *
+     * @param string $teamid The team ID.
+     * @param int $userid The user ID.
+     * @param int $coins The number of coins.
+     * @param array $logparams Containing userid, contextid, actionname and actionhash.
+     * @param lang_reason $reason The reason.
+     */
+    protected function award_coins_and_log($teamid, $userid, $coins, $logparams, lang_reason $reason = null) {
+        global $DB;
+
+        $broadcasted = time();
+        $broadcasterror = null;
+        $rethrow = null;
+
+        try {
+            $this->award_coins($teamid, $userid, $coins, $reason);
+        } catch (api_error $e) {
+            $broadcasted = 0;
+            $broadcasterror = 'HTTP ' . $e->get_http_code() . ' ' . $e->get_error_code();
+        } catch (client_exception $e) {
+            $broadcasted = 0;
+            $broadcasterror = 'HTTP ' . $e->get_http_code() . ' ' . $e->getMessage();
+        } catch (moodle_exception $e) {
+            $broadcasted = 0;
+            $broadcasterror = $e->errorcode;
+            // We passively handle the player ID not found.
+            if ($e->errorcode !== 'playeridnotfound') {
+                $rethrow = $e;
+            }
+        }
+
+        $DB->insert_record('block_motrain_log', array_merge($logparams, [
+            'coins' => $coins,
+            'timecreated' => time(),
+            'timebroadcasted' => $broadcasted,
+            'broadcasterror' => $broadcasterror
+        ]));
+
+        if ($rethrow) {
+            throw $e;
+        }
     }
 
     /**

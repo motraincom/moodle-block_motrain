@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/motrain/db" VERSION="20220511" COMMENT="XMLDB file for Moodle blocks/motrain"
+<XMLDB PATH="blocks/motrain/db" VERSION="20220512" COMMENT="XMLDB file for Moodle blocks/motrain"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -59,6 +59,7 @@
         <FIELD NAME="actionhash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timebroadcasted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="broadcasterror" TYPE="char" LENGTH="512" NOTNULL="false" SEQUENCE="false" COMMENT="The last error encountered when the broadcast failed."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
