@@ -31,6 +31,9 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('block_motrain_players');
 
+$action = optional_param('action', null, PARAM_ALPHANUMEXT);
+$userid = optional_param('userid', null, PARAM_ALPHANUMEXT);
+
 $output = $PAGE->get_renderer('block_motrain');
 $manager = manager::instance();
 
@@ -42,9 +45,18 @@ if (!$manager->is_enabled()) {
     die();
 }
 
+if ($action === 'delete' && confirm_sesskey()) {
+    $manager->get_player_mapper()->remove_user($userid);
+    redirect($PAGE->url);
+} else if ($action === 'reset' && confirm_sesskey()) {
+    $manager->get_player_mapper()->unblock_user($userid);
+    redirect($PAGE->url);
+}
+
 // Display the page.
 echo $output->header();
 echo $output->heading(get_string('playersmapping', 'block_motrain'));
+echo html_writer::tag('p', get_string('playermappingintro', 'block_motrain'));
 $table = new players_mapping_table($manager);
 $table->define_baseurl($PAGE->url);
 $table->out(50, true);

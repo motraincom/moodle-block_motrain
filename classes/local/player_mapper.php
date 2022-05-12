@@ -133,4 +133,24 @@ class player_mapper {
         return $user;
     }
 
+    /**
+     * Remove the mapping for user.
+     *
+     * @param int $userid The user ID.
+     */
+    public function remove_user($userid) {
+        global $DB;
+        $DB->delete_records('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
+    }
+
+    /**
+     * Unblock the user.
+     *
+     * @param int $userid The user ID.
+     */
+    public function unblock_user($userid) {
+        global $DB;
+        $DB->set_field('block_motrain_playermap', 'blocked', 0, ['accountid' => $this->accountid, 'userid' => $userid]);
+    }
+
 }

@@ -73,6 +73,7 @@ $string['nocohortallusers'] = 'All users';
 $string['notenabled'] = 'The plugin is not enabled, please contact your administrator.';
 $string['nooptions'] = 'No options';
 $string['playerid'] = 'Player ID';
+$string['playermappingintro'] = 'A player mapping is the association between a local user and a player on the Motrain dashboard. You can find the list of known mappings below. Mappings with an error will not be re-attempted, please fix the issue and reset the mapping.';
 $string['pleasewait'] = 'Please wait...';
 $string['pluginnotenabledseesettings'] = 'The plugin is not enabled, please see its settings.';
 $string['saving'] = "Saving...";

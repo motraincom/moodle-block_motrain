@@ -28,10 +28,14 @@ namespace block_motrain\output;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
 
+use action_link;
 use block_motrain\manager;
 use stdClass;
 use table_sql;
 use block_motrain\local\user_utils;
+use confirm_action;
+use moodle_url;
+use pix_icon;
 
 /**
  * Table.
@@ -66,7 +70,7 @@ class players_mapping_table extends table_sql {
         $columns = [
             'fullname' => get_string('fullname', 'core'),
             'playerid' => get_string('playerid', 'block_motrain'),
-            'blocked' => '',
+            'blocked' => get_string('error', 'core'),
             'actions' => ''
         ];
         $this->define_columns(array_keys($columns));
@@ -94,7 +98,20 @@ class players_mapping_table extends table_sql {
      * @return string Output produced.
      */
     protected function col_actions($row) {
-        return '';
+        $actions = [];
+        if (!empty($row->pmblocked)) {
+            $actions[] = $this->renderer->action_icon(
+                new moodle_url($this->baseurl, ['action' => 'reset', 'userid' => $row->id, 'sesskey' => sesskey()]),
+                new pix_icon('t/reset', get_string('reset', 'core')),
+                new confirm_action(get_string('areyousure', 'core'))
+            );
+        }
+        $actions[] = $this->renderer->action_icon(
+            new moodle_url($this->baseurl, ['action' => 'delete', 'userid' => $row->id, 'sesskey' => sesskey()]),
+            new pix_icon('t/delete', get_string('delete', 'core')),
+            new confirm_action(get_string('areyousure', 'core'))
+        );
+        return implode(' ', $actions);
     }
 
     /**
@@ -105,7 +122,7 @@ class players_mapping_table extends table_sql {
      */
     protected function col_blocked($row) {
         if (empty($row->pmblocked)) {
-            return '';
+            return '-';
         }
         return '⚠ ' . $row->pmblockedreason;
     }
