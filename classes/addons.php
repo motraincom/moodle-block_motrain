@@ -50,6 +50,9 @@ class addons {
         return array_map(function($plugin) {
             $hassettings = file_exists($plugin->full_path('settings.php'));
             $settingsurl = new moodle_url('/admin/settings.php', ['section' => $plugin->component]);
+            if ($hassettings && component_callback_exists($plugin->component, 'get_settings_page_url')) {
+                $settingsurl = component_callback($plugin->component, 'get_settings_page_url');
+            }
             return (object) [
                 'component' => $plugin->component,
                 'displayname' => $plugin->displayname,
