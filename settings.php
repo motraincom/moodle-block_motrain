@@ -83,7 +83,8 @@ if ($hassiteconfig) {
     $setting = new static_content('block_motrain/metadatacache', get_string('metadatacache', 'block_motrain'),
         get_string('metadatacache_help', 'block_motrain'),
             html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'purgemetadata', 'sesskey' => sesskey(),
-                'returnurl' => $PAGE->url->out_as_local_url()]), get_string('purgecache', 'block_motrain'))
+                'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
+                get_string('purgecache', 'block_motrain'))
     );
     $settingspage->add($setting);
 
