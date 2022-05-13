@@ -87,22 +87,23 @@ class block_motrain extends block_base {
         $manager = manager::instance();
         $canmanage = has_capability('block/motrain:addinstance', $PAGE->context);
         $canview = $canmanage || has_capability('block/motrain:view', $PAGE->context);
+        $renderer = $this->page->get_renderer('block_motrain');
 
         // Hide the block to non-logged in users, guests and those who cannot view the block.
         if (!$USER->id || isguestuser() || !$canview) {
             return $this->content;
         }
 
-        // Get the user's team.
-        $teamid = $manager->get_team_resolver()->get_team_id_for_user($USER->id);
-        if (!$teamid && !$canmanage) {
+        // Check whether the plugin is enabled.
+        if (!$manager->is_enabled()) {
+            if ($canmanage) {
+                $this->content->text = $renderer->notification(get_string('notenabled', 'block_motrain'), 'info');
+            }
             return $this->content;
         }
 
-        $renderer = $this->page->get_renderer('block_motrain');
-
-        if (!$manager->is_enabled()) {
-            $this->content->text = $renderer->notification(get_string('notenabled', 'block_motrain'), 'info');
+        // The user must be a player, or manager.
+        if (!$manager->is_player($USER->id) && !$canmanage) {
             return $this->content;
         }
 
@@ -112,7 +113,7 @@ class block_motrain extends block_base {
         $plugins = addons::get_list_with_function('extend_block_motrain_content');
         foreach ($plugins as $pluginname => $functionname) {
             $this->content->text .= component_callback($pluginname, 'extend_block_motrain_content',
-                [$manager, $renderer, $teamid], '');
+                [$manager, $renderer], '');
         }
 
         // Include the footer.
