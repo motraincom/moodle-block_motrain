@@ -373,6 +373,15 @@ class manager {
     }
 
     /**
+     * Require permission to award coins.
+     *
+     * @throws \required_capability_exception
+     */
+    public function require_award_coins() {
+        require_capability('block/motrain:awardcoins', context_system::instance());
+    }
+
+    /**
      * Require enabled.
      *
      * @throws \moodle_exception

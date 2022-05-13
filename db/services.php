@@ -26,6 +26,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+    'block_motrain_award_coins' => [
+        'classname'     => 'block_motrain\\external',
+        'methodname'    => 'award_coins',
+        'description'   => 'Award coins to a user.',
+        'type'          => 'write',
+        'capabilities'  => 'block/motrain:awardcoins',
+    ],
     'block_motrain_get_activities_with_completion' => [
         'classname' => 'block_motrain\external',
         'methodname' => 'get_activities_with_completion',

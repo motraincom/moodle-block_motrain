@@ -25,6 +25,7 @@
 
 namespace block_motrain;
 
+use block_motrain\local\award\award;
 use completion_info;
 use context_course;
 use context_system;
@@ -48,6 +49,56 @@ require_once($CFG->libdir . '/externallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class external extends external_api {
+
+    /**
+     * External function parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function award_coins_parameters() {
+        return new external_function_parameters([
+            'userid' => new external_value(PARAM_INT, 'The user ID'),
+            'coins' => new external_value(PARAM_INT, 'The number of coins'),
+        ]);
+    }
+
+    /**
+     * External function.
+     *
+     * @return array
+     */
+    public static function award_coins($userid, $coins) {
+        $params = self::validate_parameters(self::award_coins_parameters(), ['userid' => $userid, 'coins' => $coins]);
+        $userid = $params['userid'];
+        $coins = $params['coins'];
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $manager = manager::instance();
+        $manager->require_enabled();
+        $manager->require_award_coins();
+        $manager->require_player($userid);
+
+        $award = new award($userid, SYSCONTEXTID, 'ws');
+        $award->set_strict(true);
+        $success = $award->give($coins);
+
+        return [
+            'success' => $success,
+        ];
+    }
+
+    /**
+     * External function return definition.
+     *
+     * @return external_single_structure
+     */
+    public static function award_coins_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL),
+        ]);
+    }
 
     /**
      * External function parameters.

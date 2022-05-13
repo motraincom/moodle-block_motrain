@@ -47,6 +47,13 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
 
+    // Whether the user can arbitrarily award coins to another.
+    'block/motrain:awardcoins' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [],
+    ],
+
     // Whether the user can earn coins.
     'block/motrain:earncoins' => [
         'captype' => 'read',
