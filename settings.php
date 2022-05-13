@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\local\setting\static_content;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -61,7 +63,7 @@ if ($hassiteconfig) {
 
     $setting = new admin_setting_configtext('block_motrain/accountid', get_string('accountid', 'block_motrain'),
         get_string('accountid_desc', 'block_motrain'), '');
-    $setting->set_updatedcallback('block_motrain_check_enabled_state');
+    $setting->set_updatedcallback('block_motrain_accountid_updated_hook');
     $settingspage->add($setting);
 
     $hosts = [
@@ -76,6 +78,13 @@ if ($hassiteconfig) {
     $setting = new admin_setting_configpasswordunmask('block_motrain/apikey', get_string('apikey', 'block_motrain'),
         get_string('apikey_desc', 'block_motrain'), '');
     $setting->set_updatedcallback('block_motrain_check_enabled_state');
+    $settingspage->add($setting);
+
+    $setting = new static_content('block_motrain/metadatacache', get_string('metadatacache', 'block_motrain'),
+        get_string('metadatacache_help', 'block_motrain'),
+            html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'purgemetadata', 'sesskey' => sesskey(),
+                'returnurl' => $PAGE->url->out_as_local_url()]), get_string('purgecache', 'block_motrain'))
+    );
     $settingspage->add($setting);
 
     $setting = new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),

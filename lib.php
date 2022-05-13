@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use block_motrain\local\client_exception;
 use block_motrain\manager;
 
 defined('MOODLE_INTERNAL') || die();
@@ -58,6 +57,14 @@ function block_motrain_pluginfile($course, $bi, $context, $filearea, $args, $for
 
     send_stored_file($file, null, 0, true);
 }
+
+/**
+ * Hook after account ID has been changed.
+ */
+function block_motrain_accountid_updated_hook() {
+    cache_helper::purge_by_definition('block_motrain', 'metadata');
+    block_motrain_check_enabled_state();
+};
 
 /**
  * Check enabled state.

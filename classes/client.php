@@ -116,6 +116,34 @@ class client {
         return $this->get('/v2/accounts/' . $this->accountid . '/teams');
     }
 
+    public function is_account_leaderboard_enabled() {
+        try {
+            $this->head('/v2/accounts/' . $this->accountid . '/leaderboard');
+        } catch (api_error $e) {
+            if ($e->get_http_code() === 404) {
+                return false;
+            }
+            throw $e;
+        }
+        return true;
+    }
+
+    public function is_team_leaderboard_enabled($teamid) {
+        try {
+            $this->head('/v2/teams/' . $teamid . '/leaderboard');
+        } catch (api_error $e) {
+            if ($e->get_http_code() === 404) {
+                return false;
+            }
+            throw $e;
+        }
+        return true;
+    }
+
+    protected function head($uri, $params = null) {
+        return $this->request('HEAD', $uri, $params);
+    }
+
     protected function get($uri, $params = null) {
         return $this->request('GET', $uri, $params);
     }
@@ -138,6 +166,9 @@ class client {
         } else if ($method === 'GET') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->get($url->out(false));
+        }else if ($method === 'HEAD') {
+            $url = new moodle_url($this->apihost . $uri, $data);
+            $response = $curl->head($url->out(false));
         }
 
         try {

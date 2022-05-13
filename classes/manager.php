@@ -29,6 +29,7 @@ use block_motrain\local\api_error;
 use block_motrain\local\balance_proxy;
 use block_motrain\local\client_exception;
 use block_motrain\local\collection_strategy;
+use block_motrain\local\metadata_reader;
 use block_motrain\local\player_mapper;
 use block_motrain\local\team_resolver;
 use block_motrain\local\user_pusher;
@@ -62,6 +63,8 @@ class manager {
     protected $coinscache;
     /** @var string|null The dashboard URL. */
     protected $dashboardurl;
+    /** @var metadata_reader|null The metadata reader. */
+    protected $metadatareader;
     /** @var player_mapper|null The player mapper. */
     protected $playermapper;
     /** @var team_resolver|null The team resolver. */
@@ -96,6 +99,31 @@ class manager {
         }
 
         return true;
+    }
+
+    /**
+     * Whether the user can manage.
+     *
+     * Managing means seeing the block, and navigating to its page, it does not
+     * mean configuring the plugin. To configure the plugin, a user must be an admin.
+     *
+     * This permission is mostly useless, it really just serves to know who can see
+     * the block even when they do not have the permission to view it, or are not player.
+     */
+    public function can_manage($userid = null) {
+        global $PAGE;
+        return has_capability('block/motrain:addinstance', $PAGE->context, $userid);
+    }
+
+    /**
+     * Whether the user can view.
+     *
+     * This does not tell us whether the user is a player by the way. It is only
+     * used to determine whether the user can see the block at all.
+     */
+    public function can_view($userid = null) {
+        global $PAGE;
+        return has_capability('block/motrain:view', $PAGE->context, $userid);
     }
 
     /**
@@ -207,6 +235,16 @@ class manager {
     }
 
     /**
+     * Get the metadata reader.
+     */
+    public function get_metadata_reader() {
+        if (!$this->metadatareader) {
+            $this->metadatareader = new metadata_reader($this);
+        }
+        return $this->metadatareader;
+    }
+
+    /**
      * Get the player mapper.
      *
      * @return player_mapper
@@ -255,6 +293,31 @@ class manager {
                 $this->get_player_mapper());
         }
         return $this->userpusher;
+    }
+
+    /**
+     * Whether user has access to a leaderboard.
+     *
+     * @return bool
+     */
+    public function has_leaderboard_access($userid) {
+        $teamid = $this->get_team_resolver()->get_team_id_for_user($userid);
+        if (!$teamid && !$this->can_manage($userid)) {
+            return false;
+        }
+
+        $metadata = $this->get_metadata_reader();
+        if ($metadata->is_account_leaderboard_enabled()) {
+            return true;
+        } else if ($teamid && $metadata->is_team_leaderboard_enabled($teamid)) {
+            return true;
+        }
+
+        if (!$this->can_manage($userid)) {
+            return false;
+        }
+
+        return $metadata->is_any_known_team_leaderboard_enabled();
     }
 
     public function has_team_associations() {

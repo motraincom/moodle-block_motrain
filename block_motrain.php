@@ -85,8 +85,8 @@ class block_motrain extends block_base {
 
         $config = $this->config;
         $manager = manager::instance();
-        $canmanage = has_capability('block/motrain:addinstance', $PAGE->context);
-        $canview = $canmanage || has_capability('block/motrain:view', $PAGE->context);
+        $canmanage = $manager->can_manage();
+        $canview = $canmanage || $manager->can_view();
         $renderer = $this->page->get_renderer('block_motrain');
 
         // Hide the block to non-logged in users, guests and those who cannot view the block.

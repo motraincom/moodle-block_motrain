@@ -163,8 +163,7 @@ class block_motrain_renderer extends plugin_renderer_base {
             new pix_icon('purchases', '', 'block_motrain')
         );
 
-        // TODO Remove leaderboard when not enabled.
-        if (true) {
+        if ($manager->has_leaderboard_access($USER->id)) {
             $actions[] = new action_link(
                 $urls->leaderboard,
                 get_string('leaderboard', 'block_motrain'),
