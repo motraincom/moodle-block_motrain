@@ -26,6 +26,7 @@
 namespace block_motrain\local;
 
 use block_motrain\client;
+use block_motrain\local\award\award;
 use block_motrain\local\reason\lang_reason;
 use block_motrain\manager;
 use context;
@@ -46,33 +47,21 @@ defined('MOODLE_INTERNAL') || die();
  */
 class collection_strategy {
 
-    /** @var bool Whether admins can earn. */
-    protected $adminscanearn = false;
     /** @var array Allowed contexts. */
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
-    /** @var balance_proxy The balance proxy. */
-    protected $balanceproxy;
-    /** @var client The client. */
-    protected $client;
     /** @var completion_coins_calculator The calculator. */
     protected $completioncoinscalculator;
-    /** @var player_mapper The player mapper. */
-    protected $playermapper;
-    /** @var team_resolver The team resolver. */
-    protected $teamresolver;
+    /** @var manager The manager. */
+    protected $manager;
     /** @var array Ignore modules. */
     protected $ignoredmodules = ['local_mootivated', 'block_mootivated', 'block_motrain'];
 
     /**
      * Constructor.
      */
-    public function __construct($teamresolver, $playermapper, client $client, balance_proxy $balanceproxy) {
-        $this->adminscanearn = (bool) get_config('block_motrain', 'adminscanearn');
+    public function __construct(manager $manager) {
         $this->completioncoinscalculator = new completion_coins_calculator();
-        $this->client = $client;
-        $this->teamresolver = $teamresolver;
-        $this->playermapper = $playermapper;
-        $this->balanceproxy = $balanceproxy;
+        $this->manager = $manager;
     }
 
     /**
@@ -83,7 +72,7 @@ class collection_strategy {
     public function collect_event(\core\event\base $event) {
         global $DB;
 
-        if (!manager::instance()->is_enabled()) {
+        if (!$this->manager->is_enabled()) {
             return;
         }
 
@@ -119,12 +108,6 @@ class collection_strategy {
             return;
         }
 
-        // Resolve the team.
-        $teamid = $this->teamresolver->get_team_id_for_user($userid);
-        if (!$teamid) {
-            return;
-        }
-
         if ($event instanceof course_module_completion_updated) {
 
             // The user may have completed an activity.
@@ -133,21 +116,15 @@ class collection_strategy {
                 $courseid = $event->courseid;
                 $cmid = $context->instanceid;
 
-                $actionname = 'cm_completed';
-                $actionhash = sha1($cmid);
-
-                $params = [
-                    'userid' => $userid,
-                    'contextid' => $context->id,
-                    'actionname' => $actionname,
-                    'actionhash' => $actionhash
-                ];
-
-                if ($DB->record_exists('block_motrain_log', $params)) {
+                $award = new award($userid, $context->id, 'cm_completed', sha1($cmid));
+                if ($award->has_been_recorded_previously()) {
                     return;
                 }
 
                 $coins = $this->completioncoinscalculator->get_module_coins($courseid, $cmid);
+                if ($coins <= 0) {
+                    return;
+                }
 
                 try {
                     $modinfo = get_fast_modinfo($courseid);
@@ -163,23 +140,19 @@ class collection_strategy {
                     $reasonstr = 'transaction:credit.activitycompleted';
                     $reasonargs = null;
                 }
-                $reason = new lang_reason($reasonstr, $reasonargs);
-                $this->award_coins_and_log($teamid, $userid, $coins, $params, $reason);
+                $award->give($coins, new lang_reason($reasonstr, $reasonargs));
             }
 
         } else if ($event instanceof course_completed) {
             $courseid = $event->courseid;
-            $actionname = 'course_completed';
-            $actionhash = sha1($courseid);
 
-            $params = [
-                'userid' => $userid,
-                'contextid' => $context->id,
-                'actionname' => $actionname,
-                'actionhash' => $actionhash
-            ];
+            $award = new award($userid, $context->id, 'course_completed', sha1($courseid));
+            if ($award->has_been_recorded_previously()) {
+                return;
+            }
 
-            if ($DB->record_exists('block_motrain_log', $params)) {
+            $coins = $this->completioncoinscalculator->get_course_coins($courseid);
+            if ($coins <= 0) {
                 return;
             }
 
@@ -197,78 +170,7 @@ class collection_strategy {
                 $reasonargs = null;
             }
 
-            $reason = new lang_reason($reasonstr, $reasonargs);
-            $coins = $this->completioncoinscalculator->get_course_coins($event->courseid);
-            $this->award_coins_and_log($teamid, $userid, $coins, $params, $reason);
-        }
-    }
-
-    /**
-     * Award coins.
-     *
-     * @param string $teamid The team ID.
-     * @param int $userid The user ID.
-     * @param int $coins The number of coins.
-     * @param lang_reason $reason The reason.
-     */
-    protected function award_coins($teamid, $userid, $coins, lang_reason $reason = null) {
-
-        // Safety check.
-        if ($coins <= 0) {
-            return;
-        }
-
-        $playerid = $this->playermapper->get_player_id($userid, $teamid);
-        if (!$playerid) {
-            throw new \moodle_exception('playeridnotfound', 'block_motrain');
-        }
-
-        $this->client->add_coins($playerid, $coins, $reason);
-        $this->balanceproxy->invalidate_balance($userid);
-    }
-
-    /**
-     * Award coins.
-     *
-     * @param string $teamid The team ID.
-     * @param int $userid The user ID.
-     * @param int $coins The number of coins.
-     * @param array $logparams Containing userid, contextid, actionname and actionhash.
-     * @param lang_reason $reason The reason.
-     */
-    protected function award_coins_and_log($teamid, $userid, $coins, $logparams, lang_reason $reason = null) {
-        global $DB;
-
-        $broadcasted = time();
-        $broadcasterror = null;
-        $rethrow = null;
-
-        try {
-            $this->award_coins($teamid, $userid, $coins, $reason);
-        } catch (api_error $e) {
-            $broadcasted = 0;
-            $broadcasterror = 'HTTP ' . $e->get_http_code() . ' ' . $e->get_error_code();
-        } catch (client_exception $e) {
-            $broadcasted = 0;
-            $broadcasterror = 'HTTP ' . $e->get_http_code() . ' ' . $e->getMessage();
-        } catch (moodle_exception $e) {
-            $broadcasted = 0;
-            $broadcasterror = $e->errorcode;
-            // We passively handle the player ID not found.
-            if ($e->errorcode !== 'playeridnotfound') {
-                $rethrow = $e;
-            }
-        }
-
-        $DB->insert_record('block_motrain_log', array_merge($logparams, [
-            'coins' => $coins,
-            'timecreated' => time(),
-            'timebroadcasted' => $broadcasted,
-            'broadcasterror' => $broadcasterror
-        ]));
-
-        if ($rethrow) {
-            throw $e;
+            $award->give($coins, new lang_reason($reasonstr, $reasonargs));
         }
     }
 
@@ -283,18 +185,7 @@ class collection_strategy {
      * @return bool
      */
     protected function can_user_earn_coins($userid, context $context) {
-
-        // If non-logged in users, guests or admin, deny.
-        if (!$userid || isguestuser($userid) || (!$this->adminscanearn && is_siteadmin($userid))) {
-            return false;
-        }
-
-        // Check has capability in context.
-        if (!has_capability('block/motrain:earncoins', $context, $userid)) {
-            return false;
-        }
-
-        return true;
+        return $this->manager->can_earn_in_context($userid, $context);
     }
 
     /**

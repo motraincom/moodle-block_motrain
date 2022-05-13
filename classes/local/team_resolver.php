@@ -43,6 +43,8 @@ class team_resolver {
     protected $globalteamid;
     /** @var bool Whether we're using cohorts. */
     protected $isusingcohorts = true;
+    /** @var array The user ID team ID cache. */
+    protected $userteamcache = [];
 
     /**
      * Constructor.
@@ -63,7 +65,10 @@ class team_resolver {
     protected function get_global_team_id() {
         global $DB;
         if ($this->globalteamid === null) {
-            $this->globalteamid = $DB->get_field('block_motrain_teammap', 'teamid', ['cohortid' => -1]);
+            $this->globalteamid = $DB->get_field('block_motrain_teammap', 'teamid', [
+                'cohortid' => -1,
+                'accountid' => $this->accountid
+            ]);
         }
         return $this->globalteamid ? $this->globalteamid : null;
     }
@@ -80,13 +85,23 @@ class team_resolver {
             return $this->get_global_team_id();
         }
 
-        $sql = 'SELECT t.teamid
-                  FROM {cohort_members} cm
-                  JOIN {block_motrain_teammap} t
-                    ON t.cohortid = cm.cohortid
-                 WHERE cm.userid = :userid
-              ORDER BY cm.cohortid ASC';
-        return $DB->get_field_sql($sql, ['userid' => $userid], IGNORE_MULTIPLE);
+        $userid = (int) $userid;
+
+        if (!isset($this->userteamcache[$userid])) {
+            $sql = 'SELECT t.teamid
+                      FROM {cohort_members} cm
+                      JOIN {block_motrain_teammap} t
+                        ON t.cohortid = cm.cohortid
+                     WHERE cm.userid = :userid
+                       AND t.accountid = :accountid
+                  ORDER BY cm.cohortid ASC';
+            $this->userteamcache[$userid] = $DB->get_field_sql($sql, [
+                'userid' => $userid,
+                'accountid' => $this->accountid
+            ], IGNORE_MULTIPLE);
+        }
+
+        return $this->userteamcache[$userid] ? $this->userteamcache[$userid] : null;
     }
 
 }

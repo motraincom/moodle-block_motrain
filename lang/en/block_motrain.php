@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['eventcoinsearned'] = 'Coins earned';
 $string['infopagetitle'] = 'Info';
 $string['store'] = 'Store';
 $string['purchases'] = 'My purchases';
@@ -32,8 +33,10 @@ $string['leaderboard'] = 'Leaderboard';
 $string['dashboard'] = 'Dashboard';
 $string['manageaddons'] = 'Manage add-ons';
 $string['editassociation'] = 'Edit association';
+$string['invalidcoinamount'] = 'Invalid amount of coins';
 $string['playeridnotfound'] = 'The player associated with the current user could not be found, please contact the adminstrator.';
 $string['userteamnotfound'] = 'The team of the current user could not be found, please contact the adminstrator.';
+$string['usernotplayer'] = 'The user does not meet the criteria to be a player.';
 $string['createassociation'] = 'Create association';
 $string['addactivityellipsis'] = 'Add activity...';
 $string['addcourseellipsis'] = 'Add course...';
@@ -74,7 +77,10 @@ $string['playersmapping'] = 'Players mapping';
 $string['pluginname'] = 'Motrain';
 $string['addon'] = 'Add-on';
 $string['motrainaddons'] = 'Motrain add-ons';
+$string['motrain:accessdashboard'] = 'Access the Motrain dashboard';
 $string['motrain:addinstance'] = 'Add a new Motrain block';
+$string['motrain:awardcoins'] = 'Award coins to other users';
+$string['motrain:earncoins'] = 'Earn coins';
 $string['motrain:myaddinstance'] = 'Add the Motrain block on the dashboard';
 $string['motrain:view'] = 'View the content of the Motrain block';
 $string['noaddoninstalled'] = 'No add-ons have been installed yet.';

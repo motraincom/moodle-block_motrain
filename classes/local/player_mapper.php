@@ -90,8 +90,10 @@ class player_mapper {
                     ]);
                     $playerid = $player->id;
                 } catch (api_error $e) {
+                    $playerid = null;
                     $blockedreason = $e->get_error_code();
                 } catch (client_exception $e) {
+                    $playerid = null;
                     $blockedreason = $e->errorcode;
                 }
             }

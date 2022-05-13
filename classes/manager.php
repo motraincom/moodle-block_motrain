@@ -34,6 +34,7 @@ use block_motrain\local\team_resolver;
 use block_motrain\local\user_pusher;
 use block_motrain\task\adhoc_queue_cohort_members_for_push;
 use cache;
+use context;
 use context_system;
 use moodle_url;
 
@@ -70,6 +71,32 @@ class manager {
 
     /** @var static The singleton. */
     protected static $instance;
+
+    /**
+     * Can the user earn.
+     *
+     * Note that this is unlikely to return true when the context is not a course context
+     * because students are given the capability to earn coins. You should simply check
+     * whether the user is a player for awards that do not depend on the capability to earn.
+     *
+     * @param int $userid The user ID.
+     * @param context $context The context.
+     * @return bool
+     */
+    public function can_earn_in_context($userid, context $context) {
+
+        // First of all, the user must be a player.
+        if (!$this->is_player($userid)) {
+            return false;
+        }
+
+        // Check has capability in context.
+        if (!has_capability('block/motrain:earncoins', $context, $userid)) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Check the enabled state.
@@ -151,8 +178,7 @@ class manager {
      */
     public function get_collection_strategy() {
         if (!$this->collectionstrategy) {
-            $this->collectionstrategy = new collection_strategy($this->get_team_resolver(), $this->get_player_mapper(),
-                $this->get_client(), $this->get_balance_proxy());
+            $this->collectionstrategy = new collection_strategy($this);
         }
         return $this->collectionstrategy;
     }
@@ -271,6 +297,27 @@ class manager {
     }
 
     /**
+     * Whether the user is a player.
+     *
+     * A user is considered a player when they meet the conditions to become
+     * one, not necessarily when have a mapping for said user. This is useful
+     * to determine whether a user is allowed to receive coins beyond checking
+     * the permission.
+     *
+     * @return bool
+     */
+    public function is_player($userid) {
+
+        // Guests and admins are not players, unless admins can earn.
+        if (!$userid || isguestuser($userid) || (!$this->is_admin_earning_enabled() && is_siteadmin($userid))) {
+            return false;
+        }
+
+        // The user must belong to a team.
+        return (bool) $this->get_team_resolver()->get_team_id_for_user($userid);
+    }
+
+    /**
      * Whether the plugin seems setup.
      *
      * As in, its settings have been provided.
@@ -333,6 +380,18 @@ class manager {
     public function require_enabled() {
         if (!$this->is_enabled()) {
             throw new \moodle_exception('notenabled', 'block_motrain');
+        }
+    }
+
+    /**
+     * Require the user to be a player.
+     *
+     * @param int $userid The user ID.
+     * @throws \moodle_exception
+     */
+    public function require_player($userid) {
+        if (!$this->is_player($userid)) {
+            throw new \moodle_exception('usernotplayer', 'block_motrain');
         }
     }
 
