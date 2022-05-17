@@ -112,7 +112,7 @@ class team_form extends moodleform {
 
         // We can't create an "all associations" if there are other associations.
         $data = [];
-        if (empty($this->_customdata['globalassociation'])) {
+        if (empty($this->_customdata['isusingcohorts'])) {
             $data[-1] = get_string('nocohortallusers', 'block_motrain');
         }
         $data[0] = '---';
