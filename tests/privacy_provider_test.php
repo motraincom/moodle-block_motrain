@@ -55,7 +55,7 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
         $this->assert_contextlist_equals($contextlist, [SYSCONTEXTID, context_course::instance($c1->id)->id,
             context_course::instance($c2->id)->id]);
         $contextlist = provider::get_contexts_for_userid($u2->id);
-        $this->assert_contextlist_equals($contextlist, [SYSCONTEXTID, context_course::instance($c1->id)->id,]);
+        $this->assert_contextlist_equals($contextlist, [SYSCONTEXTID, context_course::instance($c1->id)->id]);
         $contextlist = provider::get_contexts_for_userid($u3->id);
         $this->assert_contextlist_equals($contextlist, [SYSCONTEXTID]);
         $contextlist = provider::get_contexts_for_userid($u4->id);

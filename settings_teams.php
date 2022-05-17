@@ -96,11 +96,10 @@ if ($motrainteamid !== null) {
             if ($manager->is_automatic_push_enabled() && $association->cohortid > 0) {
                 $manager->schedule_cohort_sync($association->cohortid);
             }
-
-        } else {
-            // TODO We do not support updates yet.
-            // $DB->update_record('block_motrain_teammap', $association);
         }
+
+        // TODO We do not support updates yet.
+
         redirect($PAGE->url, get_string('teamassociationcreated', 'block_motrain'));
 
     } else if ($form->is_cancelled()) {

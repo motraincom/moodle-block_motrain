@@ -166,7 +166,7 @@ class client {
         } else if ($method === 'GET') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->get($url->out(false));
-        }else if ($method === 'HEAD') {
+        } else if ($method === 'HEAD') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->head($url->out(false));
         }

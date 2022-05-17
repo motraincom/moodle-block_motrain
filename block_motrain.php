@@ -73,7 +73,7 @@ class block_motrain extends block_base {
      * @return stdClass
      */
     public function get_content() {
-        global $PAGE, $USER;
+        global $USER;
 
         if (isset($this->content)) {
             return $this->content;

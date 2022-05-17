@@ -75,7 +75,7 @@ try {
     $client = $manager->get_client();
     $url = $client->get_store_login_url($playerid, $landingpage);
 
-} catch (moodle_exception $e)  {
+} catch (moodle_exception $e) {
     $PAGE->set_pagelayout('standard');
     throw $e;
 }
