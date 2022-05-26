@@ -43,11 +43,18 @@ use block_motrain\privacy\provider;
 class block_motrain_privacy_provider_testcase extends \advanced_testcase {
 
     public function test_get_metadata() {
+        if (!class_exists('core_privacy\local\request\plugin\provider')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
+
         $data = provider::get_metadata(new collection('block_motrain'));
         $this->assertCount(5, $data->get_collection());
     }
 
     public function test_get_contexts_for_userid() {
+        if (!class_exists('core_privacy\local\request\plugin\provider')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
@@ -65,6 +72,9 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
     public function test_delete_data_for_all_users_in_context() {
         global $DB;
 
+        if (!class_exists('core_privacy\local\request\plugin\provider')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
@@ -97,6 +107,9 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
     public function test_delete_data_for_user() {
         global $DB;
 
+        if (!class_exists('core_privacy\local\request\plugin\provider')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
@@ -157,6 +170,9 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
     }
 
     public function test_extract_user_data() {
+        if (!class_exists('core_privacy\local\request\plugin\provider')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
