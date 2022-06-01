@@ -74,6 +74,8 @@ class collection_strategy {
 
         if (!$this->manager->is_enabled()) {
             return;
+        } else if ($this->manager->is_paused()) {
+            return;
         }
 
         if (in_array($event->component, $this->ignoredmodules)) {

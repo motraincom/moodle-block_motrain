@@ -44,7 +44,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * To avoid exceptions, check the result of manager::is_enabled and
  * manager::is_player or manager::can_earn_in_context prior to attempting
- * to use an award on a particular user.
+ * to use an award on a particular user. Additionally, if manager::is_paused
+ * then awards should not be attempted.
  *
  * @package    block_motrain
  * @copyright  2022 Mootivation Technologies Corp.
@@ -88,6 +89,7 @@ class award {
     protected function award_coins($coins, lang_reason $reason = null) {
         $manager = manager::instance();
         $manager->require_enabled();
+        $manager->require_not_paused();
 
         $coins = (int) $coins;
         $userid = $this->userid;

@@ -61,6 +61,7 @@ if (!$do) {
 try {
     $manager = manager::instance();
     $manager->require_enabled();
+    $manager->require_not_paused();
     $manager->require_view();
 
     $teamid = $manager->get_team_resolver()->get_team_id_for_user($USER->id);

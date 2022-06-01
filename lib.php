@@ -76,3 +76,13 @@ function block_motrain_check_enabled_state() {
     $manager = manager::instance();
     $manager->check_enabled_state();
 };
+
+/**
+ * Hook after setting ispaused has been changed.
+ */
+function block_motrain_ispaused_updated_hook() {
+    cache_helper::purge_by_definition('block_motrain', 'metadata');
+    $manager = manager::instance();
+    $balanceproxy = $manager->get_balance_proxy();
+    $balanceproxy->invalidate_all();
+};

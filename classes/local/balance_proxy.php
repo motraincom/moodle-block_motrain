@@ -87,7 +87,7 @@ class balance_proxy {
             $userid = $userorid->id;
         }
 
-        if (!$manager->is_enabled()) {
+        if (!$manager->is_enabled() || $manager->is_paused()) {
             return 0;
         }
 
@@ -107,6 +107,15 @@ class balance_proxy {
             return 0;
         } catch (client_exception $e) {
             return 0;
+        }
+    }
+
+    /**
+     * Invalidate the balance for all users.
+     */
+    public function invalidate_all() {
+        if (method_exists($this->coinscache, 'purge')) {
+            $this->coinscache->purge();
         }
     }
 

@@ -360,6 +360,21 @@ class manager {
     }
 
     /**
+     * Whether the plugin is paused.
+     *
+     * When paused, the plugin will ignore any potential coin awards, and will not
+     * push players to the dashboard. Essentially, it will prevent write operations
+     * from happening.
+     *
+     * The plugin can be paused while it is being setup, or during a migration.
+     *
+     * @return bool
+     */
+    public function is_paused() {
+        return (bool) get_config('block_motrain', 'ispaused');
+    }
+
+    /**
      * Whether the user is a player.
      *
      * A user is considered a player when they meet the conditions to become
@@ -452,6 +467,17 @@ class manager {
     public function require_enabled() {
         if (!$this->is_enabled()) {
             throw new \moodle_exception('notenabled', 'block_motrain');
+        }
+    }
+
+    /**
+     * Require enabled.
+     *
+     * @throws \moodle_exception
+     */
+    public function require_not_paused() {
+        if ($this->is_paused()) {
+            throw new \moodle_exception('pluginispaused', 'block_motrain');
         }
     }
 

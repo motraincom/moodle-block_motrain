@@ -38,28 +38,26 @@ use moodle_exception;
  */
 class client_exception extends moodle_exception {
 
-    /** @var curl The curl. */
+    /** @var curl|null The curl. */
     protected $curl;
-    /** @var curl The HTTP error code. */
-    protected $httpcode;
-    /** @var string The response. */
+    /** @var string|null The response, if any. */
     protected $response;
 
     /**
      * Constructor.
      *
      * @param string $error The error code.
-     * @param curl $curl The curl object post request.
-     * @param string $response The response from the server.
+     * @param curl|null $curl The curl object post request.
+     * @param string|null $response The response from the server.
      */
-    public function __construct($error, $curl, $response) {
+    public function __construct($error, $curl = null, $response = null) {
         $this->curl = $curl;
         $this->response = $response;
         $debuginfo = json_encode([
-            'info' => $curl->info,
-            'errno' => $curl->errno,
-            'error' => $curl->error,
-            'response' => $response,
+            'info' => $curl ? $curl->info : '',
+            'errno' => $curl ? $curl->errno : '',
+            'error' => $curl ? $curl->error : '',
+            'response' => $curl ? $response : '',
         ]);
         parent::__construct($error, 'block_motrain', '', null, $debuginfo);
     }
@@ -70,7 +68,7 @@ class client_exception extends moodle_exception {
      * @return int Zero when unknown.
      */
     public function get_http_code() {
-        return !empty($this->curl->info['http_code']) ? $this->curl->info['http_code'] : 0;
+        return ($this->curl && !empty($this->curl->info['http_code'])) ? $this->curl->info['http_code'] : 0;
     }
 
 }

@@ -77,6 +77,7 @@ class external extends external_api {
 
         $manager = manager::instance();
         $manager->require_enabled();
+        $manager->require_not_paused();
         $manager->require_award_coins();
         $manager->require_player($userid);
 

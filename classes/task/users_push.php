@@ -49,6 +49,9 @@ class users_push extends \core\task\scheduled_task {
         if (!$manager->is_enabled()) {
             mtrace('Motrain is not enabled.');
             return;
+        } else if ($manager->is_paused()) {
+            mtrace('Motrain is paused.');
+            return;
         }
 
         $userpusher = $manager->get_user_pusher();

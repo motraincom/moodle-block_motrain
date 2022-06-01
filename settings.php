@@ -61,6 +61,11 @@ if ($hassiteconfig) {
 
     $settingspage->add(new block_motrain\local\setting\is_enabled());
 
+    $setting = new admin_setting_configcheckbox('block_motrain/ispaused', get_string('ispaused', 'block_motrain'),
+        get_string('ispaused_help', 'block_motrain'), false);
+    $setting->set_updatedcallback('block_motrain_ispaused_updated_hook');
+    $settingspage->add($setting);
+
     $setting = new admin_setting_configtext('block_motrain/accountid', get_string('accountid', 'block_motrain'),
         get_string('accountid_desc', 'block_motrain'), '');
     $setting->set_updatedcallback('block_motrain_accountid_updated_hook');

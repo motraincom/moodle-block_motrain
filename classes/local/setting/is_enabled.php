@@ -89,8 +89,14 @@ class is_enabled extends \admin_setting {
         global $PAGE;
         $manager = manager::instance();
         $isenabled = $manager->is_enabled();
+
+        $content = html_writer::tag('strong', $isenabled ? get_string('yes', 'core') : get_string('no', 'core'));
+        if ($isenabled && $manager->is_paused()) {
+            $content .= ' (' . get_string('butpaused', 'block_motrain') . ')';
+        }
+
         return format_admin_setting($this, $this->visiblename,
-            html_writer::tag('strong', $isenabled ? get_string('yes', 'core') : get_string('no', 'core')),
+            $content,
             get_string('isenabled_desc', 'block_motrain'),
             false);
     }
