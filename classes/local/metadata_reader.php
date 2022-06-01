@@ -96,7 +96,6 @@ class metadata_reader {
             try {
                 $val = (int) $this->manager->get_client()->is_team_leaderboard_enabled($teamid);
             } catch (client_exception $e) {
-                throw $e;
                 $val = 0;
             }
             $this->cache->set($key, $val);
