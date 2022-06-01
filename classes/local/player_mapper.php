@@ -41,6 +41,8 @@ class player_mapper {
 
     /** @var string The account ID. */
     protected $accountid;
+    /** @var bool Whether the mapping only considers local data. */
+    protected $localonly = false;
     /** @var client The client. */
     protected $client;
 
@@ -69,7 +71,7 @@ class player_mapper {
         }
 
         $mapping = $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
-        if (empty($mapping) || (empty($mapping->playerid) && !$mapping->blocked)) {
+        if ((empty($mapping) || (empty($mapping->playerid) && !$mapping->blocked)) && !$this->localonly) {
             $user = $user ? $user : $this->get_user($userid);
             $playerid = null;
             $blockedreason = null;
@@ -133,6 +135,15 @@ class player_mapper {
         }
 
         return $user;
+    }
+
+    /**
+     * Whether the mapping only considers local data.
+     *
+     * @param bool $localonly Local only.
+     */
+    public function set_local_only($localonly) {
+        $this->localonly = (bool) $localonly;
     }
 
     /**

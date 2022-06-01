@@ -252,6 +252,7 @@ class manager {
     public function get_player_mapper() {
         if (!$this->playermapper) {
             $this->playermapper = new player_mapper($this->get_client(), $this->get_account_id());
+            $this->playermapper->set_local_only($this->is_paused());
         }
         return $this->playermapper;
     }
