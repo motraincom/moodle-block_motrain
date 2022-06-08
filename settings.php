@@ -48,7 +48,7 @@ $category->add('block_motrain_category', new admin_externalpage('block_motrain_t
 
 // Add page to view the player mapping.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
-get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php')));
+    get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php')));
 
 // Add page to manage add-ons.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_manageaddons', new lang_string('manageaddons',

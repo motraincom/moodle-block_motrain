@@ -82,6 +82,10 @@ class client {
         return $this->post('/v2/users/' . $playerid . '/balance', $data);
     }
 
+    public function complete_redemption($redemptionid) {
+        return $this->put('/v2/redemptions/' . $redemptionid . '/complete');
+    }
+
     public function create_player($teamid, $data) {
         return $this->post('/v2/teams/' . $teamid . '/users', $data);
     }
@@ -101,6 +105,14 @@ class client {
             return $resp[0];
         }
         return null;
+    }
+
+    public function get_player_redemptions($playerid, $filters) {
+        $resp = $this->request_advanced('GET', '/v2/users/' . $playerid . '/redemptions', $filters);
+        if (!empty($resp->headers['Link']) || !empty($resp->headers['link'])) {
+            debugging('API returned paginated results, but we only return the first page.', DEBUG_DEVELOPER);
+        }
+        return $this->decode_json_response($resp);
     }
 
     public function get_store_login_url($playerid, $landingpage = null) {
@@ -152,7 +164,30 @@ class client {
         return $this->request('POST', $uri, $data);
     }
 
+    protected function put($uri, $data = null) {
+        return $this->request('PUT', $uri, $data);
+    }
+
+    protected function decode_json_response($result) {
+        $data = json_decode($result->response);
+        if ($data === null) {
+            throw new client_exception('json_expected', $result->curl, $result->response);
+        }
+        return $data;
+    }
+
     protected function request($method, $uri, $data = null) {
+        $result = $this->request_advanced($method, $uri, $data);
+
+        $data = null;
+        if ($result->http_code !== 204) {
+            $data = $this->decode_json_response($result);
+        }
+
+        return $data;
+    }
+
+    protected function request_advanced($method, $uri, $data = null) {
         $method = strtoupper($method);
 
         $curl = new curl();
@@ -163,6 +198,9 @@ class client {
         if ($method === 'POST') {
             $url = new moodle_url($this->apihost . $uri);
             $response = $curl->post($url, $data ? json_encode($data) : '');
+        } else if ($method === 'PUT') {
+            $url = new moodle_url($this->apihost . $uri);
+            $response = $curl->put($url, $data ? json_encode($data) : '');
         } else if ($method === 'GET') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->get($url->out(false));
@@ -188,15 +226,12 @@ class client {
             throw $e;
         }
 
-        $data = null;
-        if ($curl->info['http_code'] !== 204) {
-            $data = json_decode($response);
-            if ($data === null) {
-                throw new client_exception('json_expected', $curl, $response);
-            }
-        }
-
-        return $data;
+        return (object) [
+            'curl' => $curl,
+            'response' => $response,
+            'http_code' => $curl->info['http_code'],
+            'headers' => $curl->getResponse(),
+        ];
     }
 
     public function set_observer($observer) {
