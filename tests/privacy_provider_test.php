@@ -74,7 +74,10 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
     public function test_get_users_in_context() {
         if (!class_exists('core_privacy\manager')) {
             $this->markTestSkipped("Privacy providers not installed");
+        } else if (!interface_exists('core_privacy\local\request\core_userlist_provider')) {
+            $this->markTestSkipped("Interface core_userlist_provider not available");
         }
+
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
@@ -200,7 +203,10 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
 
         if (!class_exists('core_privacy\manager')) {
             $this->markTestSkipped("Privacy providers not installed");
+        } else if (!interface_exists('core_privacy\local\request\core_userlist_provider')) {
+            $this->markTestSkipped("Interface core_userlist_provider not available");
         }
+
         $this->resetAfterTest(true);
         extract($this->generate_test_data());
 
