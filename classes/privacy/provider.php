@@ -30,9 +30,11 @@ use context;
 use context_system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\contextlist_base;
 use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 /**
@@ -45,7 +47,8 @@ use core_privacy\local\request\writer;
  */
 class provider implements
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider {
+    \core_privacy\local\request\plugin\provider,
+    \core_privacy\local\request\core_userlist_provider {
 
     use \core_privacy\local\legacy_polyfill;
 
@@ -114,6 +117,19 @@ class provider implements
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+        $userlist->add_from_sql('userid', 'SELECT userid FROM {block_motrain_log} WHERE contextid = ?', [$context->id]);
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            $userlist->add_from_sql('userid', 'SELECT userid FROM {block_motrain_playermap}', []);
+        }
     }
 
     /**
@@ -223,6 +239,29 @@ class provider implements
             }
             $DB->delete_records('block_motrain_log', ['contextid' => $context->id, 'userid' => $userid]);
         }
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $userids = $userlist->get_userids();
+        if (empty($userids)) {
+            return;
+        }
+
+        $context = $userlist->get_context();
+        if ($context->contextlevel == CONTEXT_SYSTEM) {
+            $DB->delete_records_list('block_motrain_playermap', 'userid', $userids);
+        }
+
+        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $params = ['contextid' => $context->id] + $inparams;
+        $DB->delete_records_select('block_motrain_log', "contextid = :contextid AND userid $insql", $params);
     }
 
     /**

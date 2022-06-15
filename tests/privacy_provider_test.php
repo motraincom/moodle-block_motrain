@@ -31,6 +31,8 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\writer;
 use core_privacy\tests\request\approved_contextlist;
 use block_motrain\privacy\provider;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\userlist;
 
 /**
  * Privacy provider testcase.
@@ -67,6 +69,30 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
         $this->assert_contextlist_equals($contextlist, [SYSCONTEXTID]);
         $contextlist = provider::get_contexts_for_userid($u4->id);
         $this->assert_contextlist_equals($contextlist, []);
+    }
+
+    public function test_get_users_in_context() {
+        if (!class_exists('core_privacy\manager')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
+        $this->resetAfterTest(true);
+        extract($this->generate_test_data());
+
+        $sysctx = context_system::instance();
+        $c1ctx = context_course::instance($c1->id);
+        $c2ctx = context_course::instance($c2->id);
+
+        $userlist = new userlist($sysctx, 'block_motrain');
+        provider::get_users_in_context($userlist);
+        $this->assert_userlist_contains_userids($userlist, [$u1->id, $u2->id, $u3->id]);
+
+        $userlist = new userlist($c1ctx, 'block_motrain');
+        provider::get_users_in_context($userlist);
+        $this->assert_userlist_contains_userids($userlist, [$u1->id, $u2->id]);
+
+        $userlist = new userlist($c2ctx, 'block_motrain');
+        provider::get_users_in_context($userlist);
+        $this->assert_userlist_contains_userids($userlist, [$u1->id]);
     }
 
     public function test_delete_data_for_all_users_in_context() {
@@ -167,6 +193,61 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => $c1ctx->id]));
         $this->assertFalse($DB->record_exists('block_motrain_playermap', ['userid' => $u1->id]));
         $this->assertFalse($DB->record_exists('block_motrain_playermap', ['userid' => $u3->id]));
+    }
+
+    public function test_delete_data_for_users() {
+        global $DB;
+
+        if (!class_exists('core_privacy\manager')) {
+            $this->markTestSkipped("Privacy providers not installed");
+        }
+        $this->resetAfterTest(true);
+        extract($this->generate_test_data());
+
+        $sysctx = context_system::instance();
+        $c1ctx = context_course::instance($c1->id);
+        $c2ctx = context_course::instance($c2->id);
+
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c1ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c2ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => $c1ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u1->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u3->id]));
+
+        $userlist = new approved_userlist($c2ctx, 'block_motrain', [$u1->id]);
+        provider::delete_data_for_users($userlist);
+
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c1ctx->id]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c2ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => $c1ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u1->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u3->id]));
+
+        $userlist = new approved_userlist($c1ctx, 'block_motrain', [$u1->id]);
+        provider::delete_data_for_users($userlist);
+
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c1ctx->id]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c2ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => $c1ctx->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u1->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u3->id]));
+
+        $userlist = new approved_userlist($sysctx, 'block_motrain', [$u1->id, $u2->id]);
+        provider::delete_data_for_users($userlist);
+
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c1ctx->id]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u1->id, 'contextid' => $c2ctx->id]));
+        $this->assertFalse($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => SYSCONTEXTID]));
+        $this->assertTrue($DB->record_exists('block_motrain_log', ['userid' => $u2->id, 'contextid' => $c1ctx->id]));
+        $this->assertFalse($DB->record_exists('block_motrain_playermap', ['userid' => $u1->id]));
+        $this->assertTrue($DB->record_exists('block_motrain_playermap', ['userid' => $u3->id]));
     }
 
     public function test_extract_user_data() {
@@ -319,6 +400,19 @@ class block_motrain_privacy_provider_testcase extends \advanced_testcase {
         sort($contextids);
         sort($expectedids);
         $this->assertEquals($expectedids, $contextids);
+    }
+
+    /**
+     * Compare user lists.
+     *
+     * @param object $userlist The list.
+     * @param int[] $expectedids The IDs.
+     */
+    protected function assert_userlist_contains_userids($userlist, $expectedids) {
+        $userids = array_map('intval', $userlist->get_userids());
+        sort($userids);
+        sort($expectedids);
+        $this->assertEquals($expectedids, $userids);
     }
 
 }
