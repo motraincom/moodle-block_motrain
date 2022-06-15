@@ -37,6 +37,34 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
+// Compatibility with earlier versions of Moodle where the interface does not exist. Note that we
+// use class_alias because otherwise the code checker thinks that we have defined the same class twice.
+if (interface_exists('core_privacy\local\request\core_userlist_provider')) {
+    /**
+     * Maybe user list provider.
+     *
+     * @package    block_motrain
+     * @copyright  2022 Mootivation Technologies Corp.
+     * @author     Frédéric Massart <fred@branchup.tech>
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
+    abstract class provider_with_userlist implements \core_privacy\local\request\core_userlist_provider {
+    }
+    class_alias('block_motrain\privacy\provider_with_userlist', 'block_motrain\privacy\maybe_userlist_provider');
+} else {
+    /**
+     * Maybe user list provider.
+     *
+     * @package    block_motrain
+     * @copyright  2022 Mootivation Technologies Corp.
+     * @author     Frédéric Massart <fred@branchup.tech>
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
+    abstract class provider_without_userlist {
+    }
+    class_alias('block_motrain\privacy\provider_without_userlist', 'block_motrain\privacy\maybe_userlist_provider');
+}
+
 /**
  * Data provider class.
  *
@@ -45,10 +73,9 @@ use core_privacy\local\request\writer;
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
+class provider extends maybe_userlist_provider implements
     \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider,
-    \core_privacy\local\request\core_userlist_provider {
+    \core_privacy\local\request\plugin\provider {
 
     use \core_privacy\local\legacy_polyfill;
 
