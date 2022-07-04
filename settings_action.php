@@ -40,4 +40,4 @@ if ($action === 'purgemetadata') {
     $message = get_string('purgedefinitionsuccess', 'core_cache');
 }
 
-redirect($returnurl, $message);
+redirect(new moodle_url($returnurl), $message);
