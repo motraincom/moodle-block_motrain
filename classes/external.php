@@ -26,6 +26,7 @@
 namespace block_motrain;
 
 use block_motrain\local\award\award;
+use block_motrain\local\completion_coins_calculator;
 use completion_info;
 use context_course;
 use context_system;
@@ -336,6 +337,10 @@ class external extends external_api {
                 $DB->delete_records_list('block_motrain_comprules', 'id', $todeleteids);
             }
         }
+
+        // Purge the cache.
+        $completioncoinscalculator = new completion_coins_calculator();
+        $completioncoinscalculator->purge_cache();
 
         return ['success' => true];
     }

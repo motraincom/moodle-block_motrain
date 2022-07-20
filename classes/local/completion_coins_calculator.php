@@ -181,6 +181,17 @@ class completion_coins_calculator {
     }
 
     /**
+     * Purge the cache.
+     *
+     * Ideally this should not be part of the public API.
+     *
+     * @return void
+     */
+    public function purge_cache() {
+        $this->cache->purge();
+    }
+
+    /**
      * Get the recommended global values.
      *
      * @return object
