@@ -121,6 +121,34 @@ class player_mapper {
             }
         }
 
+        // If the player metadata is stale, update the player.
+        if (!empty($mapping) && !empty($mapping->metadatastale) && $this->syncmetadata) {
+            $user = $user ? $user : $this->get_user($userid);
+
+            // In some instances, the user metadata can be marked as stale, but the user object
+            // we are dealing with seems to be outdated (points to the previous metadata hash).
+            // This can happen when an admin modifies a user that is already logged in, and that user
+            // is entering this code with an outdated object. To remedy this, we force the user object
+            // to be loaded from the database to guarantee that we've got the latest one.
+            if ($mapping->metadatahash === $this->get_user_metadata_hash($user)) {
+                $user = $this->get_user($userid, true);
+            }
+
+            try {
+                $this->client->update_player($mapping->playerid, [
+                    'firstname' => $user->firstname,
+                    'lastname' => $user->lastname,
+                    'email' => $user->email,
+                ]);
+            } catch (client_exception $e) {
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
+            }
+
+            $mapping->metadatastale = 0;
+            $mapping->metadatahash = $this->get_user_metadata_hash($user);
+            $DB->update_record('block_motrain_playermap', $mapping);
+        }
+
         return $mapping ? $mapping->playerid : null;
     }
 
@@ -128,13 +156,14 @@ class player_mapper {
      * Get the user object.
      *
      * @param int $userid The user ID.
+     * @param bool $forcedb Force loading from database.
      * @return object The user.
      */
-    protected function get_user($userid) {
+    protected function get_user($userid, $forcedb = false) {
         global $USER;
 
         $user = $USER;
-        if ($USER->id != $userid) {
+        if ($forcedb || $USER->id != $userid) {
             $user = core_user::get_user($userid, '*');
         }
 

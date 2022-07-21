@@ -152,12 +152,20 @@ class client {
         return true;
     }
 
+    public function update_player($playerid, $data) {
+        return $this->patch('/v2/users/' . $playerid, $data);
+    }
+
     protected function head($uri, $params = null) {
         return $this->request('HEAD', $uri, $params);
     }
 
     protected function get($uri, $params = null) {
         return $this->request('GET', $uri, $params);
+    }
+
+    protected function patch($uri, $data = null) {
+        return $this->request('PATCH', $uri, $data);
     }
 
     protected function post($uri, $data = null) {
@@ -198,6 +206,9 @@ class client {
         if ($method === 'POST') {
             $url = new moodle_url($this->apihost . $uri);
             $response = $curl->post($url, $data ? json_encode($data) : '');
+        } else if ($method === 'PATCH') {
+            $url = new moodle_url($this->apihost . $uri);
+            $response = $curl->patch($url, $data ? json_encode($data) : '');
         } else if ($method === 'PUT') {
             $url = new moodle_url($this->apihost . $uri);
             $response = $curl->put($url, $data ? json_encode($data) : '');
