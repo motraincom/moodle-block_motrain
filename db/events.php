@@ -40,6 +40,10 @@ $observers = [
         'callback' => 'block_motrain\\observer::cohort_member_added',
     ],
     [
+        'eventname' => '\\core\\event\\user_updated',
+        'callback' => 'block_motrain\\observer::user_updated',
+    ],
+    [
         'eventname' => '\\totara_cohort\\event\\members_updated',
         'callback' => 'block_motrain\\observer::totara_cohort_members_updated',
     ],

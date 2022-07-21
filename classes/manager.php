@@ -253,6 +253,7 @@ class manager {
         if (!$this->playermapper) {
             $this->playermapper = new player_mapper($this->get_client(), $this->get_account_id());
             $this->playermapper->set_local_only($this->is_paused());
+            $this->playermapper->set_sync_metadata($this->is_player_metadata_sync_enabled());
         }
         return $this->playermapper;
     }
@@ -358,6 +359,15 @@ class manager {
             return false;
         }
         return $this->is_setup();
+    }
+
+    /**
+     * Whether we update player's metadata when it changes.
+     *
+     * @return bool
+     */
+    public function is_player_metadata_sync_enabled() {
+        return true;
     }
 
     /**

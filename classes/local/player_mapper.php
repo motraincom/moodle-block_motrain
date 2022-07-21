@@ -43,6 +43,8 @@ class player_mapper {
     protected $accountid;
     /** @var bool Whether the mapping only considers local data. */
     protected $localonly = false;
+    /** @var bool Whether we support synchronising metadata. */
+    protected $syncmetadata = false;
     /** @var client The client. */
     protected $client;
 
@@ -103,11 +105,13 @@ class player_mapper {
             if (empty($mapping)) {
                 $mapping = (object) [
                     'accountid' => $this->accountid,
-                    'userid' => $userid
+                    'userid' => $userid,
                 ];
             }
 
             $mapping->playerid = $playerid;
+            $mapping->metadatahash = $this->get_user_metadata_hash($user);
+            $mapping->metadatastale = 0;
             $mapping->blocked = !empty($blockedreason);
             $mapping->blockedreason = $blockedreason;
             if (!empty($mapping->id)) {
@@ -138,12 +142,30 @@ class player_mapper {
     }
 
     /**
+     * Get the user's metadata hash.
+     *
+     * @param object $user The user.
+     */
+    protected function get_user_metadata_hash($user) {
+        return sha1($user->firstname . '|' . $user->lastname . '|' . $user->email);
+    }
+
+    /**
      * Whether the mapping only considers local data.
      *
      * @param bool $localonly Local only.
      */
     public function set_local_only($localonly) {
         $this->localonly = (bool) $localonly;
+    }
+
+    /**
+     * Whether we supports updating the metadata of players.
+     *
+     * @param bool $syncmetadata Enabled when true.
+     */
+    public function set_sync_metadata($syncmetadata) {
+        $this->syncmetadata = (bool) $syncmetadata;
     }
 
     /**
@@ -164,6 +186,39 @@ class player_mapper {
     public function unblock_user($userid) {
         global $DB;
         $DB->set_field('block_motrain_playermap', 'blocked', 0, ['accountid' => $this->accountid, 'userid' => $userid]);
+    }
+
+    /**
+     * Check a mapping's metadata staleness.
+     *
+     * This checks whether the user's metadata has been modified since the last time
+     * we processed it. If yes, it will mark the mapping as stale to trigger the
+     * update on the remote server if that's the case.
+     *
+     * This only affects existing mappings.
+     *
+     * @param object $user The user.
+     */
+    public function update_mapping_metadata_staleness($user) {
+        global $DB;
+
+        if (!$this->syncmetadata) {
+            return;
+        }
+
+
+        $metadatahash = $this->get_user_metadata_hash($user);
+        $DB->set_field_select(
+            'block_motrain_playermap',
+            'metadatastale',
+            1,
+            'accountid = ? AND userid = ? AND (metadatahash != ? OR metadatahash IS NULL)',
+            [
+                $this->accountid,
+                $user->id,
+                $metadatahash,
+            ]
+        );
     }
 
 }

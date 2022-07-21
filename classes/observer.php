@@ -132,4 +132,26 @@ class observer {
         $manager->schedule_cohort_sync($event->objectid, false);
     }
 
+    /**
+     * When a user's data has been updated.
+     *
+     * @param \core\event\user_updated $event The event.
+     */
+    public static function user_updated($event) {
+        $manager = manager::instance();
+        if (!$manager->is_enabled()) {
+            return;
+        }
+
+        // Check whether we should even bother.
+        if (!$manager->is_player_metadata_sync_enabled()) {
+            return;
+        }
+
+        // We must load the record snapshot as it's not guaranteed that the $USER object has been updated,
+        // therefore we cannot try to be smart and re-use the $USER object in order to save a database query.
+        $playermap = $manager->get_player_mapper();
+        $playermap->update_mapping_metadata_staleness($event->get_record_snapshot('user', $event->objectid));
+    }
+
 }
