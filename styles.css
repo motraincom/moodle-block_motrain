@@ -24,6 +24,9 @@
 /** Rules */
 .block_motrain-rule-item {
     margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .block_motrain-rule-item label {
     display: flex;
@@ -32,7 +35,7 @@
 }
 .block_motrain-rule-item-label {
     flex: 1;
-    max-width: 16rem;
+    width: 16rem;
 }
 .block_motrain-rule-item-field {
     width: 8rem;
@@ -47,8 +50,12 @@
 .block_motrain-section-title {
     font-weight: bold;
     font-size: large;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
 }
-.block_motrain-section-title:hover {
+.block_motrain-section-title a:hover {
     cursor: pointer;
 }
 .block_motrain-section-title .icon {
@@ -58,6 +65,10 @@
     border-left: 3px solid #efefef;
     padding-left: 16px;
     margin-top: 4px;
+}
+.block_motrain-section-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
 /** Block wallet. */

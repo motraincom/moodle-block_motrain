@@ -5,7 +5,7 @@ import SectionTitle from '../components/SectionTitle';
 import Selector from '../components/Selector';
 import Str from '../components/Str';
 import { useString, useUnloadCheck } from '../lib/hooks';
-import { getModule, getUrl } from '../lib/moodle';
+import { getModule, getUrl, imageUrl } from '../lib/moodle';
 import { genClassName } from '../lib/style';
 import { AppContext } from './lib/context';
 import { useCourseActivitiesWithCompletion } from './lib/hooks';
@@ -135,7 +135,8 @@ const CoursesRules: React.FC<{
     courses: Course[];
     expanded: number[];
 }> = ({ rules, courses, expanded }) => {
-    const { addCourse, setExpanded, setCollapsed } = useReducerAction();
+    const { addCourse, removeCourse, setExpanded, setCollapsed } = useReducerAction();
+    const areYouSureStr = useString('areyousure', 'core');
 
     const courseIds = rules.reduce<number[]>((carry, r) => {
         if (carry.indexOf(r.id) < 0) {
@@ -159,11 +160,17 @@ const CoursesRules: React.FC<{
                     if (v) setExpanded(courseId);
                     else setCollapsed(courseId);
                 };
+                const handleDelete = () => {
+                    if (confirm(areYouSureStr)) {
+                        removeCourse(courseId);
+                    }
+                };
                 return (
                     <div className={[genClassName('section'), isExpanded ? '' : 'expanded'].join(' ')} key={courseId}>
                         <SectionTitle
                             title={course?.displayname || <Str id="unknowncoursen" a={courseId} />}
                             onExpandedChange={handleExpandedChange}
+                            onDelete={handleDelete}
                             expanded={isExpanded}
                         />
                         {isExpanded && course ? (
@@ -184,7 +191,7 @@ const CourseRules: React.FC<{
     id: number;
 }> = ({ rule, id }) => {
     const { isError, isSuccess, activities } = useCourseActivitiesWithCompletion(id);
-    const { addCm, updateCourseCompleted, updateCmCompleted } = useReducerAction();
+    const { addCm, removeCm, updateCourseCompleted, updateCmCompleted } = useReducerAction();
 
     if (isError) {
         return <div style={{ margin: '1rem 0' }}>Error loading</div>;
@@ -227,12 +234,17 @@ const CourseRules: React.FC<{
                         updateCmCompleted(id, cmId, coins);
                     };
 
+                    const handleLessonCompletionDelete = () => {
+                        removeCm(id, cmId);
+                    };
+
                     return (
                         <Item
                             key={cmId}
                             label={`${activity ? getActivityName(activity) : <Str id="unknownactivityn" a={cmId} />} completion`}
                             value={cmRules.coins}
                             onChange={handleLessonCompletionChange}
+                            onDelete={handleLessonCompletionDelete}
                         />
                     );
                 })}
@@ -248,16 +260,19 @@ const Item = ({
     label,
     value = null,
     onChange,
+    onDelete,
     disabled,
     allowNull = true,
 }: {
     label: React.ReactNode;
     value?: number | string | null;
     onChange: (v: number | null) => void;
+    onDelete?: () => void;
     allowNull?: boolean;
     disabled?: boolean;
 }) => {
     const defaultParensStr = useString('defaultparens');
+    const deleteStr = useString('delete', 'core');
     const [localValue, setLocalValue] = useState<string | undefined | null | number>(value);
     useEffect(() => setLocalValue(value), [value, setLocalValue]);
 
@@ -272,6 +287,11 @@ const Item = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (disabled) return;
         setLocalValue(e.target.value);
+    };
+
+    const handleDeleteClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        onDelete && onDelete();
     };
 
     const isDefault = localValue !== 0 && !localValue;
@@ -293,6 +313,13 @@ const Item = ({
                     />
                 </div>
             </label>
+            {onDelete ? (
+                <div>
+                    <a className={genClassName('rule-item-delete')} onClick={handleDeleteClick} role="button" href="#">
+                        <img src={imageUrl('t/delete', 'core')} alt={deleteStr} className="icon" />
+                    </a>
+                </div>
+            ) : null}
         </div>
     );
 };
@@ -300,6 +327,8 @@ const Item = ({
 type Action =
     | 'addCourse'
     | 'addCm'
+    | 'removeCourse'
+    | 'removeCm'
     | 'setDirty'
     | 'setExpanded'
     | 'setGlobalUsesrecommended'
@@ -369,6 +398,16 @@ function rulesReducer(state: CourseRules, [type, payload]: [Action, any]) {
             return {
                 ...course,
                 cms: [...(course.cms || []), { id: payload.cmId, coins: null } as CmRule],
+            };
+        });
+    } else if (type === 'removeCourse') {
+        return state.filter((c) => c.id !== payload);
+    } else if (type === 'removeCm') {
+        return state.map((course) => {
+            if (course.id !== payload.courseId) return course;
+            return {
+                ...course,
+                cms: (course.cms || []).filter((cm) => cm.id !== payload.cmId),
             };
         });
     } else if (type === 'updateCourseCompleted') {
@@ -457,6 +496,8 @@ function reducer(state: State, action: [Action, any]) {
 const ReducerActionsContext = createContext({
     addCourse: (courseId: number) => {},
     addCm: (courseId: number, cmId: number) => {},
+    removeCourse: (courseId: number) => {},
+    removeCm: (courseId: number, cmId: number) => {},
     setCollapsed: (courseId: number) => {},
     setExpanded: (courseId: number) => {},
     setGlobalUsesrecommended: (useRecommended: boolean, defaults: Defaults) => {},
@@ -512,6 +553,9 @@ const App = ({ rules = [], globalRules = {} }: { rules?: CourseRules; globalRule
                 value={{
                     addCourse: (courseId: number) => dispatch(['addCourse', courseId]),
                     addCm: (courseId: number, cmId: number) => dispatch(['addCm', { courseId, cmId }]),
+                    removeCourse: (courseId: number) => dispatch(['removeCourse', courseId]),
+                    removeCm: (courseId: number, cmId: number) => dispatch(['removeCm', { courseId, cmId }]),
+
                     setCollapsed: (courseId: number) => dispatch(['setCollapsed', courseId]),
 
                     setExpanded: (courseId: number) => dispatch(['setExpanded', courseId]),

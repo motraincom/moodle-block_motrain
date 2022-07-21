@@ -262,6 +262,7 @@ class external extends external_api {
 
         } else {
             $todeleteids = [];
+            $rulecourseids = [];
 
             $courserecords = $DB->get_recordset_select('block_motrain_comprules', 'courseid != ?', [0]);
             $organised = [];
@@ -283,6 +284,7 @@ class external extends external_api {
             // For each of the course rules.
             foreach ($rules as $rule) {
                 $courseid = $rule['id'];
+                $rulecourseids[] = $courseid;
                 $coursedata = !empty($organised[$courseid]) ? $organised[$courseid] : null;
 
                 // Update the course completion value.
@@ -329,6 +331,19 @@ class external extends external_api {
                     $todeleteids = array_merge($todeleteids, array_values(array_map(function($record) {
                         return $record->id;
                     }, $cmstodelete)));
+                }
+            }
+
+            // Flag the courses that have been removed to be deleted.
+            $extraneousrecords = array_diff_key($organised, array_flip($rulecourseids));
+            foreach ($extraneousrecords as $extraneousrecord) {
+                if (!empty($extraneousrecord->course)) {
+                    $todeleteids[] = $extraneousrecord->course->id;
+                }
+                if (!empty($extraneousrecord->cms)) {
+                    $todeleteids = array_merge($todeleteids, array_values(array_map(function($record) {
+                        return $record->id;
+                    }, $extraneousrecord->cms)));
                 }
             }
 
