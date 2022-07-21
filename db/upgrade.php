@@ -68,5 +68,20 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2022072101, 'motrain');
     }
 
+    if ($oldversion < 2022072102) {
+
+        // Define index useraccountmetadata (not unique) to be added to block_motrain_playermap.
+        $table = new xmldb_table('block_motrain_playermap');
+        $index = new xmldb_index('useraccountmetadata', XMLDB_INDEX_NOTUNIQUE, ['userid', 'accountid', 'metadatahash']);
+
+        // Conditionally launch add index useraccountmetadata.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2022072102, 'motrain');
+    }
+
     return true;
 }

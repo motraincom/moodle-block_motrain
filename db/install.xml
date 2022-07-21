@@ -35,6 +35,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="useraccount" UNIQUE="true" FIELDS="userid, accountid"/>
+        <INDEX NAME="useraccountmetadata" UNIQUE="false" FIELDS="userid, accountid, metadatahash"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="block_motrain_teammap" COMMENT="The cohort-team mappings.">
