@@ -111,6 +111,10 @@ while ($row = $importer->next()) {
 }
 
 foreach ($otherlangs as $lang) {
+    if (!preg_match('/^[a-z]+(_[a-z]+)*$/', $lang)) {
+        mtrace("Invalid language code {$lang}, skipping...");
+        continue;
+    }
     list($langdir, $file) = block_motrain_cli_get_language_paths($component, $lang);
     if (empty($otherstrings[$lang])) {
         continue;
