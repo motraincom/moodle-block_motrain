@@ -46,7 +46,8 @@ $courses = array_values(array_map(function($course) {
     $context = context_course::instance($course->id);
     return (object) [
         'id' => (int) $course->id,
-        'displayname' => format_string(get_course_display_name_for_list($course), true, ['context' => $context])
+        'displayname' => format_string(get_course_display_name_for_list($course), true,
+            ['context' => $context, 'escape' => false])
     ];
 }, $courses));
 

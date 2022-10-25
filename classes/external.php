@@ -144,7 +144,7 @@ class external extends external_api {
                 $carry[] = [
                     'cmid' => (int) $cminfo->id,
                     'contextid' => (int) $contextid,
-                    'name' => external_format_string($cminfo->name, $contextid),
+                    'name' => external_format_string($cminfo->name, $contextid, true, ['escape' => false]),
                     'module' => (string) $cminfo->modname,
                 ];
                 return $carry;
