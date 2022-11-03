@@ -27,6 +27,7 @@ namespace block_motrain;
 
 use block_motrain\local\award\award;
 use block_motrain\local\completion_coins_calculator;
+use block_motrain\local\helper;
 use completion_info;
 use context_course;
 use context_system;
@@ -144,7 +145,7 @@ class external extends external_api {
                 $carry[] = [
                     'cmid' => (int) $cminfo->id,
                     'contextid' => (int) $contextid,
-                    'name' => external_format_string($cminfo->name, $contextid, true, ['escape' => false]),
+                    'name' => helper::external_format_string_unescaped($cminfo->name, $contextid),
                     'module' => (string) $cminfo->modname,
                 ];
                 return $carry;
