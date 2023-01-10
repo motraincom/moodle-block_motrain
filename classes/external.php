@@ -129,8 +129,9 @@ class external extends external_api {
 
         $context = context_course::instance($courseid);
         self::validate_context($context);
-        // This is only meant to be used by admins in the admin UI.
-        require_capability('moodle/site:config', context_system::instance());
+
+        $manager = manager::instance();
+        $manager->require_manage();
 
         $course = get_course($courseid);
         $modinfo = course_modinfo::instance($courseid);
@@ -208,7 +209,9 @@ class external extends external_api {
         // This is only meant to be used by admins in the admin UI.
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('moodle/site:config', $context);
+
+        $manager = manager::instance();
+        $manager->require_manage();
 
         // Save the global rules.
         if (empty($global) || !empty($global['userecommended'])) {

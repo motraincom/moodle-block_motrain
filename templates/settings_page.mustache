@@ -1,0 +1,12 @@
+{{! Inspired from admin/templates/settings.mustache. }}
+<form action="{{actionurl}}" method="post" id="adminsettings">
+    <div class="settingsform">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        {{{content}}}
+        <div class="row">
+            <div class="offset-sm-3 col-sm-3">
+                <button type="submit" class="btn btn-primary">{{#str}}savechanges, admin{{/str}}</button>
+            </div>
+        </div>
+    </div>
+</form>

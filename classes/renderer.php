@@ -122,6 +122,63 @@ class block_motrain_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Return the block's content.
+     *
+     * @param manager $manager The manager.
+     * @return string
+     */
+    public function main_block_content_when_disabled(manager $manager) {
+        $o = '';
+        if ($manager->can_manage()) {
+            $o .= $this->notification(get_string('notenabled', 'block_motrain'), 'info', false);
+            $o .= $this->navigation_on_block_for_managers($manager);
+        }
+        return $o;
+    }
+
+    /**
+     * Render navigation.
+     *
+     * @param manager $manager The manager.
+     * @return string
+     */
+    public function navigation_for_managers(manager $manager, $currentpage) {
+        $tabs = [
+            new tabobject(
+                'settings',
+                new moodle_url('/blocks/motrain/settings_config.php'),
+                get_string('settings', 'core'),
+                clean_param(get_string('settings', 'core'), PARAM_NOTAGS)
+            ),
+            new tabobject(
+                'rules',
+                new moodle_url('/blocks/motrain/settings_rules.php'),
+                get_string('coinrules', 'block_motrain'),
+                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+            ),
+            new tabobject(
+                'teams',
+                new moodle_url('/blocks/motrain/settings_teams.php'),
+                get_string('teamassociations', 'block_motrain'),
+                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+            ),
+            new tabobject(
+                'players',
+                new moodle_url('/blocks/motrain/settings_players.php'),
+                get_string('playersmapping', 'block_motrain'),
+                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+            ),
+            new tabobject(
+                'addons',
+                new moodle_url('/blocks/motrain/settings_addons.php'),
+                get_string('manageaddons', 'block_motrain'),
+                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+            ),
+        ];
+        return $this->tabtree($tabs, $currentpage);
+    }
+
+    /**
      * Render navigation.
      *
      * @param manager $manager The manager.
@@ -183,28 +240,48 @@ class block_motrain_renderer extends plugin_renderer_base {
             );
         }
 
-        $o = '';
-        $o .= html_writer::start_tag('nav');
-        $o .= implode('', array_map(function(action_link $action) {
-            if (!isset($action->attributes['id'])) {
-                $action->attributes['id'] = html_writer::random_id();
-            }
+        if ($manager->can_manage()) {
+            $actions[] = new action_link(
+                new moodle_url('/blocks/motrain/settings_config.php'),
+                get_string('settings', 'core'),
+                null,
+                null,
+                new pix_icon('i/settings', '', 'core')
+            );
+        }
 
-            $iconandtext = html_writer::div($this->render($action->icon));
-            $iconandtext .= html_writer::div($action->text, 'nav-label');
-            $content = html_writer::link($action->url, $iconandtext, array_merge($action->attributes, ['class' => 'nav-button']));
-
-            $componentactions = !empty($action->actions) ? $action->actions : [];
-            foreach ($componentactions as $componentaction) {
-                $this->add_action_handler($componentaction, $action->attributes['id']);
-            }
-
-            return $content;
-        }, $actions));
-        $o .= html_writer::end_tag('nav');
-
-        return $o;
+        return $this->render_navigation_on_block($actions);
     }
+
+    /**
+     * Render navigation.
+     *
+     * @param manager $manager The manager.
+     * @return string
+     */
+    public function navigation_on_block_for_managers(manager $manager) {
+        $actions = [];
+        if (has_capability('block/motrain:accessdashboard', context_system::instance())) {
+            $actions[] = new action_link(
+                $manager->get_dashboard_url(),
+                get_string('dashboard', 'block_motrain'),
+                null,
+                ['target' => '_blank'],
+                new pix_icon('dashboard', '', 'block_motrain')
+            );
+        }
+        if ($manager->can_manage()) {
+            $actions[] = new action_link(
+                new moodle_url('/blocks/motrain/settings_config.php'),
+                get_string('settings', 'core'),
+                null,
+                null,
+                new pix_icon('i/settings', '', 'core')
+            );
+        }
+        return $this->render_navigation_on_block($actions);
+    }
+
 
     /**
      * Override pix_url to auto-handle deprecation.
@@ -246,6 +323,39 @@ class block_motrain_renderer extends plugin_renderer_base {
                 launcher('$module', '$id', '$propsid');
             });
         ");
+
+        return $o;
+    }
+
+    /**
+     * Render navigation on block.
+     *
+     * @param array $actions A list of actions.
+     */
+    protected function render_navigation_on_block($actions) {
+        if (empty($actions)) {
+            return '';
+        }
+
+        $o = '';
+        $o .= html_writer::start_tag('nav');
+        $o .= implode('', array_map(function(action_link $action) {
+            if (!isset($action->attributes['id'])) {
+                $action->attributes['id'] = html_writer::random_id();
+            }
+
+            $iconandtext = html_writer::div($this->render($action->icon));
+            $iconandtext .= html_writer::div($action->text, 'nav-label');
+            $content = html_writer::link($action->url, $iconandtext, array_merge($action->attributes, ['class' => 'nav-button']));
+
+            $componentactions = !empty($action->actions) ? $action->actions : [];
+            foreach ($componentactions as $componentaction) {
+                $this->add_action_handler($componentaction, $action->attributes['id']);
+            }
+
+            return $content;
+        }, $actions));
+        $o .= html_writer::end_tag('nav');
 
         return $o;
     }

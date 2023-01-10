@@ -23,91 +23,37 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use block_motrain\local\setting\static_content;
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/blocks/motrain/lib.php');
+
+$settings = new admin_externalpage('blocksettingmotrain', get_string('settings', 'core'),
+    new moodle_url('/blocks/motrain/settings_config.php'), 'block/motrain:manage');
 
 $category = new admin_category('block_motrain_category', get_string('pluginname', 'block_motrain'));
 $category->add('block_motrain_category', $settings);
 
 // Swap the category for the main settings page.
 $settingspage = $settings;
-$settingspage->visiblename = get_string('settings', 'core');
 $settings = $category;
 
 // Add page to manage the coin rules.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_rules',
-    get_string('coinrules', 'block_motrain'), new moodle_url('/blocks/motrain/settings_rules.php')));
+    get_string('coinrules', 'block_motrain'), new moodle_url('/blocks/motrain/settings_rules.php'), 'block/motrain:manage'));
 
 // Add page to manage the teams.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_teams',
-    get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php')));
+    get_string('teamassociations', 'block_motrain'), new moodle_url('/blocks/motrain/settings_teams.php'), 'block/motrain:manage'));
 
 // Add page to view the player mapping.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
-    get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php')));
+    get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php'), 'block/motrain:manage'));
 
 // Add page to manage add-ons.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_manageaddons', new lang_string('manageaddons',
-    'block_motrain'), new moodle_url('/blocks/motrain/settings_addons.php')));
+    'block_motrain'), new moodle_url('/blocks/motrain/settings_addons.php'), 'block/motrain:manage'));
 
 // Add the add-ons category settings.
 $addoncategory = new admin_category('block_motrain_addons', new lang_string('motrainaddons', 'block_motrain'));
 $category->add('block_motrain_category', $addoncategory);
-
-// Add the admin settings.
-if ($hassiteconfig) {
-
-    $settingspage->add(new block_motrain\local\setting\is_enabled());
-
-    $setting = new admin_setting_configcheckbox('block_motrain/ispaused', get_string('ispaused', 'block_motrain'),
-        get_string('ispaused_help', 'block_motrain'), false);
-    $setting->set_updatedcallback('block_motrain_ispaused_updated_hook');
-    $settingspage->add($setting);
-
-    $setting = new admin_setting_configtext('block_motrain/accountid', get_string('accountid', 'block_motrain'),
-        get_string('accountid_desc', 'block_motrain'), '');
-    $setting->set_updatedcallback('block_motrain_accountid_updated_hook');
-    $settingspage->add($setting);
-
-    $hosts = [
-        'https://api.motrainapp.com' => 'api.motrainapp.com',
-        'https://api.eu.motrainapp.com' => 'api.eu.motrainapp.com'
-    ];
-    $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
-        get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts);
-    $setting->set_updatedcallback('block_motrain_check_enabled_state');
-    $settingspage->add($setting);
-
-    $setting = new admin_setting_configpasswordunmask('block_motrain/apikey', get_string('apikey', 'block_motrain'),
-        get_string('apikey_desc', 'block_motrain'), '');
-    $setting->set_updatedcallback('block_motrain_check_enabled_state');
-    $settingspage->add($setting);
-
-    $setting = new static_content('block_motrain/metadatacache', get_string('metadatacache', 'block_motrain'),
-        get_string('metadatacache_help', 'block_motrain'),
-            html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'purgemetadata',
-                'sesskey' => sesskey(), 'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
-                get_string('purgecache', 'block_motrain'))
-    );
-    $settingspage->add($setting);
-
-    $setting = new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),
-        get_string('usecohorts_help', 'block_motrain'), true);
-    $settingspage->add($setting);
-
-    $settingspage->add(new admin_setting_configcheckbox('block_motrain/adminscanearn',
-        get_string('adminscanearn', 'block_motrain'), get_string('adminscanearn_desc', 'block_motrain'), false));
-
-    $setting = new admin_setting_configcheckbox('block_motrain/autopush', get_string('autopush', 'block_motrain'),
-        get_string('autopush_help', 'block_motrain'), false);
-    $settingspage->add($setting);
-
-    $setting = new admin_setting_configstoredfile('block_motrain/coinsimage', get_string('coinsimage', 'block_motrain'),
-        get_string('coinsimage_help', 'block_motrain'), 'coinsimage', 0, ['accepted_types' => ['image']]);
-    $settingspage->add($setting);
-
-}

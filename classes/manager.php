@@ -104,15 +104,10 @@ class manager {
     /**
      * Whether the user can manage.
      *
-     * Managing means seeing the block, and navigating to its page, it does not
-     * mean configuring the plugin. To configure the plugin, a user must be an admin.
-     *
-     * This permission is mostly useless, it really just serves to know who can see
-     * the block even when they do not have the permission to view it, or are not player.
+     * Managing means seeing the block, and navigating to its page, and configuring it.
      */
     public function can_manage($userid = null) {
-        global $PAGE;
-        return has_capability('block/motrain:addinstance', $PAGE->context, $userid);
+        return has_capability('block/motrain:manage', context_system::instance(), $userid);
     }
 
     /**
@@ -479,6 +474,15 @@ class manager {
         if (!$this->is_enabled()) {
             throw new \moodle_exception('notenabled', 'block_motrain');
         }
+    }
+
+    /**
+     * Require view permissions.
+     *
+     * @throws \required_capability_exception
+     */
+    public function require_manage() {
+        require_capability('block/motrain:manage', context_system::instance());
     }
 
     /**

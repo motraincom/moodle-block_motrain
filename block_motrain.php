@@ -96,9 +96,7 @@ class block_motrain extends block_base {
 
         // Check whether the plugin is enabled.
         if (!$manager->is_enabled()) {
-            if ($canmanage) {
-                $this->content->text = $renderer->notification(get_string('notenabled', 'block_motrain'), 'info');
-            }
+            $this->content->text = $renderer->main_block_content_when_disabled($manager);
             return $this->content;
         }
 

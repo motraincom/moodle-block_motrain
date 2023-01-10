@@ -23,21 +23,25 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\manager;
+
 require_once(__DIR__ . ' /../../config.php');
 
 $action = required_param('action', PARAM_LOCALURL);
 $returnurl = required_param('returnurl', PARAM_LOCALURL);
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
 require_sesskey();
+
+$manager = manager::instance();
+$manager->require_manage();
 
 $PAGE->set_context(context_system::instance());
 
 $message = '';
 if ($action === 'purgemetadata') {
     cache_helper::purge_by_definition('block_motrain', 'metadata');
-    $message = get_string('purgedefinitionsuccess', 'core_cache');
+    $message = get_string('cachepurged', 'block_motrain');
 }
 
 redirect(new moodle_url($returnurl), $message);

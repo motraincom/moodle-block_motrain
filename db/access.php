@@ -63,6 +63,14 @@ $capabilities = [
         ],
     ],
 
+    // Whether the user can manage Motrain.
+    'block/motrain:manage' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => [],
+        'clonepermissionsfrom' => 'moodle/site:config'
+    ],
+
     // Whether or not the user can add the block on their dashboard.
     'block/motrain:myaddinstance' => array(
         'captype' => 'write',

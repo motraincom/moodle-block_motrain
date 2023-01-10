@@ -24,20 +24,28 @@
  */
 
 use block_motrain\addons;
+use block_motrain\manager;
 
 require_once(__DIR__ . ' /../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
-admin_externalpage_setup('block_motrain_manageaddons');
+require_login();
+$manager = manager::instance();
+$manager->require_manage();
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('motrainaddons', 'block_motrain'));
+$PAGE->set_url('/blocks/motrain/settings_addons.php');
+$PAGE->set_context(context_system::instance());
+$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
+
+$output = $PAGE->get_renderer('block_motrain');
+
+echo $output->header();
+echo $output->navigation_for_managers($manager, 'addons');
 
 $addons = addons::get_addons();
 if (empty($addons)) {
-    echo $OUTPUT->notification(get_string('noaddoninstalled', 'block_motrain'), 'nofityinfo');
-    echo $OUTPUT->footer();
+    echo $output->notification(get_string('noaddoninstalled', 'block_motrain'), 'nofityinfo');
+    echo $output->footer();
     die();
 }
 
@@ -77,4 +85,4 @@ foreach ($plugins as $name => $plugin) {
 
 $table->finish_output();
 
-echo $OUTPUT->footer();
+echo $output->footer();

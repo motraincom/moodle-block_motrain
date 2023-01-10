@@ -28,20 +28,24 @@ use block_motrain\manager;
 use core\output\notification;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 
 $motrainteamid = optional_param('id', null, PARAM_INT);
 $deleteid = optional_param('delete', null, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-admin_externalpage_setup('block_motrain_teams');
+require_login();
+$manager = manager::instance();
+$manager->require_manage();
+
+$PAGE->set_url('/blocks/motrain/settings_teams.php');
+$PAGE->set_context(context_system::instance());
+$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
 
 $output = $PAGE->get_renderer('block_motrain');
-$manager = manager::instance();
 
 if (!$manager->is_enabled()) {
     echo $output->header();
-    echo $output->heading(get_string('teamassociations', 'block_motrain'));
+    echo $output->navigation_for_managers($manager, 'teams');
     echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
     echo $output->footer();
     die();
@@ -109,17 +113,17 @@ if ($motrainteamid !== null) {
 
 // Display the page.
 echo $output->header();
+echo $output->navigation_for_managers($manager, 'teams');
 
 if ($motrainteamid !== null) {
     if ($motrainteamid) {
-        echo $output->heading(get_string('editassociation', 'block_motrain'));
+        echo $output->heading(get_string('editassociation', 'block_motrain'), 3);
     } else {
-        echo $output->heading(get_string('createassociation', 'block_motrain'));
+        echo $output->heading(get_string('createassociation', 'block_motrain'), 3);
     }
     $form->display();
 
 } else {
-    echo $output->heading(get_string('teamassociations', 'block_motrain'));
 
     if (!$globalassociation || $isusingcohorts) {
         echo html_writer::div(
