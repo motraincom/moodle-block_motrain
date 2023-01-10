@@ -42,7 +42,10 @@ $PAGE->set_pagelayout('admin');
 
 $output = $PAGE->get_renderer('block_motrain');
 
-// Generate the list of settings.
+// Generate the list of settings. This re-implements the adminsetting_page behaviour of the settings page
+// in order to stay consistent with what we had before (when admin settings were required to edit the page).
+// Unfortunately, this means taht the settings cannot be searched in the UI. This also means that they do not
+// benefit from getting the default values set during the installation.
 $settingspage = new admin_settingpage('block_motrain_settings', get_string('settings', 'core'), 'moodle/motrain:manage');
 
 $settingspage->add(new block_motrain\local\setting\is_enabled());
