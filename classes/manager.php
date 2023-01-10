@@ -421,7 +421,11 @@ class manager {
      * @return bool
      */
     public function is_using_cohorts() {
-        return (bool) get_config('block_motrain', 'usecohorts');
+        $cfg = get_config('block_motrain', 'usecohorts');
+        if ($cfg === false) {
+            return true; // The default value is true.
+        }
+        return (bool) $cfg;
     }
 
     /**
