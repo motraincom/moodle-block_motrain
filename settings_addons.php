@@ -37,6 +37,7 @@ $PAGE->set_url('/blocks/motrain/settings_addons.php');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('pluginname', 'block_motrain'));
 $PAGE->set_title(get_string('manageaddons', 'block_motrain'));
+$PAGE->set_pagelayout('admin');
 
 $output = $PAGE->get_renderer('block_motrain');
 
