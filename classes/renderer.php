@@ -246,7 +246,7 @@ class block_motrain_renderer extends plugin_renderer_base {
                 get_string('settings', 'core'),
                 null,
                 null,
-                new pix_icon('i/settings', '', 'core')
+                new pix_icon('settings', '', 'block_motrain')
             );
         }
 
