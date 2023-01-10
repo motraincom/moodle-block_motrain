@@ -35,13 +35,14 @@ $manager->require_manage();
 
 $PAGE->set_url('/blocks/motrain/settings_addons.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_title(get_string('manageaddons', 'block_motrain'));
 $PAGE->set_pagelayout('admin');
 
 $output = $PAGE->get_renderer('block_motrain');
 
 echo $output->header();
+echo $output->heading(get_string('pluginname', 'block_motrain'));
 echo $output->navigation_for_managers($manager, 'addons');
 
 $addons = addons::get_addons();

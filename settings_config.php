@@ -36,7 +36,7 @@ $manager->require_manage();
 
 $PAGE->set_url('/blocks/motrain/settings_config.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_title(get_string('settings', 'core'));
 $PAGE->set_pagelayout('admin');
 
@@ -138,6 +138,7 @@ if ($data = data_submitted() and confirm_sesskey()) {
 
 // Display the page.
 echo $output->header();
+echo $output->heading(get_string('pluginname', 'block_motrain'));
 echo $output->navigation_for_managers($manager, 'settings');
 
 if (!empty($errormsg)) {

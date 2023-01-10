@@ -40,7 +40,7 @@ $manager->require_manage();
 
 $PAGE->set_url('/blocks/motrain/settings_rules.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_title(get_string('coinrules', 'block_motrain'));
 $PAGE->set_pagelayout('admin');
 
@@ -70,6 +70,7 @@ $allrules = completion_coins_calculator::get_all_rules();
 
 // Display the page.
 echo $output->header();
+echo $output->heading(get_string('pluginname', 'block_motrain'));
 echo $output->navigation_for_managers($manager, 'rules');
 
 if (!$manager->is_enabled()) {

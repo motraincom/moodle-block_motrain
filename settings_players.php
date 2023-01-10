@@ -37,7 +37,7 @@ $manager->require_manage();
 
 $PAGE->set_url('/blocks/motrain/settings_players.php');
 $PAGE->set_context(context_system::instance());
-$PAGE->set_heading(get_string('pluginname', 'block_motrain'));
+$PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_title(get_string('playersmapping', 'block_motrain'));
 $PAGE->set_pagelayout('admin');
 
@@ -45,6 +45,7 @@ $output = $PAGE->get_renderer('block_motrain');
 
 if (!$manager->is_enabled()) {
     echo $output->header();
+    echo $output->heading(get_string('pluginname', 'block_motrain'));
     echo $output->navigation_for_managers($manager, 'players');
     echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
     echo $output->footer();
@@ -61,6 +62,7 @@ if ($action === 'delete' && confirm_sesskey()) {
 
 // Display the page.
 echo $output->header();
+echo $output->heading(get_string('pluginname', 'block_motrain'));
 echo $output->navigation_for_managers($manager, 'players');
 echo html_writer::tag('p', get_string('playermappingintro', 'block_motrain'));
 $table = new players_mapping_table($manager);
