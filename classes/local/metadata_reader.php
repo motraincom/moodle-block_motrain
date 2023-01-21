@@ -67,6 +67,45 @@ class metadata_reader {
     }
 
     /**
+     * Get the item.
+     *
+     * @param string $itemid The item ID.
+     * @return object|null
+     */
+    protected function get_item($itemid) {
+        $key = 'item_' . $itemid;
+        if (($val = $this->cache->get($key)) === false) {
+            try {
+                $val = $this->manager->get_client()->get_item($itemid);
+            } catch (client_exception $e) {
+                $val = null;
+            }
+            $this->cache->set($key, $val);
+        }
+        return $val;
+    }
+
+    /**
+     * Get the item name.
+     *
+     * @param string $itemid The item ID.
+     * @return string
+     */
+    public function get_item_name($itemid) {
+        return $this->get_item($itemid)->name ?? 'Unknown item';
+    }
+
+    /**
+     * Get the item redemption message.
+     *
+     * @param string $itemid The item ID.
+     * @return string|null
+     */
+    public function get_item_redemption_message($itemid) {
+        return $this->get_item($itemid)->redemption->message ?? null;
+    }
+
+    /**
      * Is the account leaderboard enabled.
      *
      * @return bool

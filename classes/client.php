@@ -105,6 +105,11 @@ class client {
         return $resp->coins;
     }
 
+    public function get_item($itemid) {
+        $resp = $this->get('/v2/items/' . $itemid);
+        return $resp;
+    }
+
     public function get_player_by_email($teamid, $email) {
         $resp = $this->get('/v2/teams/' . $teamid . '/users', ['email' => $email]);
         if (!empty($resp)) {
