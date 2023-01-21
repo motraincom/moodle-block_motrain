@@ -96,6 +96,10 @@ class client {
         return $this->post('/v2/accounts/' . $this->accountid . '/webhooks', $data);
     }
 
+    public function delete_webhook($webhookid) {
+        return $this->delete('/v2/accounts/' . $this->accountid . '/webhooks/' . $webhookid);
+    }
+
     public function get_account() {
         return $this->get('/v2/accounts/' . $this->accountid);
     }
@@ -171,6 +175,10 @@ class client {
         return $this->patch('/v2/accounts/' . $this->accountid . '/webhooks/' . $webhookid, $data);
     }
 
+    protected function delete($uri, $params = null) {
+        return $this->request('DELETE', $uri, $params);
+    }
+
     protected function head($uri, $params = null) {
         return $this->request('HEAD', $uri, $params);
     }
@@ -233,6 +241,9 @@ class client {
         } else if ($method === 'HEAD') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->head($url->out(false));
+        } else if ($method === 'DELETE') {
+            $url = new moodle_url($this->apihost . $uri, $data);
+            $response = $curl->delete($url->out(false));
         }
 
         try {

@@ -59,6 +59,14 @@ class processor {
      * @param object $payload The payload.
      */
     public function process_webhook($type, $payload) {
+
+        // Validate the account ID.
+        if ($this->manager->get_account_id() !== $payload->account_id ?? '-unknown-') {
+            throw new \moodle_exception('accountidmismatch', 'block_motrain');
+        }
+
+        set_config('webhooklasthit', time(), 'block_motrain');
+
         $supported = [
             'redemption.requestAccepted',
             'redemption.selfCompleted',
@@ -69,11 +77,6 @@ class processor {
 
         if (!in_array($type, $supported)) {
             return;
-        }
-
-        // Validate the account ID.
-        if ($this->manager->get_account_id() !== $payload->account_id ?? '-unknown-') {
-            throw new \moodle_exception('accountidmismatch', 'block_motrain');
         }
 
         // Obtain the local user.

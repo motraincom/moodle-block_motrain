@@ -303,6 +303,15 @@ class manager {
     }
 
     /**
+     * Get the last time a valid webhook was encountered.
+     *
+     * @return int Zero means never.
+     */
+    public function get_last_webhook_hit() {
+        return (int) get_config('block_motrain', 'webhooklasthit');
+    }
+
+    /**
      * Whether user has access to a leaderboard.
      *
      * @return bool
@@ -412,6 +421,15 @@ class manager {
     }
 
     /**
+     * Whether we send notifications locally.
+     *
+     * @return bool
+     */
+    public function is_sending_local_notifications_enabled() {
+        return (bool) get_config('block_motrain', 'sendlocalnotifications');
+    }
+
+    /**
      * Whether the plugin seems setup.
      *
      * As in, its settings have been provided.
@@ -436,6 +454,17 @@ class manager {
             return true; // The default value is true.
         }
         return (bool) $cfg;
+    }
+
+    /**
+     * Whether we are using cohorts.
+     *
+     * @return bool
+     */
+    public function is_webhook_connected() {
+        $id = get_config('block_motrain', 'webhookid');
+        $secret = get_config('block_motrain', 'webhooksecret');
+        return !empty($id) && !empty($secret);
     }
 
     /**
@@ -593,6 +622,10 @@ class manager {
             ]
         ];
 
+        if (strpos($webhookdata['url'], 'https://') !== 0) {
+            return;
+        }
+
         if (!empty($webhookid)) {
             $client->update_webhook($webhookid, $webhookdata);
             return;
@@ -602,6 +635,25 @@ class manager {
 
         set_config('webhookid', $webhook->id, 'block_motrain');
         set_config('webhooksecret', $webhook->secret, 'block_motrain');
+    }
+
+    /**
+     * Unset the webhook.
+     */
+    public function unset_webhook() {
+        $webhookid = get_config('block_motrain', 'webhookid');
+
+        if ($this->is_enabled()) {
+            try {
+                $this->get_client()->delete_webhook($webhookid);
+            } catch (\moodle_exception $e) {
+                debugging(get_string('errorwhiledisconnectingwebhook', 'block_motrain', $e->getMessage()), DEBUG_ALL);
+            }
+        }
+
+        unset_config('webhookid', 'block_motrain');
+        unset_config('webhooksecret', 'block_motrain');
+        unset_config('webhooklasthit', 'block_motrain');
     }
 
     /**

@@ -74,6 +74,20 @@ $setting = new admin_setting_configpasswordunmask('block_motrain/apikey', get_st
 $setting->set_updatedcallback('block_motrain_check_enabled_state');
 $settingspage->add($setting);
 
+$webhookregistrationcontent = get_string('no', 'core');
+if ($manager->is_webhook_connected()) {
+    $lasthit = $manager->get_last_webhook_hit();
+    $webhooktime = get_string('lastwebhooktime', 'block_motrain', $lasthit ? userdate($lasthit) : get_string('never', 'core'));
+    $disconnect = html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'disconnectwebhook',
+        'sesskey' => sesskey(), 'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
+        get_string('disconnect', 'block_motrain'));
+    $webhookregistrationcontent = get_string('yes', 'core') . '. ' . $webhooktime . ' (' . $disconnect . ')';
+}
+$setting = new static_content('block_motrain/webhooksconnected', get_string('webhooksconnected', 'block_motrain'),
+    get_string('webhooksconnected_help', 'block_motrain'), $webhookregistrationcontent
+);
+$settingspage->add($setting);
+
 $setting = new static_content('block_motrain/metadatacache', get_string('metadatacache', 'block_motrain'),
     get_string('metadatacache_help', 'block_motrain'),
         html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'purgemetadata',
@@ -84,6 +98,11 @@ $settingspage->add($setting);
 
 $setting = new admin_setting_configcheckbox('block_motrain/usecohorts', get_string('usecohorts', 'block_motrain'),
     get_string('usecohorts_help', 'block_motrain'), true);
+$settingspage->add($setting);
+
+$setting = new admin_setting_configcheckbox('block_motrain/sendlocalnotifications',
+    get_string('sendlocalnotifications', 'block_motrain'), get_string('sendlocalnotifications_help', 'block_motrain'), false);
+$setting->set_updatedcallback('block_motrain_sendlocalnotifications_updated_hook');
 $settingspage->add($setting);
 
 $settingspage->add(new admin_setting_configcheckbox('block_motrain/adminscanearn',

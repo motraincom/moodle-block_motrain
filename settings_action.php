@@ -24,6 +24,7 @@
  */
 
 use block_motrain\manager;
+use core\notification;
 
 require_once(__DIR__ . ' /../../config.php');
 
@@ -42,6 +43,15 @@ $message = '';
 if ($action === 'purgemetadata') {
     cache_helper::purge_by_definition('block_motrain', 'metadata');
     $message = get_string('cachepurged', 'block_motrain');
+
+} else if ($action === 'disconnectwebhook') {
+    $manager->unset_webhook();
+    notification::add(get_string('webhooksdisconnected', 'block_motrain'), notification::SUCCESS);
+
+    if ($manager->is_sending_local_notifications_enabled()) {
+        set_config('sendlocalnotifications', 0, 'block_motrain');
+        notification::add(get_string('sendlocalnotificationsdisabledwithwebhooks', 'block_motrain'), notification::WARNING);
+    }
 }
 
 redirect(new moodle_url($returnurl), $message);

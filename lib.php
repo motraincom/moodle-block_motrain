@@ -24,6 +24,7 @@
  */
 
 use block_motrain\manager;
+use core\notification;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -86,3 +87,18 @@ function block_motrain_ispaused_updated_hook() {
     $balanceproxy = $manager->get_balance_proxy();
     $balanceproxy->invalidate_all();
 };
+
+/**
+ * Hook after setting sendlocalnotifications has been changed.
+ */
+function block_motrain_sendlocalnotifications_updated_hook() {
+    $manager = manager::instance();
+    if ($manager->is_sending_local_notifications_enabled()) {
+        if (!$manager->is_enabled()) {
+            set_config('sendlocalnotifications', 0, 'block_motrain');
+            notification::add(get_string('sendlocalnotificationsdisabledrequiresenabled', 'block_motrain'), notification::WARNING);
+            return;
+        }
+        $manager->setup_webhook();
+    }
+}
