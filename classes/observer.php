@@ -133,6 +133,18 @@ class observer {
     }
 
     /**
+     * When a user is deleted.
+     *
+     * @param \core\event\user_deleted $event The event.
+     */
+    public static function user_deleted($event) {
+        // Remove the mapping of deleted users, that ignores whether the plugin is enabled or not.
+        $manager = manager::instance();
+        $playermap = $manager->get_player_mapper();
+        $playermap->remove_user($event->objectid);
+    }
+
+    /**
      * When a user's data has been updated.
      *
      * @param \core\event\user_updated $event The event.
