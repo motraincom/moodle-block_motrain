@@ -37,6 +37,7 @@ use block_motrain\task\adhoc_queue_cohort_members_for_push;
 use cache;
 use context;
 use context_system;
+use core_user;
 use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
@@ -545,6 +546,31 @@ class manager {
         ]);
         $task->set_component('block_motrain');
         \core\task\manager::queue_adhoc_task($task);
+    }
+
+    /**
+     * Send notification to user.
+     *
+     * @param object $user The user.
+     * @param string $subject The subject.
+     * @param string $html The HTML content.
+     * @return bool Whether successfully delivered.
+     */
+    public function send_notification($user, $subject, $html) {
+        $userfrom = core_user::get_noreply_user();
+
+        $message = new \core\message\message();
+        $message->component         = 'block_motrain';
+        $message->name              = 'notification';
+        $message->notification      = 1;
+        $message->userto            = $user;
+        $message->userfrom          = $userfrom;
+        $message->subject           = $subject;
+        $message->fullmessage       = html_to_text($html);
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->fullmessagehtml   = $html;
+
+        return (bool) message_send($message);
     }
 
     /**

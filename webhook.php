@@ -23,9 +23,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('AJAX_SCRIPT', true);
+use block_motrain\manager;
 
+define('AJAX_SCRIPT', true);
 require(__DIR__ . '/../../config.php');
+
+$PAGE->set_url('/blocks/motrain/webhook.php');
+$PAGE->set_context(context_system::instance());
 
 // We only accept POST requests.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

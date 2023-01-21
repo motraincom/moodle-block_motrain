@@ -57,6 +57,18 @@ class player_mapper {
     }
 
     /**
+     * Get the local user ID.
+     *
+     * @param string $remoteplayerid The remote player ID.
+     * @return int|null
+     */
+    public function get_local_user_id($remoteplayerid) {
+        global $DB;
+        $mapping = $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'playerid' => $remoteplayerid]);
+        return $mapping ? $mapping->userid : null;
+    }
+
+    /**
      * Get the player ID of a user.
      *
      * @param int|object $userorid The user or its ID.

@@ -15,19 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version.
+ * Messages.
  *
  * @package    block_motrain
- * @copyright  2022 Mootivation Technologies Corp.
+ * @copyright  2023 Mootivation Technologies Corp.
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2023011003;
-$plugin->requires = 2017051500;     // Moodle 3.3.0.
-$plugin->release = '1.4.0';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->component = 'block_motrain';
+$enabledflag = defined('MESSAGE_DEFAULT_ENABLED') ? MESSAGE_DEFAULT_ENABLED : MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF;
 
+$messageproviders = [
+    // Various notifications.
+    'notification' => [
+        'defaults' => [
+            'popup' => $enabledflag,
+            'email' => $enabledflag,
+        ],
+    ],
+];

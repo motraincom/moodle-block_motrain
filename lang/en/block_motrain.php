@@ -79,6 +79,7 @@ $string['leaderboard'] = 'Leaderboard';
 $string['manageaddons'] = 'Manage add-ons';
 $string['metadatacache_help'] = 'The plugin keeps a cache of some metadata from the API to improve performance. It stores information such as which leaderboards are enabled, etc. After making some changes on the Motrain dashboard, you may need to manually purge this cache. You can do so by clicking the link above.';
 $string['metadatacache'] = 'Metadata cache';
+$string['messageprovider:notification'] = 'Notifications in relation to Motrain.';
 $string['motrain:accessdashboard'] = 'Access the Motrain dashboard';
 $string['motrain:addinstance'] = 'Add a new Motrain block';
 $string['motrain:awardcoins'] = 'Award coins to other users';

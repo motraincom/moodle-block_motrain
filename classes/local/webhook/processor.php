@@ -26,6 +26,7 @@
 namespace block_motrain\local\webhook;
 
 use block_motrain\manager;
+use core_user;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -58,6 +59,36 @@ class processor {
      * @param object $payload The payload.
      */
     public function process_webhook($type, $payload) {
+        $supported = [
+            'redemption.requestAccepted',
+            'redemption.selfCompleted',
+            'user.auctionWon',
+            'user.manuallyAwardedCoins',
+            'user.raffleWon'
+        ];
+
+        if (!in_array($type, $supported)) {
+            return;
+        }
+
+        // Validate the account ID.
+        if ($this->manager->get_account_id() !== $payload->account_id ?? '-unknown-') {
+            throw new \moodle_exception('accountidmismatch', 'block_motrain');
+        }
+
+        // Obtain the local user.
+        $playermapper = $this->manager->get_player_mapper();
+        $userid = $playermapper->get_local_user_id($payload->user_id ?? 0);
+        if (!$userid) {
+            return;
+        }
+        $user = core_user::get_user($userid);
+        if (!$user || !core_user::is_real_user($user->id)) {
+            return;
+        }
+
+        // Send a notification.
+        $this->manager->send_notification($user, 'Congrats', 'That was amazing!');
     }
 
 }
