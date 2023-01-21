@@ -88,9 +88,35 @@ if (!$isvalid) {
 
 // Parse and basic validation of the content of the webhook.
 $data = json_decode($body);
-if (empty($data) || empty($data->type) || empty($data->payload)) {
+if (empty($data) || empty($data->type) || empty($data->payload) || !is_string($data->type) || !is_object($data->payload)) {
     header('HTTP/1.1 400 Bad Request');
     die();
 }
 
-// Ok we're good!
+try {
+    // Validate state of the plugin.
+    $manager = manager::instance();
+    $manager->require_enabled();
+    $manager->require_not_paused();
+
+    // Ok we're good!
+    $whprocessor = $manager->get_webhook_processor();
+    $whprocessor->process_webhook($data->type, $data->payload);
+
+} catch (Throwable $err) {
+    // We must handle all exceptions, otherwise Moodle returns a 200 for exceptions.
+
+    if ($err instanceof \moodle_exception) {
+        if ($err->errorcode === 'notenabled' || $err->errorcode === 'pluginispaused') {
+            header('HTTP/1.1 503 Service Unavailable');
+            header('Content-Type: application/json');
+            echo json_encode(['code' => $err->errorcode, 'message' => $err->getMessage()]);
+            die();
+        }
+    }
+
+    header('HTTP/1.1 500 Internal Server Error');
+    header('Content-Type: application/json');
+    echo json_encode(['code' => 'unknown', 'message' => $err->getMessage()]);
+    die();
+}

@@ -293,6 +293,15 @@ class manager {
     }
 
     /**
+     * Get the webhook processor.
+     *
+     * @return local\webhook\processor
+     */
+    public function get_webhook_processor() {
+        return new local\webhook\processor($this);
+    }
+
+    /**
      * Whether user has access to a leaderboard.
      *
      * @return bool
