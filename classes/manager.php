@@ -539,6 +539,37 @@ class manager {
     }
 
     /**
+     * Setup the webhook.
+     */
+    public function setup_webhook() {
+        $client = $this->get_client();
+        $webhookid = get_config('block_motrain', 'webhookid');
+
+        $webhookurl = new moodle_url('/blocks/motrain/webhook.php');
+        $webhookdata = [
+            'url' => $webhookurl->out(false),
+            'description' => 'Integration with Moodle (block_motrain)',
+            'event_types' => [
+                'redemption.requestAccepted',
+                'redemption.selfCompleted',
+                'user.auctionWon',
+                'user.manuallyAwardedCoins',
+                'user.raffleWon',
+            ]
+        ];
+
+        if (!empty($webhookid)) {
+            $client->update_webhook($webhookid, $webhookdata);
+            return;
+        }
+
+        $webhook = $client->create_webhook($webhookdata);
+
+        set_config('webhookid', $webhook->id, 'block_motrain');
+        set_config('webhooksecret', $webhook->secret, 'block_motrain');
+    }
+
+    /**
      * Get the manager's instance.
      *
      * @return static

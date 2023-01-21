@@ -54,6 +54,8 @@ class client {
     protected $accountid;
     /** @var object An observer. */
     protected $observer;
+    /** @var string The language. */
+    protected $lang;
 
     /**
      * Constructor.
@@ -88,6 +90,10 @@ class client {
 
     public function create_player($teamid, $data) {
         return $this->post('/v2/teams/' . $teamid . '/users', $data);
+    }
+
+    public function create_webhook($data) {
+        return $this->post('/v2/accounts/' . $this->accountid . '/webhooks', $data);
     }
 
     public function get_account() {
@@ -154,6 +160,10 @@ class client {
 
     public function update_player($playerid, $data) {
         return $this->patch('/v2/users/' . $playerid, $data);
+    }
+
+    public function update_webhook($webhookid, $data) {
+        return $this->patch('/v2/accounts/' . $this->accountid . '/webhooks/' . $webhookid, $data);
     }
 
     protected function head($uri, $params = null) {
