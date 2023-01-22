@@ -65,6 +65,7 @@ $string['defaulttitle'] = 'Motrain';
 $string['disabled'] = 'Disabled';
 $string['disconnect'] = 'Disconnect';
 $string['editassociation'] = 'Edit association';
+$string['emailtemplate'] = 'Email template';
 $string['enableaddon_help'] = 'An add-on must be enabled to work.';
 $string['enableaddon'] = 'Enable add-on';
 $string['enabled'] = 'Enabled';
@@ -83,6 +84,8 @@ $string['manageaddons'] = 'Manage add-ons';
 $string['metadatacache_help'] = 'The plugin keeps a cache of some metadata from the API to improve performance. It stores information such as which leaderboards are enabled, item names, etc. After making some changes on the Motrain dashboard, you may need to manually purge this cache. You can do so by clicking the link above.';
 $string['metadatacache'] = 'Metadata cache';
 $string['messageprovider:notification'] = 'Notifications in relation to Motrain.';
+$string['messagetemplates'] = 'Message templates';
+$string['messagetemplatesintro'] = 'The following templates are used when notifications are sent to players from this site. The system will pick the template language that best matches the language of the recipient, or use the fallback template when none fit.';
 $string['motrain:accessdashboard'] = 'Access the Motrain dashboard';
 $string['motrain:addinstance'] = 'Add a new Motrain block';
 $string['motrain:awardcoins'] = 'Award coins to other users';
@@ -94,13 +97,24 @@ $string['motrainaddons'] = 'Motrain add-ons';
 $string['noaddoninstalled'] = 'No add-ons have been installed yet.';
 $string['nocohortallusers'] = 'All users';
 $string['nooptions'] = 'No options';
+$string['noredemptionessagefound'] = '[No information found]';
 $string['noteamsyetcreatefirst'] = 'No team association exist yet, please start by creating one.';
 $string['notenabled'] = 'The plugin is not enabled, please check its settings.';
+$string['placeholdercoins'] = 'The number of coins associated.';
+$string['placeholderitemname'] = 'The name of the associated item.';
+$string['placeholdermessage'] = 'A message associated with this event.';
+$string['placeholdermessageexample'] = 'A message associated with this event.';
+$string['placeholderoptionalmessagefromadmin'] = 'An optional message from the admin.';
+$string['placeholderoptionalmessagefromadminexample'] = 'Excellent job! You will receive your item shortly!';
 $string['playerid'] = 'Player ID';
 $string['playeridnotfound'] = 'The player associated with the current user could not be found, please contact the adminstrator.';
 $string['playermappingintro'] = 'A player mapping is the association between a local user and a player on the Motrain dashboard. You can find the list of known mappings below. Mappings with an error will not be re-attempted, please fix the issue and reset the mapping.';
 $string['playersmapping'] = 'Players mapping';
 $string['pleasewait'] = 'Please wait...';
+$string['previewemail'] = 'Send preview email to';
+$string['previewemail_help'] = 'The email to which the preview is sent. This value is not saved.';
+$string['previewnotsent'] = 'The preview email could not be sent.';
+$string['previewsent'] = 'The preview email was sent using the content below. Note that the template has not yet been saved.';
 $string['pluginispaused'] = 'The plugin is currently paused.';
 $string['pluginname'] = 'Motrain';
 $string['pluginnotenabledseesettings'] = 'The plugin is not enabled, please see its settings.';
@@ -139,6 +153,8 @@ $string['sendlocalnotifications'] = 'Send local notifications';
 $string['sendlocalnotifications_help'] = 'When enabled, Moodle will deliver messages to players instead of Motrain. To prevent messages from being sent twice, you should disable \'Outgoing communications to player\' from the Motrain dashboard. The messages sent to players are customisable in the \'Message templates\' settings page. Webhooks are required for this to work.';
 $string['sendlocalnotificationsdisabledrequiresenabled'] = 'Sending local notifications has been disabled, it cannot be enabled before the plugin itself is enabled.';
 $string['sendlocalnotificationsdisabledwithwebhooks'] = 'Sending local notifications has been disabled, it requires webhooks to function.';
+$string['sendlocalnotificationsnotenabledseesettings'] = 'Sending local notifications is not enabled, please see settings.';
+$string['sendpreview'] = 'Send preview';
 $string['setup'] = 'Set-up';
 $string['store'] = 'Store';
 $string['taskpushusers'] = 'Push users to dashboard';
@@ -147,8 +163,46 @@ $string['team'] = 'Team';
 $string['teamassociationcreated'] = 'Team association created.';
 $string['teamassociations'] = 'Team associations';
 $string['teams'] = 'Teams';
+$string['templatedeleted'] = 'The template was deleted';
+$string['templateenabled'] = 'Enabled';
+$string['templateenabled_help'] = 'Enable the template when it is ready to be sent to players.';
+$string['templateforlangalreadyexists'] = 'A template for this language already exists.';
+$string['templatelanguage'] = 'Template language';
+$string['templatelanguage_help'] = 'The language of the template will be matched with the language of the intended recipient.';
+$string['templatelanguageanyfallback'] = 'All languages (fallback)';
+$string['templatesaved'] = 'The template was saved';
+$string['templatecontent'] = 'Content';
+$string['templatecontent_help'] = '
+The content of the message to send.
+
+The following placeholders are available:
+
+- `[message]`: An optional associated message (e.g. order approval, automatic order), if any.
+- `[itemname]`: The name of the associated item, if any.
+- `[firstname]`: The first name of the player.
+- `[lastname]`: The last name of the player.
+- `[fullname]`: The full name of the player.
+';
+$string['templatesubject'] = 'Subject';
+$string['templatesubject_help'] = '
+The subject of the message to send.
+
+The following placeholders are available:
+
+- `[itemname]`: The name of the associated item, if any.
+- `[firstname]`: The first name of the player.
+- `[lastname]`: The last name of the player.
+- `[fullname]`: The full name of the player.
+';
+$string['templatetypeauctionwon'] = 'Auction won';
+$string['templatetypemanualaward'] = 'Player manually awarded';
+$string['templatetyperafflewon'] = 'Raffle won';
+$string['templatetyperedemptionrequestaccepted'] = 'Order request approved';
+$string['templatetyperedemptionselfcompleted'] = 'Automatic order completed';
+$string['templatex'] = 'Template: {$a}';
 $string['unknownactivityn'] = 'Unknown activity {$a}';
 $string['unknowncoursen'] = 'Unknown course {$a}';
+$string['unknowntemplatecode'] = 'Unknown template code \'{$a}\'';
 $string['usecohorts_help'] = 'When enabled, users can be organised in different teams using cohorts. Note that when cohorts are not used all Moodle users will be considered as potential players.';
 $string['usecohorts'] = 'Use cohorts';
 $string['userecommended'] = 'Use recommended';

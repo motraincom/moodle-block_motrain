@@ -29,6 +29,7 @@ use block_motrain\local\api_error;
 use block_motrain\local\balance_proxy;
 use block_motrain\local\client_exception;
 use block_motrain\local\collection_strategy;
+use block_motrain\local\message_dealer;
 use block_motrain\local\metadata_reader;
 use block_motrain\local\player_mapper;
 use block_motrain\local\team_resolver;
@@ -64,6 +65,8 @@ class manager {
     protected $coinscache;
     /** @var string|null The dashboard URL. */
     protected $dashboardurl;
+    /** @var message_dealer|null The message dealder. */
+    protected $messagedealer;
     /** @var metadata_reader|null The metadata reader. */
     protected $metadatareader;
     /** @var player_mapper|null The player mapper. */
@@ -228,6 +231,18 @@ class manager {
         global $DB;
         $accountid = get_config('block_motrain', 'accountid');
         return $DB->get_record('block_motrain_teammap', ['accountid' => $accountid, 'cohortid' => -1]);
+    }
+
+    /**
+     * Get the message dealer.
+     *
+     * @return message_dealer
+     */
+    public function get_message_dealer() {
+        if (!$this->messagedealer) {
+            $this->messagedealer = new message_dealer();
+        }
+        return $this->messagedealer;
     }
 
     /**

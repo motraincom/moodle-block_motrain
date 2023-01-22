@@ -100,5 +100,6 @@ function block_motrain_sendlocalnotifications_updated_hook() {
             return;
         }
         $manager->setup_webhook();
+        $manager->get_message_dealer()->create_missing_default_templates();
     }
 }

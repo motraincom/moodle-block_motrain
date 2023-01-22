@@ -50,6 +50,11 @@ $category->add('block_motrain_category', new admin_externalpage('block_motrain_t
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_players',
     get_string('playersmapping', 'block_motrain'), new moodle_url('/blocks/motrain/settings_players.php'), 'block/motrain:manage'));
 
+// Add page to view the message templates.
+$category->add('block_motrain_category', new admin_externalpage('block_motrain_message_templates',
+    get_string('messagetemplates', 'block_motrain'), new moodle_url('/blocks/motrain/settings_message_templates.php'),
+    'block/motrain:manage'));
+
 // Add page to manage add-ons.
 $category->add('block_motrain_category', new admin_externalpage('block_motrain_manageaddons', new lang_string('manageaddons',
     'block_motrain'), new moodle_url('/blocks/motrain/settings_addons.php'), 'block/motrain:manage'));

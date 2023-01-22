@@ -83,5 +83,46 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2022072102, 'motrain');
     }
 
+    if ($oldversion < 2023012100) {
+
+        // Define table block_motrain_msgtpl to be created.
+        $table = new xmldb_table('block_motrain_msgtpl');
+
+        // Adding fields to table block_motrain_msgtpl.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('code', XMLDB_TYPE_CHAR, '32', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('lang', XMLDB_TYPE_CHAR, '32', null, null, null, null);
+        $table->add_field('subject', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('content', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('contentformat', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table block_motrain_msgtpl.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for block_motrain_msgtpl.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2023012100, 'motrain');
+    }
+
+    if ($oldversion < 2023012101) {
+
+        // Define index codelang (unique) to be added to block_motrain_msgtpl.
+        $table = new xmldb_table('block_motrain_msgtpl');
+        $index = new xmldb_index('codelang', XMLDB_INDEX_UNIQUE, ['code', 'lang']);
+
+        // Conditionally launch add index codelang.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2023012101, 'motrain');
+    }
+
     return true;
 }

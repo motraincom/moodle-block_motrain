@@ -147,32 +147,32 @@ class block_motrain_renderer extends plugin_renderer_base {
             new tabobject(
                 'settings',
                 new moodle_url('/blocks/motrain/settings_config.php'),
-                get_string('settings', 'core'),
-                clean_param(get_string('settings', 'core'), PARAM_NOTAGS)
+                get_string('settings', 'core')
             ),
             new tabobject(
                 'rules',
                 new moodle_url('/blocks/motrain/settings_rules.php'),
-                get_string('coinrules', 'block_motrain'),
-                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+                get_string('coinrules', 'block_motrain')
             ),
             new tabobject(
                 'teams',
                 new moodle_url('/blocks/motrain/settings_teams.php'),
-                get_string('teamassociations', 'block_motrain'),
-                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+                get_string('teamassociations', 'block_motrain')
             ),
             new tabobject(
                 'players',
                 new moodle_url('/blocks/motrain/settings_players.php'),
-                get_string('playersmapping', 'block_motrain'),
-                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+                get_string('playersmapping', 'block_motrain')
+            ),
+            new tabobject(
+                'messagetemplates',
+                new moodle_url('/blocks/motrain/settings_message_templates.php'),
+                get_string('messagetemplates', 'block_motrain')
             ),
             new tabobject(
                 'addons',
                 new moodle_url('/blocks/motrain/settings_addons.php'),
-                get_string('manageaddons', 'block_motrain'),
-                clean_param(get_string('coinrules', 'block_motrain'), PARAM_NOTAGS)
+                get_string('manageaddons', 'block_motrain')
             ),
         ];
         return $this->tabtree($tabs, $currentpage);
