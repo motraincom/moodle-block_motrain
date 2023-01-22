@@ -49,6 +49,7 @@ $PAGE->set_pagelayout('admin');
 
 $output = $PAGE->get_renderer('block_motrain');
 $messagedealer = $manager->get_message_dealer();
+$messagedealer->create_missing_default_templates();
 
 // Read the template, if any.
 $template = null;
@@ -83,13 +84,16 @@ if ($action === 'edit' && !$code) {
 
 // Prepare the form.
 $form = new message_template($pageurl->out(false), ['code' => $code, 'template' => $template]);
-if ($template) {
+if ($action === 'edit') {
+    $templatesource = $template ?? $messagedealer->get_default_template($code);
     $form->set_data([
-        'lang' => $template->lang,
-        'subject' => $template->subject,
-        'content' => ['text' => $template->content, 'format' => $template->contentformat],
-        'enabled' => $template->enabled,
+        'lang' => $templatesource->lang,
+        'subject' => $templatesource->subject,
+        'content' => ['text' => $templatesource->content, 'format' => $templatesource->contentformat],
+        'enabled' => $templatesource->enabled,
     ]);
+    unset($templatesource);
+    unset($formdefaultdata);
 }
 
 // Process the form.
@@ -110,11 +114,12 @@ if ($data = $form->get_data()) {
             'subject' => $data->subject,
             'content' => $data->content['text'],
             'contentformat' => $data->content['format'],
+            'enabled' => $data->enabled,
         ];
     }
 
     if (!empty($data->previewbutton)) {
-        if ($templaterepository->send_preview_to_email($record, $data->previewemail)) {
+        if ($messagedealer->send_preview_to_email($record, $data->previewemail)) {
             notification::add(get_string('previewsent', 'block_motrain'), notification::INFO);
         } else {
             notification::add(get_string('previewnotsent', 'block_motrain'), notification::ERROR);
@@ -168,8 +173,8 @@ if ($action === 'edit') {
         $carry[$record->code][] = $record;
         return $carry;
     }, []);
-    foreach ($alltemplates as $code => &$templates) {
-        usort($templates, function($a, $b) {
+    foreach ($alltemplates as $code => $array) {
+        usort($array, function($a, $b) {
             if ($a->lang === null) {
                 return 1;
             } else if ($b->lang === null) {

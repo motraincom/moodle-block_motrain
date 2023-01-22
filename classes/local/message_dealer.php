@@ -65,7 +65,7 @@ class message_dealer {
                     (object) [
                         'tag' => 'itemname',
                         'description' => new lang_string('placeholderitemname', 'block_motrain'),
-                        'example' => 'Stormproof Umbrella 2000'
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
                     ],
                     (object) [
                         'tag' => 'message',
@@ -81,12 +81,12 @@ class message_dealer {
                     (object) [
                         'tag' => 'itemname',
                         'description' => new lang_string('placeholderitemname', 'block_motrain'),
-                        'example' => 'Stormproof Umbrella 2000'
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
                     ],
                     (object) [
                         'tag' => 'message',
                         'description' => new lang_string('placeholderoptionalmessagefromadmin', 'block_motrain'),
-                        'example' => new lang_string('placeholderoptionalmessagefromadminexample', 'block_motrain')
+                        'example' => new lang_string('placeholdermessageexample', 'block_motrain')
                     ],
                 ],
                 'name' => new lang_string('templatetyperedemptionselfcompleted', 'block_motrain'),
@@ -97,7 +97,7 @@ class message_dealer {
                     (object) [
                         'tag' => 'itemname',
                         'description' => new lang_string('placeholderitemname', 'block_motrain'),
-                        'example' => 'Stormproof Umbrella 2000'
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
                     ],
                 ],
                 'name' => new lang_string('templatetypeauctionwon', 'block_motrain'),
@@ -113,7 +113,7 @@ class message_dealer {
                     (object) [
                         'tag' => 'message',
                         'description' => new lang_string('placeholderoptionalmessagefromadmin', 'block_motrain'),
-                        'example' => new lang_string('placeholderoptionalmessagefromadminexample', 'block_motrain')
+                        'example' => new lang_string('placeholdermessageexample', 'block_motrain')
                     ],
                 ],
                 'name' => new lang_string('templatetypemanualaward', 'block_motrain'),
@@ -124,7 +124,7 @@ class message_dealer {
                     (object) [
                         'tag' => 'itemname',
                         'description' => new lang_string('placeholderitemname', 'block_motrain'),
-                        'example' => 'Stormproof Umbrella 2000'
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
                     ],
                 ],
                 'name' => new lang_string('templatetyperafflewon', 'block_motrain'),
@@ -248,6 +248,17 @@ class message_dealer {
     }
 
     /**
+     * Get default templates.
+     *
+     * @param string $code The code.
+     * @return object
+     */
+    public function get_default_template($type) {
+        global $DB;
+        return $DB->get_record_select('block_motrain_msgtpl', 'code = ? AND lang IS NULL', [$type], '*', MUST_EXIST);
+    }
+
+    /**
      * Get a particular type.
      *
      * @param sring $code Its code.
@@ -310,6 +321,66 @@ class message_dealer {
     }
 
     /**
+     * Resolve the best template.
+     *
+     * @param string $code The code.
+     * @param string $lang The language.
+     * @return object|null The templare record or null.
+     */
+    public function resolve_best_template($code, $lang) {
+        global $DB;
+
+        $candidatelangs = static::get_candidate_languages_from_language($lang);
+
+        list($insql, $inparams) = $DB->get_in_or_equal($candidatelangs, SQL_PARAMS_NAMED);
+        $select = "code = :code AND (lang $insql OR lang IS NULL) AND enabled = :enabled";
+        $params = array_merge([
+            'code' => $code,
+            'enabled' => 1
+        ], $inparams);
+        $records = $DB->get_records_select('block_motrain_msgtpl', $select, $params);
+
+        $templates = array_reduce($records, function($carry, $record) {
+            $carry[$record->lang ?? '_'] = $record;
+            return $carry;
+        }, []);
+
+        foreach ($candidatelangs as $candidatelang) {
+            if (isset($templates[$candidatelang])) {
+                return $templates[$candidatelang];
+            }
+        }
+
+        return $templates['_'] ?? null;
+    }
+    /**
+     * Send notification to user.
+     *
+     * @param object $user The user.
+     * @param object $template The template.
+     * @param object|null $data Extra placeholder data indexed by key.
+     * @return bool Whether successfully delivered.
+     */
+    public function send_notification($user, $template, $data = null) {
+        $userfrom = core_user::get_noreply_user();
+
+        [$subject, $html] = $this->generate_content($template, $user, (object) $data);
+
+        $message = new \core\message\message();
+        $message->component         = 'block_motrain';
+        $message->name              = 'notification';
+        $message->notification      = 1;
+        $message->userto            = $user;
+        $message->userfrom          = $userfrom;
+        $message->subject           = $subject;
+        $message->fullmessage       = html_to_text($html);
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->fullmessagehtml   = $html;
+
+        return (bool) message_send($message);
+    }
+
+    /**
      * Send a preview to an email.
      *
      * @param object $template The template record.
@@ -319,11 +390,12 @@ class message_dealer {
     public function send_preview_to_email($template, $email) {
         global $USER;
 
-        $type = $this->get_type($template->type);
-        $data = (object) array_map(function($placeholder) {
-            return $placeholder->example;
-        }, $type->placeholders);
-        list($subject, $html) = $this->generate_content($template, $USER, $data);
+        $type = $this->get_type($template->code);
+        $data = (object) array_reduce($type->placeholders, function($carry, $placeholder) {
+            $carry[$placeholder->tag] = $placeholder->example;
+            return $carry;
+        }, []);
+        [$subject, $html] = $this->generate_content($template, $USER, $data);
 
         $fakeuser = core_user::get_noreply_user();
         $fakeuser->firstname = '';
@@ -333,6 +405,21 @@ class message_dealer {
         $fakeuser->mailformat = 1;
 
         return email_to_user($fakeuser, core_user::get_noreply_user(), $subject, html_to_text($html), $html);
+    }
+
+    /**
+     * Get the list of candidate languages for a language.
+     *
+     * E.g. en_us will return ['en_us', 'en'].
+     *
+     * @param string $lang
+     * @return string[]
+     */
+    public static function get_candidate_languages_from_language($lang) {
+        return array_reduce(explode('_', $lang), function($carry, $part) {
+            $prefix = !empty($carry) ? implode('_', $carry) . '_' : '';
+            return array_merge([$prefix . $part], $carry);
+        }, []);
     }
 
 }

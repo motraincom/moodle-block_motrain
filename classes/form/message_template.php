@@ -75,7 +75,7 @@ class message_template extends \moodleform {
                 get_string('templatelanguageanyfallback', 'block_motrain'));
         }
 
-        $mform->addElement('text', 'subject', get_string('templatesubject', 'block_motrain'));
+        $mform->addElement('text', 'subject', get_string('templatesubject', 'block_motrain'), ['size' => 60]);
         $mform->setDefault('subject', 'Congratulations [firstname]!');
         $mform->addHelpButton('subject', 'templatesubject', 'block_motrain');
         $mform->setType('subject', PARAM_TEXT);

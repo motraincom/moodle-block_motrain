@@ -25,6 +25,7 @@
 
 namespace block_motrain\local\webhook;
 
+use block_motrain\local\message_dealer;
 use block_motrain\manager;
 use core_user;
 
@@ -77,6 +78,8 @@ class processor {
 
         if (!in_array($type, $supported)) {
             return;
+        } else if (!$this->manager->is_sending_local_notifications_enabled()) {
+            return;
         }
 
         // Obtain the local user.
@@ -90,8 +93,51 @@ class processor {
             return;
         }
 
-        // Send a notification.
-        $this->manager->send_notification($user, 'Congrats', 'That was amazing!');
-    }
+        // Prepare the notification.
+        $code = null;
+        $data = [];
+        $metadatareader = $this->manager->get_metadata_reader();
+        if ($type == 'redemption.requestAccepted') {
+            $code = message_dealer::TYPE_REDEMPTION_REQUEST_ACCEPTED;
+            $data = [
+                'itemname' => $metadatareader->get_item_name($payload->item_id),
+                'message' => $payload->message ?? '',
+            ];
 
+        } else if ($type == 'redemption.selfCompleted') {
+            $code = message_dealer::TYPE_REDEMPTION_SELF_COMPLETED;
+            $data = [
+                'itemname' => $metadatareader->get_item_name($payload->item_id),
+                'message' => $metadatareader->get_item_redemption_message($payload->item_id)
+                    ?? get_string('noredemptionessagefound', 'block_motrain'),
+            ];
+
+        } else if ($type == 'user.auctionWon') {
+            $code = message_dealer::TYPE_USER_AUCTION_WON;
+            $data = [
+                'itemname' => $metadatareader->get_item_name($payload->item_id)
+            ];
+
+        } else if ($type == 'user.manuallyAwardedCoins') {
+            $code = message_dealer::TYPE_USER_MANUAL_AWARD;
+            $data = [
+                'coins' => $payload->coins,
+                'message' => $payload->message ?? '-',
+            ];
+
+        } else if ($type == 'user.raffleWon') {
+            $code = message_dealer::TYPE_USER_RAFFLE_WON;
+            $data = [
+                'itemname' => $metadatareader->get_item_name($payload->item_id),
+            ];
+        }
+
+        $messagedealer = $this->manager->get_message_dealer();
+        $template = $messagedealer->resolve_best_template($code, $user->lang);
+        if (!$template) {
+            return;
+        }
+
+        $messagedealer->send_notification($user, $template, $data);
+    }
 }
