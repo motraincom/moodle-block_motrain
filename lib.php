@@ -99,7 +99,14 @@ function block_motrain_sendlocalnotifications_updated_hook() {
             notification::add(get_string('sendlocalnotificationsdisabledrequiresenabled', 'block_motrain'), notification::WARNING);
             return;
         }
-        $manager->setup_webhook();
+
+        try {
+            // Catch an error when creating the webhook, and disable notification when that's the case.
+            $manager->setup_webhook();
+        } catch (\moodle_exception $e) {
+            set_config('sendlocalnotifications', 0, 'block_motrain');
+            notification::add(get_string('errorconnectingwebhookslocalnotificationsdisabled', 'block_motrain'), notification::ERROR);
+        }
         $manager->get_message_dealer()->create_missing_default_templates();
     }
 }

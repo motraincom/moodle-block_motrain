@@ -612,10 +612,6 @@ class manager {
             ]
         ];
 
-        if (strpos($webhookdata['url'], 'https://') !== 0) {
-            return;
-        }
-
         if (!empty($webhookid)) {
             $client->update_webhook($webhookid, $webhookdata);
             return;

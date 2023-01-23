@@ -69,6 +69,7 @@ $string['emailtemplate'] = 'Email template';
 $string['enableaddon_help'] = 'An add-on must be enabled to work.';
 $string['enableaddon'] = 'Enable add-on';
 $string['enabled'] = 'Enabled';
+$string['errorconnectingwebhookslocalnotificationsdisabled'] = 'An error occurred while connecting the webhooks. Sending local notifications has been disabled.';
 $string['errorwhiledisconnectingwebhook'] = 'An error occurred while disconnecting the webhook: {$a}.';
 $string['eventcoinsearned'] = 'Coins earned';
 $string['globalsettings'] = 'Global settings';
