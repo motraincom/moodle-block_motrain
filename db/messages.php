@@ -31,8 +31,8 @@ $messageproviders = [
     // Various notifications.
     'notification' => [
         'defaults' => [
-            'popup' => $enabledflag,
-            'email' => $enabledflag,
+            'popup' => MESSAGE_PERMITTED + $enabledflag,
+            'email' => MESSAGE_PERMITTED + $enabledflag,
         ],
     ],
 ];
