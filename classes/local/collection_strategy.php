@@ -33,6 +33,7 @@ use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
 use moodle_exception;
+use totara_program\event\program_completed;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -51,6 +52,8 @@ class collection_strategy {
     protected $allowedcontexts = [CONTEXT_COURSE, CONTEXT_MODULE];
     /** @var completion_coins_calculator The calculator. */
     protected $completioncoinscalculator;
+    /** @var program_coins_calculator The calculator. */
+    protected $programcoinscalculator;
     /** @var manager The manager. */
     protected $manager;
     /** @var array Ignore modules. */
@@ -61,7 +64,12 @@ class collection_strategy {
      */
     public function __construct(manager $manager) {
         $this->completioncoinscalculator = new completion_coins_calculator();
+        $this->programcoinscalculator = new program_coins_calculator();
         $this->manager = $manager;
+
+        if ($manager->is_totara()) {
+            $this->allowedcontexts[] = CONTEXT_PROGRAM;
+        }
     }
 
     /**
@@ -97,8 +105,10 @@ class collection_strategy {
 
         $context = $event->get_context();
 
-        // We only handle two events at the moment.
-        if (!($event instanceof course_module_completion_updated) && !($event instanceof course_completed)) {
+        // We only handle few events at the moment.
+        if (!($event instanceof course_module_completion_updated)
+                && !($event instanceof course_completed)
+                && !($event instanceof program_completed)) {
             return;
         }
 
@@ -169,6 +179,34 @@ class collection_strategy {
             }
             if (empty($reasonstr)) {
                 $reasonstr = 'transaction:credit.coursecompleted';
+                $reasonargs = null;
+            }
+
+            $award->give($coins, new lang_reason($reasonstr, $reasonargs));
+
+        } else if ($event instanceof program_completed) {
+            $programid = $event->objectid;
+
+            $award = new award($userid, $context->id, 'program_completed', sha1($programid));
+            if ($award->has_been_recorded_previously()) {
+                return;
+            }
+
+            $coins = $this->programcoinscalculator->get_program_coins($programid);
+            if ($coins <= 0) {
+                return;
+            }
+
+            try {
+                $program = $event->get_record_snapshot('prog', $programid);
+                $reasonstr = 'transaction:credit.programxcompleted';
+                $reasonargs = (object) ['name' => format_string($program->fullname, true, ['context' => $context])];
+            } catch (\moodle_exception $e) {
+                $reasonstr = null;
+                $reasonargs = null;
+            }
+            if (empty($reasonstr)) {
+                $reasonstr = 'transaction:credit.programcompleted';
                 $reasonargs = null;
             }
 

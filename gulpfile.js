@@ -10,7 +10,7 @@ const webpackProdConfig = require('./webpack.prod.js');
 
 const jsAmdPaths = ['./amd/src/*.js'];
 
-const jsUiPaths = ['./ui/src/**/*.ts', './ui/src/**/*.tsx', './ui/src/**/*.js'];
+const jsUiPaths = ['./ui/**/*.ts', './ui/**/*.tsx', './ui/**/*.js'];
 
 
 /** Moodle. */

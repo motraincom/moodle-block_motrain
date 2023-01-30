@@ -124,5 +124,30 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2023012101, 'motrain');
     }
 
+    if ($oldversion < 2023012301) {
+
+        // Define table block_motrain_programrules to be created.
+        $table = new xmldb_table('block_motrain_programrules');
+
+        // Adding fields to table block_motrain_programrules.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('programid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('coins', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table block_motrain_programrules.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table block_motrain_programrules.
+        $table->add_index('programid', XMLDB_INDEX_UNIQUE, array('programid'));
+
+        // Conditionally launch create table for block_motrain_programrules.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2023012301, 'motrain');
+    }
+
     return true;
 }

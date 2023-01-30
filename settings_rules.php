@@ -25,6 +25,7 @@
 
 use block_motrain\local\completion_coins_calculator;
 use block_motrain\local\helper;
+use block_motrain\local\program_coins_calculator;
 use block_motrain\manager;
 
 require_once(__DIR__ . '/../../config.php');
@@ -77,6 +78,10 @@ if (!$manager->is_enabled()) {
     echo $output->notification(get_string('pluginnotenabledseesettings', 'block_motrain'));
 }
 
+if ($manager->is_totara()) {
+    echo $output->heading(get_string('courseandactivitycompletion', 'block_motrain'));
+}
+
 echo $output->react_module('block_motrain/ui-completion-rules-lazy', [
     'courses' => $courses,
     'modules' => $modules,
@@ -84,5 +89,28 @@ echo $output->react_module('block_motrain/ui-completion-rules-lazy', [
     'globalRules' => $allrules->global,
     'rules' => $allrules->rules,
 ]);
+
+if ($manager->is_totara()) {
+    require_once($CFG->dirroot . '/totara/program/lib.php');
+
+    $programs = prog_get_programs("all", 'p.fullname ASC, p.id ASC');
+    $programs = array_values(array_map(function($program) {
+        $context = context_program::instance($program->id);
+        return (object) [
+            'id' => (int) $program->id,
+            'displayname' => helper::format_string_unescaped($program->fullname, $context)
+        ];
+    }, $programs));
+
+    $allrules = program_coins_calculator::get_all_rules();
+
+    echo $output->heading(get_string('programcompletion', 'block_motrain'));
+    echo $output->react_module('block_motrain/ui-program-rules-lazy', [
+        'programs' => $programs,
+        'defaults' => program_coins_calculator::get_recommended(),
+        'globalRules' => $allrules->global,
+        'rules' => $allrules->rules,
+    ]);
+}
 
 echo $output->footer();

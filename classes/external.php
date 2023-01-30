@@ -28,6 +28,7 @@ namespace block_motrain;
 use block_motrain\local\award\award;
 use block_motrain\local\completion_coins_calculator;
 use block_motrain\local\helper;
+use block_motrain\local\program_coins_calculator;
 use completion_info;
 use context_course;
 use context_system;
@@ -370,6 +371,149 @@ class external extends external_api {
      * @return external_single_structure
      */
     public static function save_completion_rules_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL),
+        ]);
+    }
+
+    /**
+     * External function parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function save_program_rules_parameters() {
+        return new external_function_parameters([
+            'global' => new external_single_structure([
+                'program' => new external_value(PARAM_INT, 'The number of coins', VALUE_DEFAULT, 0),
+                'userecommended' => new external_value(PARAM_BOOL, 'Whether to use the recommended values', VALUE_DEFAULT, false)
+            ]),
+            'rules' => new external_multiple_structure(new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'The course ID'),
+                'coins' => new external_value(PARAM_INT, 'The number of coins, or null.'),
+            ])),
+        ]);
+    }
+
+    /**
+     * Get all activities.
+     *
+     * @return array
+     */
+    public static function save_program_rules($global, $rules) {
+        global $DB;
+
+        $params = self::validate_parameters(self::save_program_rules_parameters(), ['global' => $global, 'rules' => $rules]);
+        $rules = $params['rules'];
+        $global = $params['global'];
+
+        // This is only meant to be used by admins in the admin UI.
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $manager = manager::instance();
+        $manager->require_manage();
+
+        // Save the global rules.
+        if (empty($global) || !empty($global['userecommended'])) {
+            // We use the recommended values, delete all.
+            $DB->delete_records('block_motrain_programrules', ['programid' => 0]);
+        } else {
+
+            $globalrecords = $DB->get_records('block_motrain_programrules', ['programid' => 0]);
+            $organised = [];
+            foreach ($globalrecords as $record) {
+                $organised['_program'] = $record;
+            }
+
+            // Program coins.
+            if (!empty($organised['_program'])) {
+                $record = $organised['_program'];
+            } else {
+                $record = (object) ['programid' => 0];
+            }
+            $record->coins = max(0, (int) $global['program']);
+            if (!empty($record->id)) {
+                $DB->update_record('block_motrain_programrules', $record);
+            } else {
+                $DB->insert_record('block_motrain_programrules', $record);
+            }
+        }
+
+        if (empty($rules)) {
+            // No rules, delete all of them.
+            $DB->delete_records_select('block_motrain_programrules', 'programid != ?', [0]);
+
+        } else {
+            $todeleteids = [];
+            $ruleprogramids = [];
+
+            $programrecords = $DB->get_recordset_select('block_motrain_programrules', 'programid != ?', [0]);
+            $organised = [];
+            foreach ($programrecords as $record) {
+                if (!isset($organised[$record->programid])) {
+                    $organised[$record->programid] = (object) [
+                        'program' => null,
+                    ];
+                }
+                $organised[$record->programid]->program = $record;
+            }
+            $programrecords->close();
+
+            // For each of the program rules.
+            foreach ($rules as $rule) {
+                $programid = $rule['id'];
+                $ruleprogramids[] = $programid;
+                $programdata = !empty($organised[$programid]) ? $organised[$programid] : null;
+
+                // Update the program completion value.
+                $programrecord = !empty($programdata) ? $programdata->program : null;
+                if ($rule['coins'] === null && $programrecord) {
+                    $todeleteids[] = $programrecord->id;
+                } else if ($rule['coins'] !== null) {
+                    if (!$programrecord) {
+                        $programrecord = (object) ['programid' => $programid, 'coins' => 0];
+                    }
+                    $programrecord->coins = $rule['coins'];
+                    if (!empty($programrecord->id)) {
+                        $DB->update_record('block_motrain_programrules', $programrecord);
+                    } else {
+                        $DB->insert_record('block_motrain_programrules', $programrecord);
+                    }
+                }
+            }
+
+            // Flag the programs that have been removed to be deleted.
+            $extraneousrecords = array_diff_key($organised, array_flip($ruleprogramids));
+            foreach ($extraneousrecords as $extraneousrecord) {
+                if (!empty($extraneousrecord->program)) {
+                    $todeleteids[] = $extraneousrecord->program->id;
+                }
+                if (!empty($extraneousrecord->cms)) {
+                    $todeleteids = array_merge($todeleteids, array_values(array_map(function($record) {
+                        return $record->id;
+                    }, $extraneousrecord->cms)));
+                }
+            }
+
+            // Remove obsolete rules.
+            if (!empty($todeleteids)) {
+                $DB->delete_records_list('block_motrain_programrules', 'id', $todeleteids);
+            }
+        }
+
+        // Purge the cache.
+        $programcoinscalculator = new program_coins_calculator();
+        $programcoinscalculator->purge_cache();
+
+        return ['success' => true];
+    }
+
+    /**
+     * External function return definition.
+     *
+     * @return external_single_structure
+     */
+    public static function save_program_rules_returns() {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL),
         ]);

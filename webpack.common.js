@@ -5,6 +5,7 @@ module.exports = {
     target: ['web', 'es5'],
     entry: {
         'ui-completion-rules': './ui/completion-rules/index.tsx',
+        'ui-program-rules': './ui/program-rules/index.tsx',
     },
     output: {
         filename: '[name]-lazy.js',

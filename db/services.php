@@ -47,4 +47,11 @@ $functions = [
         'type' => 'write',
         'ajax' => true
     ],
+    'block_motrain_save_program_rules' => [
+        'classname' => 'block_motrain\external',
+        'methodname' => 'save_program_rules',
+        'description' => 'Save the program rules.',
+        'type' => 'write',
+        'ajax' => true
+    ],
 ];

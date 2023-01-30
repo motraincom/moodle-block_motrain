@@ -38,6 +38,7 @@ use block_motrain\task\adhoc_queue_cohort_members_for_push;
 use cache;
 use context;
 use context_system;
+use core_component;
 use core_user;
 use moodle_url;
 
@@ -456,6 +457,15 @@ class manager {
         $apihost = get_config('block_motrain', 'apihost');
         $accountid = get_config('block_motrain', 'accountid');
         return !empty($apikey) && !empty($apihost) && !empty($accountid);
+    }
+
+    /**
+     * Whether we are using Totara.
+     *
+     * @return bool
+     */
+    public function is_totara() {
+        return array_key_exists('totara', core_component::get_plugin_types());
     }
 
     /**
