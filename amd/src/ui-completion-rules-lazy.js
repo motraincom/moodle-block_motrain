@@ -12421,6 +12421,7 @@ var jsx_runtime_1 = __webpack_require__(5893);
 var react_1 = __webpack_require__(7294);
 var react_query_1 = __webpack_require__(8767);
 var Button_1 = __importDefault(__webpack_require__(5749));
+var RuleItem_1 = __webpack_require__(6167);
 var SectionTitle_1 = __importDefault(__webpack_require__(3380));
 var Selector_1 = __importDefault(__webpack_require__(5672));
 var Str_1 = __importDefault(__webpack_require__(5065));
@@ -12471,9 +12472,9 @@ var GlobalRulesWidget = function (_a) {
         }, {});
     }, [rules.modules]);
     var courseCoinsValue = (useRecommended ? defaults.course : rules.course) || 0;
-    return ((0, jsx_runtime_1.jsx)("div", __assign({ style: { marginTop: '1.5rem' } }, { children: (0, jsx_runtime_1.jsxs)("div", __assign({ className: [(0, style_1.genClassName)('section'), isExpanded ? '' : 'expanded'].join(' ') }, { children: [(0, jsx_runtime_1.jsx)(SectionTitle_1.default, { title: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "globalsettings" }), onExpandedChange: handleExpandedChange, expanded: isExpanded }), isExpanded ? ((0, jsx_runtime_1.jsxs)("div", __assign({ className: (0, style_1.genClassName)('section-content') }, { children: [(0, jsx_runtime_1.jsx)("div", __assign({ style: { paddingTop: '.5rem' } }, { children: (0, jsx_runtime_1.jsxs)("label", __assign({ style: { margin: 0 } }, { children: [(0, jsx_runtime_1.jsx)("input", { type: "checkbox", checked: useRecommended, onChange: function (e) { return setGlobalUsesrecommended(e.target.checked, defaults); }, style: { marginRight: '.5rem' } }), (0, jsx_runtime_1.jsx)(Str_1.default, { id: "userecommended" })] })) })), (0, jsx_runtime_1.jsx)(Item, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "completingacourse" }), onChange: function (coins) { return updateGlobalCourseCompleted(coins || 0); }, value: courseCoinsValue, disabled: useRecommended, allowNull: false }), modules.map(function (mod) {
+    return ((0, jsx_runtime_1.jsx)("div", __assign({ style: { marginTop: '1.5rem' } }, { children: (0, jsx_runtime_1.jsxs)("div", __assign({ className: [(0, style_1.genClassName)('section'), isExpanded ? '' : 'expanded'].join(' ') }, { children: [(0, jsx_runtime_1.jsx)(SectionTitle_1.default, { title: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "globalsettings" }), onExpandedChange: handleExpandedChange, expanded: isExpanded }), isExpanded ? ((0, jsx_runtime_1.jsxs)("div", __assign({ className: (0, style_1.genClassName)('section-content') }, { children: [(0, jsx_runtime_1.jsx)("div", __assign({ style: { paddingTop: '.5rem' } }, { children: (0, jsx_runtime_1.jsxs)("label", __assign({ style: { margin: 0 } }, { children: [(0, jsx_runtime_1.jsx)("input", { type: "checkbox", checked: useRecommended, onChange: function (e) { return setGlobalUsesrecommended(e.target.checked, defaults); }, style: { marginRight: '.5rem' } }), (0, jsx_runtime_1.jsx)(Str_1.default, { id: "userecommended" })] })) })), (0, jsx_runtime_1.jsx)(RuleItem_1.RuleItem, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "completingacourse" }), onChange: function (coins) { return updateGlobalCourseCompleted(coins || 0); }, value: courseCoinsValue, disabled: useRecommended, allowNull: false }), modules.map(function (mod) {
                             var value = (useRecommended ? defaults.modules[mod.module] : modulesByName[mod.module]) || 0;
-                            return ((0, jsx_runtime_1.jsx)(Item, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "completingn", a: mod.name }), disabled: useRecommended, onChange: function (coins) { return updateGlobalModuleCompleted(mod.module, coins || 0); }, value: value, allowNull: false }, mod.module));
+                            return ((0, jsx_runtime_1.jsx)(RuleItem_1.RuleItem, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "completingn", a: mod.name }), disabled: useRecommended, onChange: function (coins) { return updateGlobalModuleCompleted(mod.module, coins || 0); }, value: value, allowNull: false }, mod.module));
                         })] }))) : null] })) })));
 };
 var CoursesRules = function (_a) {
@@ -12541,7 +12542,7 @@ var CourseRules = function (_a) {
     var handleCourseCompletionChange = function (coins) {
         updateCourseCompleted(id, coins);
     };
-    return ((0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(Item, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "coursecompletion" }), onChange: handleCourseCompletionChange, value: rule.coins }), (0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('section-items') }, { children: cmIds.map(function (cmId) {
+    return ((0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)(RuleItem_1.RuleItem, { label: (0, jsx_runtime_1.jsx)(Str_1.default, { id: "coursecompletion" }), onChange: handleCourseCompletionChange, value: rule.coins }), (0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('section-items') }, { children: cmIds.map(function (cmId) {
                     var activity = activities.find(function (l) { return l.cmid === cmId; });
                     var cmRules = byCmId[cmId];
                     var handleLessonCompletionChange = function (coins) {
@@ -12550,35 +12551,8 @@ var CourseRules = function (_a) {
                     var handleLessonCompletionDelete = function () {
                         removeCm(id, cmId);
                     };
-                    return ((0, jsx_runtime_1.jsx)(Item, { label: "".concat(activity ? getActivityName(activity) : (0, jsx_runtime_1.jsx)(Str_1.default, { id: "unknownactivityn", a: cmId }), " completion"), value: cmRules.coins, onChange: handleLessonCompletionChange, onDelete: handleLessonCompletionDelete }, cmId));
+                    return ((0, jsx_runtime_1.jsx)(RuleItem_1.RuleItem, { label: "".concat(activity ? getActivityName(activity) : (0, jsx_runtime_1.jsx)(Str_1.default, { id: "unknownactivityn", a: cmId }), " completion"), value: cmRules.coins, onChange: handleLessonCompletionChange, onDelete: handleLessonCompletionDelete }, cmId));
                 }) })), (0, jsx_runtime_1.jsx)("div", __assign({ className: "my-4" }, { children: (0, jsx_runtime_1.jsx)(AddActivityRule, { cms: activities.filter(function (item) { return !cmIds.includes(item.cmid); }), onAdd: handleaddCm }) }))] }));
-};
-var Item = function (_a) {
-    var label = _a.label, _b = _a.value, value = _b === void 0 ? null : _b, onChange = _a.onChange, onDelete = _a.onDelete, disabled = _a.disabled, _c = _a.allowNull, allowNull = _c === void 0 ? true : _c;
-    var defaultParensStr = (0, hooks_1.useString)('defaultparens');
-    var deleteStr = (0, hooks_1.useString)('delete', 'core');
-    var _d = (0, react_1.useState)(value), localValue = _d[0], setLocalValue = _d[1];
-    (0, react_1.useEffect)(function () { return setLocalValue(value); }, [value, setLocalValue]);
-    var handleBlur = function (e) {
-        if (disabled)
-            return;
-        var val = parseInt(e.target.value);
-        var finalVal = isNaN(val) ? (allowNull ? null : 0) : Math.max(0, val);
-        onChange(finalVal);
-        setLocalValue(finalVal);
-    };
-    var handleChange = function (e) {
-        if (disabled)
-            return;
-        setLocalValue(e.target.value);
-    };
-    var handleDeleteClick = function (e) {
-        e.preventDefault();
-        onDelete && onDelete();
-    };
-    var isDefault = localValue !== 0 && !localValue;
-    var displayValue = localValue === 0 || localValue ? localValue.toString() : '';
-    return ((0, jsx_runtime_1.jsxs)("div", __assign({ className: (0, style_1.genClassName)('rule-item') }, { children: [(0, jsx_runtime_1.jsxs)("label", __assign({ className: "", style: { margin: 0 } }, { children: [(0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('rule-item-label') }, { children: label })), (0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('rule-item-field') }, { children: (0, jsx_runtime_1.jsx)("input", { type: "text", value: displayValue, onBlur: handleBlur, onChange: handleChange, placeholder: allowNull && isDefault ? defaultParensStr : '', className: "form-control", disabled: disabled }) }))] })), onDelete ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("a", __assign({ className: (0, style_1.genClassName)('rule-item-delete'), onClick: handleDeleteClick, role: "button", href: "#" }, { children: (0, jsx_runtime_1.jsx)("img", { src: (0, moodle_1.imageUrl)('t/delete', 'core'), alt: deleteStr, className: "icon" }) })) })) : null] })));
 };
 function globalRulesReducer(state, _a) {
     var type = _a[0], payload = _a[1];
@@ -12945,6 +12919,61 @@ var Button = function (_a) {
     return (0, jsx_runtime_1.jsx)("button", __assign({ className: classNames }, props));
 };
 exports["default"] = Button;
+
+
+/***/ }),
+
+/***/ 6167:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RuleItem = void 0;
+var jsx_runtime_1 = __webpack_require__(5893);
+var react_1 = __webpack_require__(7294);
+var hooks_1 = __webpack_require__(4302);
+var moodle_1 = __webpack_require__(6331);
+var style_1 = __webpack_require__(142);
+var RuleItem = function (_a) {
+    var label = _a.label, _b = _a.value, value = _b === void 0 ? null : _b, onChange = _a.onChange, onDelete = _a.onDelete, disabled = _a.disabled, _c = _a.allowNull, allowNull = _c === void 0 ? true : _c;
+    var defaultParensStr = (0, hooks_1.useString)('defaultparens');
+    var deleteStr = (0, hooks_1.useString)('delete', 'core');
+    var _d = (0, react_1.useState)(value), localValue = _d[0], setLocalValue = _d[1];
+    (0, react_1.useEffect)(function () { return setLocalValue(value); }, [value, setLocalValue]);
+    var handleBlur = function (e) {
+        if (disabled)
+            return;
+        var val = parseInt(e.target.value);
+        var finalVal = isNaN(val) ? (allowNull ? null : 0) : Math.max(0, val);
+        onChange(finalVal);
+        setLocalValue(finalVal);
+    };
+    var handleChange = function (e) {
+        if (disabled)
+            return;
+        setLocalValue(e.target.value);
+    };
+    var handleDeleteClick = function (e) {
+        e.preventDefault();
+        onDelete && onDelete();
+    };
+    var isDefault = localValue !== 0 && !localValue;
+    var displayValue = localValue === 0 || localValue ? localValue.toString() : '';
+    return ((0, jsx_runtime_1.jsxs)("div", __assign({ className: (0, style_1.genClassName)('rule-item') }, { children: [(0, jsx_runtime_1.jsxs)("label", __assign({ className: "", style: { margin: 0 } }, { children: [(0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('rule-item-label') }, { children: label })), (0, jsx_runtime_1.jsx)("div", __assign({ className: (0, style_1.genClassName)('rule-item-field') }, { children: (0, jsx_runtime_1.jsx)("input", { type: "text", value: displayValue, onBlur: handleBlur, onChange: handleChange, placeholder: allowNull && isDefault ? defaultParensStr : '', className: "form-control", disabled: disabled }) }))] })), onDelete ? ((0, jsx_runtime_1.jsx)("div", { children: (0, jsx_runtime_1.jsx)("a", __assign({ className: (0, style_1.genClassName)('rule-item-delete'), onClick: handleDeleteClick, role: "button", href: "#" }, { children: (0, jsx_runtime_1.jsx)("img", { src: (0, moodle_1.imageUrl)('t/delete', 'core'), alt: deleteStr, className: "icon" }) })) })) : null] })));
+};
+exports.RuleItem = RuleItem;
 
 
 /***/ }),

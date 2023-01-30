@@ -16,7 +16,6 @@
 /**
  * Appearance.
  *
- * @package    block_motrain
  * @copyright  2019 Mootivation Technologies Corp.
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

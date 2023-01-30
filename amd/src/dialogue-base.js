@@ -18,7 +18,6 @@
  *
  * This is originally a copy of block_stash/dialogue-base.
  *
- * @package    block_motrain
  * @copyright  2018 Mootivation Technologies Corp.
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
