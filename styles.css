@@ -71,6 +71,16 @@
     gap: 0.5rem;
 }
 
+/** Block content wrapper. */
+.block_motrain-content-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.block_motrain-content-wrapper > div {
+    flex: 1;
+}
+
 /** Block wallet. */
 .block_motrain-wallet {
     display: flex;
@@ -98,6 +108,50 @@
 .block_motrain-wallet .legend {
     font-size: 85%;
     color: #666;
+}
+
+/** Block level. */
+.block_motrain-level {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.block_motrain-level .pic {
+    min-width: 2rem;
+}
+.block_motrain-level .pic img {
+    width: 100%;
+}
+.block_motrain-level .block_motrain-progress {
+    flex: 1;
+    padding-top: 1rem;
+}
+.block_motrain-level [aria-role='progressbar'] {
+    min-width: 80px;
+    width: 100%;
+    height: 10px;
+    border-radius: 20px;
+    border: 1px solid #dbdbdb;
+    position: relative;
+    overflow: hidden;
+}
+.block_motrain-level [aria-role='progressbar'] > div {
+    background-color: #a7f3d0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+}
+.block_motrain-level .progress-text {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+}
+.block_motrain-level .progress-text span {
+    color: #6b7280;
 }
 
 /** Block navigation. */

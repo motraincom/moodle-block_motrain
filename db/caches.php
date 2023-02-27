@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $definitions = [
     'coins' => array(
         'mode' => cache_store::MODE_APPLICATION,
-        'simpledata' => true,
         'simplekeys' => true,
         'staticacceleration' => true,
         'ttl' => 3600,

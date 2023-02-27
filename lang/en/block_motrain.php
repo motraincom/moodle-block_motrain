@@ -85,6 +85,7 @@ $string['ispaused_help'] = 'When paused, the plugin will not send information to
 $string['ispaused'] = 'Pause plugin';
 $string['lastwebhooktime'] = 'Last webhook received: {$a}';
 $string['leaderboard'] = 'Leaderboard';
+$string['leveln'] = 'Level {$a}';
 $string['manageaddons'] = 'Manage add-ons';
 $string['metadatacache_help'] = 'The plugin keeps a cache of some metadata from the API to improve performance. It stores information such as which leaderboards are enabled, item names, etc. After making some changes on the Motrain dashboard, you may need to manually purge this cache. You can do so by clicking the link above.';
 $string['metadatacache'] = 'Metadata cache';

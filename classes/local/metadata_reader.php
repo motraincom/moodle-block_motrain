@@ -106,6 +106,25 @@ class metadata_reader {
     }
 
     /**
+     * Get the levels.
+     *
+     * @return object[]
+     */
+    public function get_levels() {
+        $key = 'levels';
+        if (($val = $this->cache->get($key)) === false) {
+            try {
+                $resp = $this->manager->get_client()->get_account_levels();
+                $val = $resp->levels ?? [];
+            } catch (client_exception $e) {
+                $val = [];
+            }
+            $this->cache->set($key, $val);
+        }
+        return $val;
+    }
+
+    /**
      * Is the account leaderboard enabled.
      *
      * @return bool

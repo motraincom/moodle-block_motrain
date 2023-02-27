@@ -104,20 +104,38 @@ class block_motrain_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Level.
+     *
+     * @param manager $manager The manager.
+     * @param stdClass $level The level.
+     * @return string
+     */
+    public function level(stdClass $level) {
+        return $this->render_from_template('block_motrain/level', (object) array_merge(
+            (array) $level,
+            [
+                'coins_in_level_formatted' => $this->coin_amount($level->coins_in_level),
+                'coins_needed_formatted' => $this->coin_amount($level->coins_needed),
+                'progress_width' => ($level->progress_ratio > 0 ? max(0.01, $level->progress_ratio) : 0) * 100
+            ]
+        ));
+    }
+
+    /**
      * Return the block's content.
      *
      * @param manager $manager The manager.
      * @return string
      */
     public function main_block_content(manager $manager) {
-        $o = '';
-
-        $o .= html_writer::start_div();
-        $o .= $this->wallet($manager);
-        $o .= html_writer::end_div();
-
-        $o .= $this->navigation_on_block($manager);
-
+        global $USER;
+        $level = $manager->get_level_proxy()->get_level($USER);
+        $o = $this->render_from_template('block_motrain/block', [
+            'levelhtml' => $level ? $this->level($level) : null,
+            'haslevel' => !empty($level),
+            'wallethtml' => $this->wallet($manager),
+            'navhtml' => $this->navigation_on_block($manager),
+        ]);
         return $o;
     }
 

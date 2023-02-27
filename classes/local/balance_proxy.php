@@ -40,6 +40,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class balance_proxy {
 
+    /** @var cache The cache. */
+    protected $coinscache;
     /** @var manager The manager. */
     protected $manager;
 
@@ -60,26 +62,27 @@ class balance_proxy {
      * @return int
      */
     public function get_balance($userorid) {
-        $userid = $userorid;
-        if (is_object($userid)) {
-            $userid = $userorid->id;
-        }
+        return $this->get_player_coins($userorid)->coins;
+    }
 
-        if (($coins = $this->coinscache->get($userid)) === false) {
-            $coins = $this->get_remote_balance($userorid);
-            $this->set_balance($userid, $coins);
-        }
-
-        return $coins;
+    /**
+     * Get the total earned.
+     *
+     * @param object|int The user, or its ID.
+     * @return int
+     */
+    public function get_total_earned($userorid) {
+        return $this->get_player_coins($userorid)->coins_earned_lifetime;
     }
 
     /**
      * Get the coins from server.
      *
      * @param int|object $userorid The user, or its ID.
-     * @return int The coins.
+     * @return object With coins, and coins_earned_lifetime.
      */
-    protected function get_remote_balance($userorid) {
+    protected function get_player_coins($userorid) {
+        $default = (object) ['coins' => 0, 'coins_earned_lifetime' => 0];
         $manager = $this->manager;
 
         $userid = $userorid;
@@ -88,26 +91,51 @@ class balance_proxy {
         }
 
         if (!$manager->is_enabled() || $manager->is_paused()) {
-            return 0;
+            return $default;
         }
 
         $teamid = $manager->get_team_resolver()->get_team_id_for_user($userid);
         if (!$teamid) {
-            return 0;
+            return $default;
         }
 
         $playerid = $manager->get_player_mapper()->get_player_id($userorid, $teamid);
         if (!$playerid) {
-            return 0;
+            return $default;
         }
 
         try {
-            return $manager->get_client()->get_balance($playerid);
+            $player = $manager->get_client()->get_player($playerid);
+            return (object) [
+                'coins' => (int) ($player->coins ?? 0),
+                'coins_earned_lifetime' => (int) ($player->coins_earned_lifetime ?? 0),
+            ];
         } catch (api_error $e) {
-            return 0;
+            return $default;
         } catch (client_exception $e) {
-            return 0;
+            return $default;
         }
+    }
+
+    /**
+     * Get the coins from server.
+     *
+     * @param int|object $userorid The user, or its ID.
+     * @return object With coins, and coins_earned_lifetime.
+     */
+    protected function get_player_coins_cached($userorid) {
+        $userid = $userorid;
+        if (is_object($userid)) {
+            $userid = $userorid->id;
+        }
+        $userid = (int) $userid;
+
+        if (($data = $this->coinscache->get($userid)) === false) {
+            $data = $this->get_player_coins($userorid);
+            $this->coinscache->set($userid, $data);
+        }
+
+        return $data;
     }
 
     /**
@@ -133,9 +161,10 @@ class balance_proxy {
      *
      * @param int $userid The user ID.
      * @param int $coins The coins.
+     * @deprecated Do not use.
      */
     public function set_balance($userid, $coins) {
-        $this->coinscache->set((int) $userid, $coins);
+        throw new \coding_exception('Deprecated function.');
     }
 
 }

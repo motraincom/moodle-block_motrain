@@ -104,6 +104,10 @@ class client {
         return $this->get('/v2/accounts/' . $this->accountid);
     }
 
+    public function get_account_levels() {
+        return $this->get('/v2/accounts/' . $this->accountid . '/levels');
+    }
+
     public function get_balance($playerid) {
         $resp = $this->get('/v2/users/' . $playerid . '/balance');
         return $resp->coins;
@@ -112,6 +116,10 @@ class client {
     public function get_item($itemid) {
         $resp = $this->get('/v2/items/' . $itemid);
         return $resp;
+    }
+
+    public function get_player($playerid) {
+        return $this->get('/v2/users/' . $playerid);
     }
 
     public function get_player_by_email($teamid, $email) {
