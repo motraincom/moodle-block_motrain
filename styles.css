@@ -74,11 +74,12 @@
 /** Block content wrapper. */
 .block_motrain-content-wrapper {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     align-items: center;
 }
 .block_motrain-content-wrapper > div {
-    flex: 1;
+    flex: 1 0 200px;
 }
 
 /** Block wallet. */
@@ -121,6 +122,10 @@
 }
 .block_motrain-level .pic img {
     width: 100%;
+}
+.block_motrain-level .level-label {
+    font-size: 0.75rem;
+    text-align: center;
 }
 .block_motrain-level .block_motrain-progress {
     flex: 1;
