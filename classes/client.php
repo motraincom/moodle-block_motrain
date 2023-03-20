@@ -239,7 +239,9 @@ class client {
             $response = $curl->post($url, $data ? json_encode($data) : '');
         } else if ($method === 'PATCH') {
             $url = new moodle_url($this->apihost . $uri);
-            $response = $curl->patch($url, $data ? json_encode($data) : '');
+            $response = $curl->post($url, $data ? json_encode($data) : '', [
+                'CURLOPT_CUSTOMREQUEST' => 'PATCH'
+            ]);
         } else if ($method === 'PUT') {
             $url = new moodle_url($this->apihost . $uri);
             $response = $curl->put($url, $data ? json_encode($data) : '');
