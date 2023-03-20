@@ -96,14 +96,13 @@ class player_mapper {
                 $playerid = $player->id;
             }
 
+            // Compute the user's metadata.
+            [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
+
             // Attempt to create the user on the dashboard.
             if (empty($playerid)) {
                 try {
-                    $player = $this->client->create_player($teamid, [
-                        'firstname' => $user->firstname,
-                        'lastname' => $user->lastname,
-                        'email' => $user->email,
-                    ]);
+                    $player = $this->client->create_player($teamid, $playermetadata);
                     $playerid = $player->id;
                 } catch (api_error $e) {
                     $playerid = null;
@@ -122,7 +121,7 @@ class player_mapper {
             }
 
             $mapping->playerid = $playerid;
-            $mapping->metadatahash = $this->get_user_metadata_hash($user);
+            $mapping->metadatahash = $metadatahash;
             $mapping->metadatastale = 0;
             $mapping->blocked = !empty($blockedreason);
             $mapping->blockedreason = $blockedreason;
@@ -136,28 +135,26 @@ class player_mapper {
         // If the player metadata is stale, update the player.
         if (!empty($mapping) && !empty($mapping->metadatastale) && $this->syncmetadata) {
             $user = $user ? $user : $this->get_user($userid);
+            [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
 
             // In some instances, the user metadata can be marked as stale, but the user object
             // we are dealing with seems to be outdated (points to the previous metadata hash).
             // This can happen when an admin modifies a user that is already logged in, and that user
             // is entering this code with an outdated object. To remedy this, we force the user object
             // to be loaded from the database to guarantee that we've got the latest one.
-            if ($mapping->metadatahash === $this->get_user_metadata_hash($user)) {
+            if ($mapping->metadatahash === $metadatahash) {
                 $user = $this->get_user($userid, true);
+                [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
             }
 
             try {
-                $this->client->update_player($mapping->playerid, [
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'email' => $user->email,
-                ]);
+                $this->client->update_player($mapping->playerid, $playermetadata);
             } catch (client_exception $e) {
                 debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
 
             $mapping->metadatastale = 0;
-            $mapping->metadatahash = $this->get_user_metadata_hash($user);
+            $mapping->metadatahash = $metadatahash;
             $DB->update_record('block_motrain_playermap', $mapping);
         }
 
@@ -183,12 +180,33 @@ class player_mapper {
     }
 
     /**
-     * Get the user's metadata hash.
+     * Get the user's metadata.
      *
      * @param object $user The user.
+     * @return array First is the metadata, the other is the hash.
      */
-    protected function get_user_metadata_hash($user) {
-        return sha1($user->firstname . '|' . $user->lastname . '|' . $user->email);
+    protected function get_user_metadata($user) {
+        $data = (object) [
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'email' => $user->email,
+        ];
+
+        $hooks = get_plugin_list_with_function('local', 'motrain_extend_user_metadata');
+        foreach ($hooks as $plugin => $fullfunctionname) {
+            if (strpos($plugin, 'local_motrainaddon') !== 0) {
+                continue;
+            }
+            try {
+                component_callback($plugin, 'motrain_extend_user_metadata', [$user, $data]);
+            } catch (\Exception $e) {
+                debugging("Error while calling $plugin's motrain_extend_user_metadata callback: " . $e->getMessage(),
+                    DEBUG_DEVELOPER);
+            }
+        }
+
+        $hash = sha1(json_encode($data));
+        return [$data, $hash];
     }
 
     /**
@@ -247,8 +265,7 @@ class player_mapper {
             return;
         }
 
-
-        $metadatahash = $this->get_user_metadata_hash($user);
+        [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
         $DB->set_field_select(
             'block_motrain_playermap',
             'metadatastale',
