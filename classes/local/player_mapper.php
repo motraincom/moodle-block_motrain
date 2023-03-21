@@ -210,6 +210,18 @@ class player_mapper {
     }
 
     /**
+     * Mark all metadata as stale.
+     *
+     * Use this sparingly as it will cause all player metadata to be pushed to the dashboard.
+     */
+    public function mark_all_metadata_as_stale() {
+        global $DB;
+        $sql = 'UPDATE {block_motrain_playermap} SET metadatastale = ?, metadatahash = ? WHERE accountid = ?';
+        $params = [1, null, $this->accountid];
+        $DB->execute($sql, $params);
+    }
+
+    /**
      * Whether the mapping only considers local data.
      *
      * @param bool $localonly Local only.
