@@ -58,8 +58,14 @@ $courses = array_values(array_map(function($course) {
 }, $courses));
 
 // Prepare the list of modules.
+$moduletypenames = [];
+if (method_exists(\container_course\course_helper::class, 'get_all_modules')) {
+    $moduletypenames = \container_course\course_helper::get_all_modules();
+} else {
+    $moduletypenames = get_module_types_names();
+}
 $modules = [];
-foreach (get_module_types_names() as $mod => $modname) {
+foreach ($moduletypenames as $mod => $modname) {
     $modules[] = (object) [
         'module' => (string) $mod,
         'name' => (string) $modname
