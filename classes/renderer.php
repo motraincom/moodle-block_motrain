@@ -116,7 +116,8 @@ class block_motrain_renderer extends plugin_renderer_base {
             [
                 'coins_in_level_formatted' => $this->coin_amount($level->coins_in_level),
                 'coins_needed_formatted' => $this->coin_amount($level->coins_needed),
-                'progress_width' => ($level->progress_ratio > 0 ? max(0.01, $level->progress_ratio) : 0) * 100
+                'levelnstr' => get_string('leveln', 'block_motrain', $level->level),
+                'progress_width' => ($level->progress_ratio > 0 ? max(0.01, $level->progress_ratio) : 0) * 100,
             ]
         ));
     }
