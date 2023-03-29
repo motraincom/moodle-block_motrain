@@ -25,14 +25,13 @@
 
 namespace block_motrain\local;
 
-use block_motrain\client;
 use block_motrain\local\award\award;
 use block_motrain\local\reason\lang_reason;
 use block_motrain\manager;
 use context;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
-use moodle_exception;
+use totara_completioneditor\event\course_completion_edited;
 use totara_program\event\program_completed;
 
 defined('MOODLE_INTERNAL') || die();
@@ -108,7 +107,8 @@ class collection_strategy {
         // We only handle few events at the moment.
         if (!($event instanceof course_module_completion_updated)
                 && !($event instanceof course_completed)
-                && !($event instanceof program_completed)) {
+                && !($event instanceof program_completed)
+                && !($event instanceof course_completion_edited)) {
             return;
         }
 
@@ -155,8 +155,13 @@ class collection_strategy {
                 $award->give($coins, new lang_reason($reasonstr, $reasonargs));
             }
 
-        } else if ($event instanceof course_completed) {
+        } else if ($event instanceof course_completed || $event instanceof course_completion_edited) {
             $courseid = $event->courseid;
+
+            // If the completion was edited, make sure it was edited to completion.
+            if ($event instanceof course_completion_edited && !$this->is_completion_edited_to_completed($event)) {
+                return;
+            }
 
             $award = new award($userid, $context->id, 'course_completed', sha1($courseid));
             if ($award->has_been_recorded_previously()) {
@@ -236,10 +241,36 @@ class collection_strategy {
      */
     protected function get_event_target_user(\core\event\base $event) {
         $userid = $event->userid;
-        if ($event instanceof \core\event\course_completed || $event instanceof \core\event\course_module_completion_updated) {
+        if ($event instanceof \core\event\course_completed
+                || $event instanceof \core\event\course_module_completion_updated
+                || $event instanceof course_completion_edited) {
             $userid = $event->relateduserid;
         }
         return $userid;
     }
 
+    /**
+     * Check if the edited completion was marked as complete.
+     *
+     * @param course_completion_edited $event The event.
+     * @return bool
+     */
+    protected function is_completion_edited_to_completed(course_completion_edited $event) {
+        global $CFG;
+
+        // We cannot get the snapshot from a restored event, and should not be processing it anyway.
+        if ($event->is_restored()) {
+            return false;
+        }
+
+        require_once($CFG->libdir . '/completionlib.php');
+        require_once($CFG->dirroot . '/completion/completion_completion.php');
+
+        $snapshot = $event->get_record_snapshot('course_completions', $event->objectid);
+        if (!$snapshot) {
+            return false;
+        }
+
+        return in_array((int) $snapshot->status, [COMPLETION_STATUS_COMPLETE, COMPLETION_STATUS_COMPLETEVIARPL]);
+    }
 }
