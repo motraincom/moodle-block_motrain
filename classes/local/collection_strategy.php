@@ -29,6 +29,7 @@ use block_motrain\local\award\award;
 use block_motrain\local\reason\lang_reason;
 use block_motrain\manager;
 use context;
+use context_course;
 use core\event\course_completed;
 use core\event\course_module_completion_updated;
 use totara_completioneditor\event\course_completion_edited;
@@ -163,31 +164,7 @@ class collection_strategy {
                 return;
             }
 
-            $award = new award($userid, $context->id, 'course_completed', sha1($courseid));
-            if ($award->has_been_recorded_previously()) {
-                return;
-            }
-
-            $coins = $this->completioncoinscalculator->get_course_coins($courseid);
-            if ($coins <= 0) {
-                return;
-            }
-
-            try {
-                $modinfo = get_fast_modinfo($courseid);
-                $coursename = format_string($modinfo->get_course()->fullname, true, ['context' => $context]);
-                $reasonstr = 'transaction:credit.coursexcompleted';
-                $reasonargs = (object) ['name' => $coursename];
-            } catch (\moodle_exception $e) {
-                $reasonstr = null;
-                $reasonargs = null;
-            }
-            if (empty($reasonstr)) {
-                $reasonstr = 'transaction:credit.coursecompleted';
-                $reasonargs = null;
-            }
-
-            $award->give($coins, new lang_reason($reasonstr, $reasonargs));
+            $this->handle_award_for_course_completion($userid, $courseid);
 
         } else if ($event instanceof program_completed) {
             $programid = $event->objectid;
@@ -250,6 +227,52 @@ class collection_strategy {
     }
 
     /**
+     * Handle award for course completion.
+     *
+     * This assumes that all preliminary checks have been performed, such as checking that
+     * the user has the permission to earn coins, and that they have actually completed the
+     * course.
+     *
+     * This method still checks that the user has not earned coins previously for the same
+     * course completion, and will calculate how many points they should earn.
+     *
+     * It is made public so that it can be used by external tools that process course
+     * completions rewards separately, such as the bulk completion import adhoc task.
+     *
+     * @param int $userid The user ID.
+     * @param int $courseid The coruse ID.
+     */
+    public function handle_award_for_course_completion($userid, $courseid) {
+        $context = context_course::instance($courseid);
+
+        $award = new award($userid, $context->id, 'course_completed', sha1($courseid));
+        if ($award->has_been_recorded_previously()) {
+            return;
+        }
+
+        $coins = $this->completioncoinscalculator->get_course_coins($courseid);
+        if ($coins <= 0) {
+            return;
+        }
+
+        try {
+            $modinfo = get_fast_modinfo($courseid);
+            $coursename = format_string($modinfo->get_course()->fullname, true, ['context' => $context]);
+            $reasonstr = 'transaction:credit.coursexcompleted';
+            $reasonargs = (object) ['name' => $coursename];
+        } catch (\moodle_exception $e) {
+            $reasonstr = null;
+            $reasonargs = null;
+        }
+        if (empty($reasonstr)) {
+            $reasonstr = 'transaction:credit.coursecompleted';
+            $reasonargs = null;
+        }
+
+        $award->give($coins, new lang_reason($reasonstr, $reasonargs));
+    }
+
+    /**
      * Check if the edited completion was marked as complete.
      *
      * @param course_completion_edited $event The event.
@@ -273,4 +296,5 @@ class collection_strategy {
 
         return in_array((int) $snapshot->status, [COMPLETION_STATUS_COMPLETE, COMPLETION_STATUS_COMPLETEVIARPL]);
     }
+
 }

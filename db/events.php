@@ -51,4 +51,8 @@ $observers = [
         'eventname' => '\\totara_cohort\\event\\members_updated',
         'callback' => 'block_motrain\\observer::totara_cohort_members_updated',
     ],
+    [
+        'eventname' => '\\totara_completionimport\\event\\bulk_course_completionimport',
+        'callback' => 'block_motrain\\observer::totara_bulk_course_completionimport',
+    ],
 ];

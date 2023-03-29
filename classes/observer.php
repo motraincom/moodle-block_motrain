@@ -27,8 +27,10 @@ namespace block_motrain;
 defined('MOODLE_INTERNAL') || die();
 
 use block_motrain\local\collection_strategy;
+use block_motrain\task\adhoc_process_bulk_completion_import;
 use context_system;
 use moodle_exception;
+use totara_completionimport\event\bulk_course_completionimport;
 
 require_once($CFG->dirroot . '/cohort/lib.php');
 
@@ -130,6 +132,33 @@ class observer {
 
         // Schedule the synchronisation of the cohort.
         $manager->schedule_cohort_sync($event->objectid, false);
+    }
+
+    /**
+     * Observe when course completion is imported in bulk.
+     *
+     * @param totara_bulk_course_completionimport $event The event.
+     */
+    public static function totara_bulk_course_completionimport(bulk_course_completionimport $event) {
+        $manager = manager::instance();
+        if (!$manager->is_enabled() || $manager->is_paused()) {
+            return;
+        } else if ($event->is_restored()) {
+            return;
+        }
+
+        // This is expected to match ['userid' => int, 'courseid' => int][] as referenced in
+        // the function trigger_course_completions_imported_event from totara/completionimport/lib.php.
+        $completions = array_values($event->get_completions());
+        if (empty($completions)) {
+            return;
+        }
+
+        // Schedule a task to process this asynchronously.
+        $task = new adhoc_process_bulk_completion_import();
+        $task->set_component('block_motrain');
+        $task->set_custom_data($completions);
+        \core\task\manager::queue_adhoc_task($task);
     }
 
     /**
