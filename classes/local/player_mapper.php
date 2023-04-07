@@ -96,14 +96,17 @@ class player_mapper {
                 $playerid = $player->id;
             }
 
-            // Compute the user's metadata.
-            [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
+            // Prepare to maybe creating the user.
+            $hasbeencreated = false;
+            $metadatahash = null;
 
             // Attempt to create the user on the dashboard.
             if (empty($playerid)) {
+                [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
                 try {
                     $player = $this->client->create_player($teamid, $playermetadata);
                     $playerid = $player->id;
+                    $hasbeencreated = true;
                 } catch (api_error $e) {
                     $playerid = null;
                     $blockedreason = $e->get_error_code();
@@ -122,7 +125,7 @@ class player_mapper {
 
             $mapping->playerid = $playerid;
             $mapping->metadatahash = $metadatahash;
-            $mapping->metadatastale = 0;
+            $mapping->metadatastale = $hasbeencreated ? 0 : 1;
             $mapping->blocked = !empty($blockedreason);
             $mapping->blockedreason = $blockedreason;
             if (!empty($mapping->id)) {
