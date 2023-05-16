@@ -54,6 +54,27 @@ class processor {
     }
 
     /**
+     * Broadcast webhooks to other plugins.
+     *
+     * @param string $type The webhook type.
+     * @param object $payload The webhook payload.
+     */
+    protected function broadcast_webhook($type, $payload) {
+        $pluginsbytype = get_plugins_with_function('handle_block_motrain_webhook');
+        foreach ($pluginsbytype as $plugintype => $plugins) {
+            foreach ($plugins as $pluginname => $functionname) {
+                $component = $plugintype . '_' . $pluginname;
+                try {
+                    component_callback($component, 'handle_block_motrain_webhook', [$type, $payload]);
+                } catch (\Exception $e) {
+                    debugging("Webhook handler $pluginname::$functionname failed with $type: " . $e->getMessage(), DEBUG_DEVELOPER);
+                }
+
+            }
+        }
+    }
+
+    /**
      * Process a webhook.
      *
      * @param string $type The event type.
@@ -68,6 +89,17 @@ class processor {
 
         set_config('webhooklasthit', time(), 'block_motrain');
 
+        $this->handle_local_notifications($type, $payload);
+        $this->broadcast_webhook($type, $payload);
+    }
+
+    /**
+     * Handle local notifications.
+     *
+     * @param string $type The type.
+     * @param object $payload The payload.
+     */
+    protected function handle_local_notifications($type, $payload) {
         $supported = [
             'redemption.requestAccepted',
             'redemption.selfCompleted',
