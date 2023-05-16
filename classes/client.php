@@ -138,6 +138,11 @@ class client {
         return $this->decode_json_response($resp);
     }
 
+    public function get_redemption($redemptionid) {
+        $resp = $this->request_advanced('GET', '/v2/redemptions/' . $redemptionid);
+        return $this->decode_json_response($resp);
+    }
+
     public function get_store_login_url($playerid, $landingpage = null) {
         $params = null;
         if (in_array($landingpage, ['shop', 'info', 'leaderboards', 'purchases', 'activity'])) {
