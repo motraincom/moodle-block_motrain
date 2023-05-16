@@ -121,9 +121,10 @@ class block_motrain_renderer extends plugin_renderer_base {
      * Return the block's content.
      *
      * @param manager $manager The manager.
+     * @param object $config The block config.
      * @return string
      */
-    public function main_block_content(manager $manager) {
+    public function main_block_content(manager $manager, $config) {
         global $USER;
 
         $infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
@@ -173,6 +174,8 @@ class block_motrain_renderer extends plugin_renderer_base {
             'playernav' => $playernav,
             'hasmanagernav' => !empty($managernav),
             'managernav' => $managernav,
+            'accentcolor' => $config->accentcolor ?? '',
+            'bgcolor' => $config->bgcolor ?? '',
         ] + (array) $this->get_appearance_settings());
     }
 

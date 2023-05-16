@@ -105,7 +105,7 @@ class block_motrain extends block_base {
             return $this->content;
         }
 
-        $this->content->text = $renderer->main_block_content($manager, null, $config);
+        $this->content->text = $renderer->main_block_content($manager, $config ?? (object) []);
 
         // Extend block content hook.
         $plugins = addons::get_list_with_function('extend_block_motrain_content');

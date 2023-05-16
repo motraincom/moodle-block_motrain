@@ -1,3 +1,9 @@
+<style>
+.block_motrain-wrapper {
+    {{#accentcolor}}--motrain-accent-color: {{.}};{{/accentcolor}}
+    {{#bgcolor}}--motrain-bg-color: {{.}};{{/bgcolor}}
+}
+</style>
 <div class="block_motrain-wrapper">
     <div class="block_motrain-content">
         <div class="block_motrain-wallet">
@@ -24,6 +30,7 @@
                 </div>
                 <div class="block_motrain-progress">
                     <div aria-role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress_pc }}">
+                        <div></div>
                         <div style="width: {{progress_pc}}%;"></div>
                     </div>
                     <div class="progress-text">

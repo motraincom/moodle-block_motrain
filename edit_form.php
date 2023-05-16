@@ -52,6 +52,14 @@ class block_motrain_edit_form extends block_edit_form {
 
         $mform->addElement('editor', 'config_footercontent', get_string('configfootercontent', 'block_motrain'));
         $mform->addHelpButton('config_footercontent', 'configfootercontent', 'block_motrain');
+
+        $mform->addElement('text', 'config_accentcolor', get_string('configaccentcolor', 'block_motrain'));
+        $mform->addHelpButton('config_accentcolor', 'configaccentcolor', 'block_motrain');
+        $mform->setType('config_accentcolor', PARAM_NOTAGS);
+
+        $mform->addElement('text', 'config_bgcolor', get_string('configbgcolor', 'block_motrain'));
+        $mform->addHelpButton('config_bgcolor', 'configbgcolor', 'block_motrain');
+        $mform->setType('config_bgcolor', PARAM_NOTAGS);
     }
 
 }
