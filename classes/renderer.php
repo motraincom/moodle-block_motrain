@@ -88,6 +88,7 @@ class block_motrain_renderer extends plugin_renderer_base {
         return (object) [
             'thousandssep' => get_string('thousandssep', 'langconfig'),
             'pointsimageurl' => $manager->get_coins_image_url()->out(false),
+            'icondoubleurl' => $manager->get_metadata_reader()->get_icon_double_url(),
         ];
     }
 
@@ -108,18 +109,12 @@ class block_motrain_renderer extends plugin_renderer_base {
      *
      * @param manager $manager The manager.
      * @param stdClass $level The level.
+     * @deprecated Since 1.8.0.
      * @return string
      */
     public function level(stdClass $level) {
-        return $this->render_from_template('block_motrain/level', (object) array_merge(
-            (array) $level,
-            [
-                'coins_in_level_formatted' => $this->coin_amount($level->coins_in_level),
-                'coins_needed_formatted' => $this->coin_amount($level->coins_needed),
-                'levelnstr' => get_string('leveln', 'block_motrain', $level->level),
-                'progress_width' => ($level->progress_ratio > 0 ? max(0.01, $level->progress_ratio) : 0) * 100,
-            ]
-        ));
+        debugging('This method level is deprecated without replacement, yet.', DEBUG_DEVELOPER);
+        return '';
     }
 
     /**
@@ -130,14 +125,55 @@ class block_motrain_renderer extends plugin_renderer_base {
      */
     public function main_block_content(manager $manager) {
         global $USER;
+
+        $infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
+        $storeurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'shop']);
+        $leaderboardsurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'leaderboards']);
+
+        $coins = $manager->get_balance_proxy()->get_balance($USER);
         $level = $manager->get_level_proxy()->get_level($USER);
-        $o = $this->render_from_template('block_motrain/block', [
-            'levelhtml' => $level ? $this->level($level) : null,
-            'haslevel' => !empty($level),
-            'wallethtml' => $this->wallet($manager),
-            'navhtml' => $this->navigation_on_block($manager),
-        ]);
-        return $o;
+        if ($level) {
+            $level->coins_remaining_formatted = $this->coin_amount($level->coins_remaining);
+            $level->levelnstr = get_string('leveln', 'block_motrain', $level->level);
+        }
+
+        $playernav = [];
+        if ($manager->has_leaderboard_access($USER->id)) {
+            $playernav[] = [
+                'icon' => $this->render_from_template('block_motrain/nav-icon-leaderboard', []),
+                'label' => get_string('leaderboard', 'block_motrain'),
+                'url' => $leaderboardsurl->out(false),
+            ];
+        }
+
+        $managernav = [];
+        if (has_capability('block/motrain:accessdashboard', context_system::instance())) {
+            $managernav[] = [
+                'icon' => $this->render_from_template('block_motrain/nav-icon-dashboard', []),
+                'label' => get_string('dashboard', 'block_motrain'),
+                'url' => $manager->get_dashboard_url()->out(false),
+            ];
+        }
+        if ($manager->can_manage()) {
+            $url = new moodle_url('/blocks/motrain/settings_config.php');
+            $managernav[] = [
+                'icon' => $this->render_from_template('block_motrain/nav-icon-settings', []),
+                'label' => get_string('settings', 'core'),
+                'url' => $url->out(false),
+            ];
+        }
+
+        return $this->render_from_template('block_motrain/block', [
+            'coins' => $coins,
+            'coins_formatted' => $this->coin_amount($coins),
+            'level' => $level,
+            'infourl' => $infourl->out(false),
+            'storeurl' => $storeurl->out(false),
+            'hasplayernav' => !empty($playernav),
+            'playernav' => $playernav,
+            'hasmanagernav' => !empty($managernav),
+            'managernav' => $managernav,
+        ] + (array) $this->get_appearance_settings());
     }
 
     /**
@@ -204,72 +240,7 @@ class block_motrain_renderer extends plugin_renderer_base {
      * @return string
      */
     public function navigation_on_block(manager $manager) {
-        global $USER;
-
-        $embedurl = new moodle_url('/blocks/motrain/index.php');
-        $urls = (object) [
-            'info' => new moodle_url($embedurl, ['page' => 'info']),
-            'store' => new moodle_url($embedurl, ['page' => 'shop']),
-            'purchases' => new moodle_url($embedurl, ['page' => 'purchases']),
-            'leaderboard' => new moodle_url($embedurl, ['page' => 'leaderboards']),
-        ];
-
-        $actions = [];
-        $actions[] = new action_link(
-            $urls->info,
-            get_string('infopagetitle', 'block_motrain'),
-            null,
-            null,
-            new pix_icon('info', '', 'block_motrain')
-        );
-
-        $actions[] = new action_link(
-            $urls->store,
-            get_string('store', 'block_motrain'),
-            null,
-            null,
-            new pix_icon('store', '', 'block_motrain')
-        );
-
-        $actions[] = new action_link(
-            $urls->purchases,
-            get_string('purchases', 'block_motrain'),
-            null,
-            null,
-            new pix_icon('purchases', '', 'block_motrain')
-        );
-
-        if ($manager->has_leaderboard_access($USER->id)) {
-            $actions[] = new action_link(
-                $urls->leaderboard,
-                get_string('leaderboard', 'block_motrain'),
-                null,
-                null,
-                new pix_icon('leaderboard', '', 'block_motrain')
-            );
-        }
-
-        if (has_capability('block/motrain:accessdashboard', context_system::instance())) {
-            $actions[] = new action_link(
-                $manager->get_dashboard_url(),
-                get_string('dashboard', 'block_motrain'),
-                null,
-                ['target' => '_blank'],
-                new pix_icon('dashboard', '', 'block_motrain')
-            );
-        }
-
-        if ($manager->can_manage()) {
-            $actions[] = new action_link(
-                new moodle_url('/blocks/motrain/settings_config.php'),
-                get_string('settings', 'core'),
-                null,
-                null,
-                new pix_icon('settings', '', 'block_motrain')
-            );
-        }
-
-        return $this->render_navigation_on_block($actions);
+        return '';
     }
 
     /**
@@ -279,28 +250,8 @@ class block_motrain_renderer extends plugin_renderer_base {
      * @return string
      */
     public function navigation_on_block_for_managers(manager $manager) {
-        $actions = [];
-        if (has_capability('block/motrain:accessdashboard', context_system::instance())) {
-            $actions[] = new action_link(
-                $manager->get_dashboard_url(),
-                get_string('dashboard', 'block_motrain'),
-                null,
-                ['target' => '_blank'],
-                new pix_icon('dashboard', '', 'block_motrain')
-            );
-        }
-        if ($manager->can_manage()) {
-            $actions[] = new action_link(
-                new moodle_url('/blocks/motrain/settings_config.php'),
-                get_string('settings', 'core'),
-                null,
-                null,
-                new pix_icon('i/settings', '', 'core')
-            );
-        }
-        return $this->render_navigation_on_block($actions);
+        return '';
     }
-
 
     /**
      * Override pix_url to auto-handle deprecation.
@@ -347,53 +298,15 @@ class block_motrain_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render navigation on block.
-     *
-     * @param array $actions A list of actions.
-     */
-    protected function render_navigation_on_block($actions) {
-        if (empty($actions)) {
-            return '';
-        }
-
-        $o = '';
-        $o .= html_writer::start_tag('nav');
-        $o .= implode('', array_map(function(action_link $action) {
-            if (!isset($action->attributes['id'])) {
-                $action->attributes['id'] = html_writer::random_id();
-            }
-
-            $iconandtext = html_writer::div($this->render($action->icon));
-            $iconandtext .= html_writer::div($action->text, 'nav-label');
-            $content = html_writer::link($action->url, $iconandtext, array_merge($action->attributes, ['class' => 'nav-button']));
-
-            $componentactions = !empty($action->actions) ? $action->actions : [];
-            foreach ($componentactions as $componentaction) {
-                $this->add_action_handler($componentaction, $action->attributes['id']);
-            }
-
-            return $content;
-        }, $actions));
-        $o .= html_writer::end_tag('nav');
-
-        return $o;
-    }
-
-    /**
      * Return the content of the user's wallet.
      *
      * @param manager $manager The manager.
+     * @deprecated Since 1.8.0.
      * @return string
      */
     public function wallet(manager $manager) {
-        global $USER;
-        $coins = $manager->get_balance_proxy()->get_balance($USER);
-        return $this->render_from_template('block_motrain/wallet', (object) array_merge(
-            (array) $this->get_appearance_settings(),
-            [
-                'coins' => $this->coin_amount($coins),
-            ]
-        ));
+        debugging('This method level is deprecated without replacement, yet.', DEBUG_DEVELOPER);
+        return '';
     }
 
 }

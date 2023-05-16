@@ -67,6 +67,25 @@ class metadata_reader {
     }
 
     /**
+     * Get the icon double URL.
+     *
+     * @return string|null
+     */
+    public function get_icon_double_url() {
+        $key = 'icon_double';
+        if (($val = $this->cache->get($key)) === false) {
+            try {
+                $branding = $this->manager->get_client()->get_account_branding();
+                $val = $branding->icon_double;
+            } catch (client_exception $e) {
+                $val = null;
+            }
+            $this->cache->set($key, $val);
+        }
+        return $val;
+    }
+
+    /**
      * Get the item.
      *
      * @param string $itemid The item ID.

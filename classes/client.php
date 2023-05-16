@@ -104,6 +104,10 @@ class client {
         return $this->get('/v2/accounts/' . $this->accountid);
     }
 
+    public function get_account_branding() {
+        return $this->get('/v2/accounts/' . $this->accountid . '/branding');
+    }
+
     public function get_account_levels() {
         return $this->get('/v2/accounts/' . $this->accountid . '/levels');
     }

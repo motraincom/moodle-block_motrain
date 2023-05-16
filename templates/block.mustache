@@ -1,9 +1,74 @@
-<div class="block_motrain-content-wrapper">
-    {{#haslevel}}
-        <div>{{{ levelhtml }}} </div>
-    {{/haslevel}}
-    <div>
-        {{{ wallethtml }}}
+<div class="block_motrain-wrapper">
+    <div class="block_motrain-content">
+        <div class="block_motrain-wallet">
+            <div class="wallet-balance">
+                <div class="wallet-coins">{{ coins_formatted }}</div>
+                <div class="wallet-pic">{{> block_motrain/icon-coins }}</div>
+            </div>
+            <div class="wallet-action">
+                <a href="{{ storeurl }}" class="">
+                    <div>{{#str}} spend, block_motrain {{/str}}</div>
+                    <div class="action-pic">{{> block_motrain/icon-coins }}</div>
+                </a>
+            </div>
+        </div>
+
+        {{#level}}
+        <div class="block_motrain-level">
+            <div class="level-pic">
+                <img src="{{ badge_url }}" alt="{{ levelnstr }}">
+            </div>
+            <div class="level-progress">
+                <div class="progress-label">
+                    {{#str}} level, block_motrain {{/str}}
+                </div>
+                <div class="block_motrain-progress">
+                    <div aria-role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progress_pc }}">
+                        <div style="width: {{progress_pc}}%;"></div>
+                    </div>
+                    <div class="progress-text">
+                        <div class="text-label">
+                            {{# coins_remaining }}
+                                {{#str}} nextlevelin, block_motrain {{/str}} {{ coins_remaining_formatted}}
+                            {{/ coins_remaining }}
+                            {{^ coins_remaining }}{{#str}} maximumlevel, block_motrain {{/str}}{{/ coins_remaining }}
+                        </div>
+                        <div class="text-pic">{{> block_motrain/icon-coins }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/level}}
     </div>
+
+    <nav class="block_motrain-nav">
+        {{#hasplayernav}}
+            <div class="nav-container">
+                {{#playernav}}
+                    <a href="{{url}}" class="nav-item">
+                        <div class="nav-icon">{{{ icon }}}</div>
+                        <div class="nav-label">{{ label }}</div>
+                    </a>
+                {{/playernav}}
+            </div>
+        {{/hasplayernav}}
+        {{#hasmanagernav}}
+            <div class="nav-container">
+                {{#managernav}}
+                    <a href="{{url}}" class="nav-item">
+                        <div class="nav-icon">{{{ icon }}}</div>
+                        <div class="nav-label">{{ label }}</div>
+                    </a>
+                {{/managernav}}
+            </div>
+        {{/hasmanagernav}}
+        <div class="nav-container">
+            <a href="{{ infourl }}" class="nav-light nav-item nav-tight">
+                <div class="nav-icon">
+                    {{> block_motrain/nav-icon-info }}
+                </div>
+                <div class="nav-label">{{#str}} infopagetitle, block_motrain {{/str}}</div>
+            </a>
+        </div>
+    </nav>
 </div>
-{{{ navhtml }}}

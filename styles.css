@@ -71,120 +71,192 @@
     gap: 0.5rem;
 }
 
-/** Block content wrapper. */
-.block_motrain-content-wrapper {
+.block_motrain-content {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
+    gap: 16px;
 }
-.block_motrain-content-wrapper > div {
-    flex: 1 0 200px;
+.block_motrain-content > div {
+    flex: 1 1 296px;
 }
 
-/** Block wallet. */
+/** Wallet on block */
 .block_motrain-wallet {
+    background: #e7fafe;
+    border-radius: 16px;
+    padding: 16px;
+}
+.block_motrain-wallet .wallet-balance {
+    gap: 4px;
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    flex-wrap: wrap;
-    margin-top: -10px;
-}
-.block_motrain-wallet .pic {
-    justify-content: center;
-    margin: 0 0.5rem;
-    margin-top: 10px;
-}
-.block_motrain-wallet .pic img {
-    height: 60px;
-}
-.block_motrain-wallet .coins {
-    align-self: center;
-    margin-top: 10px;
-}
-.block_motrain-wallet .amount {
-    font-size: 150%;
-    font-weight: bold;
-    white-space: nowrap;
-}
-.block_motrain-wallet .legend {
-    font-size: 85%;
-    color: #666;
-}
-
-/** Block level. */
-.block_motrain-level {
-    display: flex;
-    gap: 1rem;
     align-items: center;
+    font-weight: bold;
+
+    padding-top: 4px;
+    margin-bottom: 16px;
 }
-.block_motrain-level .pic {
-    min-width: 2rem;
+.block_motrain-wallet .wallet-coins {
+    font-size: 32px;
+    line-height: 1;
 }
-.block_motrain-level .pic img {
-    width: 100%;
-}
-.block_motrain-level .level-label {
-    font-size: 0.75rem;
-    text-align: center;
-}
-.block_motrain-level .block_motrain-progress {
-    flex: 1;
-    padding-top: 1rem;
-}
-.block_motrain-level [aria-role='progressbar'] {
-    min-width: 80px;
-    width: 100%;
-    height: 10px;
-    border-radius: 20px;
-    border: 1px solid #dbdbdb;
-    position: relative;
-    overflow: hidden;
-}
-.block_motrain-level [aria-role='progressbar'] > div {
-    background-color: #a7f3d0;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    position: absolute;
-}
-.block_motrain-level .progress-text {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    text-align: center;
-}
-.block_motrain-level .progress-text span {
-    color: #6b7280;
+.block_motrain-wallet .wallet-pic {
+    height: 22px;
 }
 
-/** Block navigation. */
-.block_motrain nav {
-    text-align: center;
+.block_motrain-wallet .wallet-action a {
+    background: #07c8f3;
+    box-shadow: 5px 5px 10px rgba(7, 200, 243, 0.25);
+    border-radius: 16px;
     display: flex;
-    flex-wrap: wrap;
-    align-content: stretch;
-    align-items: stretch;
-    margin-top: 1em;
-}
-.block_motrain nav .nav-button {
-    flex: 1;
-    align-self: auto;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    font-weight: bold;
     text-decoration: none;
-    color: #333;
-    font-size: 80%;
-    padding: 5px 5px 0;
+    color: #fff;
+    padding: 4px;
+    min-height: 40px;
+    line-height: 1;
 }
-.block_motrain nav .nav-button .icon {
-    margin: 0;
-    padding: 0;
+.block_motrain-wallet .wallet-action a:hover {
+    background: #07c8f3de;
+    text-decoration: none;
+    box-shadow: none;
+    color: #fff;
 }
-.block_motrain nav .nav-button .icon,
-.block_motrain nav .nav-button .smallicon {
-    width: 16px;
+.block_motrain-wallet .wallet-action .action-pic {
     height: 16px;
 }
-.block_motrain nav .nav-button:hover {
-    background: #eee;
+
+/** Level on block */
+.block_motrain-level {
+    background: #e7fafe;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+.block_motrain-level .level-pic {
+    height: 54px;
+    flex: 0 0 auto;
+}
+.block_motrain-level .level-pic img {
+    height: 100%;
+    width: auto;
+}
+.block_motrain-level .level-progress {
+    flex: 1 0 auto;
+}
+.block_motrain-level .level-progress .progress-label {
+    color: #474747;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+/** Progress on block */
+.block_motrain-progress [aria-role='progressbar'] {
+    border-radius: 8px;
+    width: 100%;
+    height: 8px;
+    background: #07c8f333;
+}
+.block_motrain-progress [aria-role='progressbar'] div {
+    border-radius: 8px;
+    height: 100%;
+    background: #07c8f3;
+    min-width: 8px;
+}
+.block_motrain-progress [aria-role='progressbar'][aria-valuenow='0'] div {
+    min-width: 0;
+    width: 0px;
+}
+.block_motrain-progress .progress-text {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    text-align: right;
+    font-size: 10px;
+    line-height: 1;
+    gap: 8px;
+
+    color: #474747;
+    margin-top: 4px;
+}
+.block_motrain-progress .progress-text .text-label {
+    flex: 1 0 auto;
+    overflow: hidden;
+}
+.block_motrain-progress .progress-text .text-pic {
+    height: 12px;
+    flex: 0 0 auto;
+}
+.block_motrain-progress .progress-text .text-pic img,
+.block_motrain-progress .progress-text .text-pic svg {
+    height: 100%;
+    width: auto;
+}
+
+/** Nav on block */
+.block_motrain-nav {
+    margin-top: 16px;
+}
+.block_motrain-nav .nav-container {
+    gap: 16px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.block_motrain-nav .nav-container + .nav-container {
+    margin-top: 16px;
+}
+.block_motrain-nav .nav-item {
+    flex: 1 1 40%;
+    min-width: 0;
+    border: 1px solid #474747;
+    border-radius: 16px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 4px 16px;
+    font-size: 14px;
+    line-height: 1;
+    color: #474747;
+    text-decoration: none;
+    background: transparent;
+}
+.block_motrain-nav .nav-item:hover {
+    color: #07c8f3;
+    border-color: #07c8f3;
+    text-decoration: none;
+}
+.block_motrain-nav .nav-item.nav-light {
+    height: auto;
+    padding: 4px 8px;
+    border-width: 0;
+}
+.block_motrain-nav .nav-item.nav-tight {
+    flex: 0 1 auto;
+    margin: 0 auto;
+}
+
+.block_motrain-nav .nav-item .nav-icon {
+    flex: 0 0 auto;
+    height: 16px;
+    margin-right: 4px;
+}
+.block_motrain-nav .nav-item .nav-icon svg {
+    height: 16px;
+    width: auto;
+}
+.block_motrain-nav .nav-item .nav-label {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
