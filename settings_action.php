@@ -44,6 +44,10 @@ if ($action === 'purgemetadata') {
     cache_helper::purge_by_definition('block_motrain', 'metadata');
     $message = get_string('cachepurged', 'block_motrain');
 
+} else if ($action === 'connectwebhook') {
+    $manager->setup_webhook();
+    notification::add(get_string('webhooksconnected', 'block_motrain'), notification::SUCCESS);
+
 } else if ($action === 'disconnectwebhook') {
     $manager->unset_webhook();
     notification::add(get_string('webhooksdisconnected', 'block_motrain'), notification::SUCCESS);

@@ -74,14 +74,18 @@ $setting = new admin_setting_configpasswordunmask('block_motrain/apikey', get_st
 $setting->set_updatedcallback('block_motrain_check_enabled_state');
 $settingspage->add($setting);
 
-$webhookregistrationcontent = get_string('no', 'core');
 if ($manager->is_webhook_connected()) {
     $lasthit = $manager->get_last_webhook_hit();
     $webhooktime = get_string('lastwebhooktime', 'block_motrain', $lasthit ? userdate($lasthit) : get_string('never', 'core'));
     $disconnect = html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'disconnectwebhook',
-        'sesskey' => sesskey(), 'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
-        get_string('disconnect', 'block_motrain'));
+    'sesskey' => sesskey(), 'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
+    get_string('disconnect', 'block_motrain'));
     $webhookregistrationcontent = get_string('yes', 'core') . '. ' . $webhooktime . ' (' . $disconnect . ')';
+} else {
+    $connect = html_writer::link(new moodle_url('/blocks/motrain/settings_action.php', ['action' => 'connectwebhook',
+    'sesskey' => sesskey(), 'returnurl' => $PAGE->has_set_url() ? $PAGE->url->out_as_local_url() : '/']),
+    get_string('connect', 'block_motrain'));
+    $webhookregistrationcontent = get_string('no', 'core') . '. (' . $connect . ')';
 }
 $setting = new static_content('block_motrain/webhooksconnected', get_string('webhooksconnected', 'block_motrain'),
     get_string('webhooksconnected_help', 'block_motrain'), $webhookregistrationcontent

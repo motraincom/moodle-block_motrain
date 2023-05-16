@@ -57,6 +57,7 @@ $string['coinsimage'] = 'Coins image';
 $string['completingacourse'] = 'Completing a course';
 $string['completingaprogram'] = 'Completing a program';
 $string['completingn'] = 'Completing {$a}';
+$string['connect'] = 'Connect';
 $string['configfootercontent_help'] = 'The content to display at the bottom of the block.';
 $string['configfootercontent'] = 'Footer content';
 $string['configtitle'] = 'Title';
