@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\addons;
 use block_motrain\manager;
 
 defined('MOODLE_INTERNAL') || die();
@@ -163,6 +164,20 @@ class block_motrain_renderer extends plugin_renderer_base {
                 'url' => $url->out(false),
             ];
         }
+
+        // Extend player navigation from addons.
+        $addonplayernav = [];
+        $addons = addons::get_list_with_function('extend_block_motrain_player_navigation');
+        foreach ($addons as $pluginname => $functionname) {
+            $candidates = component_callback($pluginname, 'extend_block_motrain_player_navigation', [$manager, $this], []);
+            if (empty($candidates)) {
+                continue;
+            }
+            $addonplayernav = array_merge($addonplayernav, array_values(array_filter($candidates, function($item) {
+                return !empty($item['url']) && !empty($item['label']);
+            })));
+        }
+        $playernav = array_merge($playernav, $addonplayernav);
 
         return $this->render_from_template('block_motrain/block', [
             'coins' => $coins,

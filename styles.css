@@ -238,12 +238,13 @@
     height: 32px;
     display: flex;
     align-items: center;
-    padding: 4px 16px;
-    font-size: 14px;
+    padding: 4px 12px;
+    font-size: 12px;
     line-height: 1;
     color: #474747;
     text-decoration: none;
     background: transparent;
+    gap: 4px;
 }
 .block_motrain-nav .nav-item:hover {
     color: var(--motrain-accent-color);
@@ -263,7 +264,6 @@
 .block_motrain-nav .nav-item .nav-icon {
     flex: 0 0 auto;
     height: 16px;
-    margin-right: 4px;
 }
 .block_motrain-nav .nav-item .nav-icon svg {
     height: 16px;
