@@ -149,5 +149,15 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2023012301, 'motrain');
     }
 
+    if ($oldversion < 2023052801) {
+
+        // Ensure that the webhook is updated to match the latest requirements.
+        $task = new \block_motrain\task\adhoc_update_webhook();
+        \core\task\manager::queue_adhoc_task($task, true);
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2023052801, 'motrain');
+    }
+
     return true;
 }

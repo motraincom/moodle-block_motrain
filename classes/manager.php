@@ -632,6 +632,7 @@ class manager {
                 'redemption.requestAccepted',
                 'redemption.selfCompleted',
                 'user.auctionWon',
+                'user.leveledUp',
                 'user.manuallyAwardedCoins',
                 'user.raffleWon',
             ]
