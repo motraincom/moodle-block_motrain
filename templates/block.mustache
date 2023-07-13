@@ -7,10 +7,7 @@
 <div class="block_motrain-wrapper">
     <div class="block_motrain-content">
         <div class="block_motrain-wallet">
-            <div class="wallet-balance">
-                <div class="wallet-coins">{{ coins_formatted }}</div>
-                <div class="wallet-pic">{{> block_motrain/icon-coins }}</div>
-            </div>
+            {{> block_motrain/wallet-balance }}
             <div class="wallet-action">
                 <a href="{{ storeurl }}" class="">
                     <div>{{#str}} spend, block_motrain {{/str}}</div>

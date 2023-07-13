@@ -94,22 +94,25 @@
     border-radius: 16px;
     padding: 16px;
 }
-.block_motrain-wallet .wallet-balance {
+.block_motrain-wallet .block_motrain-wallet-balance {
+    padding-top: 4px;
+    margin-bottom: 16px;
+}
+
+/** Wallet balance, re-usable */
+.block_motrain-wallet-balance {
     gap: 4px;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-
-    padding-top: 4px;
-    margin-bottom: 16px;
 }
-.block_motrain-wallet .wallet-coins {
+.block_motrain-wallet-balance .wallet-coins {
     font-size: 32px;
     line-height: 1;
 }
-.block_motrain-wallet .wallet-pic {
+.block_motrain-wallet-balance .wallet-pic {
     height: 22px;
 }
 
