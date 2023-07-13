@@ -1,0 +1,35 @@
+{{! Deprecated template, do not use. Original class name was block_motrain-wallet. }}
+<style>
+    .block_motrain-wallet-deprecated {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: -10px;
+    }
+    .block_motrain-wallet-deprecated .pic {
+        justify-content: center;
+        margin: 0 0.5rem;
+        margin-top: 10px;
+    }
+    .block_motrain-wallet-deprecated .pic img {
+        height: 60px;
+    }
+    .block_motrain-wallet-deprecated .coins {
+        align-self: center;
+        margin-top: 10px;
+    }
+    .block_motrain-wallet-deprecated .amount {
+        font-size: 150%;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+</style>
+<div class="block_motrain-wallet-deprecated">
+    <div class="pic">
+        <img src="{{pointsimageurl}}" alt="{{#str}} coins, block_motrain {{/str}}">
+    </div>
+    <div class="coins">
+        {{! The coins must already be formatted to include the decimal places }}
+        <div class="amount">{{coins}} {{pointsterm}}</div>
+    </div>
+</div>
