@@ -65,6 +65,9 @@ class award {
     /** @var bool $strict Whether we should be strict. */
     protected $strict = false;
 
+    /** @var bool $hasretried Whether we have automatically retried following an error. */
+    protected $hasretried = false;
+
     /**
      * Constructor.
      *
@@ -111,7 +114,21 @@ class award {
         }
 
         // Send the coins, and invalidate the cash.
-        $manager->get_client()->add_coins($playerid, $coins, $reason);
+        try {
+            $manager->get_client()->add_coins($playerid, $coins, $reason);
+        } catch (api_error $e) {
+
+            // It would appear that the player is not found. That is likely because we have a mapping that
+            // is no tied to a player that has been deleted. In this case, we delete the mapping and retry.
+            if ($e->get_http_code() == 404 && $playerid && !$this->hasretried) {
+                $this->hasretried = true;
+                $manager->get_player_mapper()->remove_user($userid);
+                $this->award_coins($coins, $reason);
+                return;
+            }
+
+            throw $e;
+        }
         $manager->get_balance_proxy()->invalidate_balance($userid);
     }
 
