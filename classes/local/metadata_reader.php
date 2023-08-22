@@ -85,6 +85,15 @@ class metadata_reader {
     }
 
     /**
+     * Get the automatic earning percentage of tickets.
+     *
+     * @return int
+     */
+    public function get_automatic_ticket_earning_percentage() {
+        return (int) $this->get_account()->tickets_auto_earn ?? 0;
+    }
+
+    /**
      * Get the branding.
      *
      * @return object|null

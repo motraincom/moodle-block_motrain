@@ -150,6 +150,31 @@ class manager {
     }
 
     /**
+     * Calculate tickets auto earned from coins.
+     *
+     * @return int
+     */
+    public function calculate_tickets_auto_earned_from_coins($coins) {
+        if ($coins <= 0) {
+            return 0;
+        }
+
+        $autoearnpc = $this->get_metadata_reader()->get_automatic_ticket_earning_percentage();
+        if ($autoearnpc <= 0) {
+            return 0;
+        }
+
+        $multiplier = $autoearnpc / 100;
+        if ($autoearnpc == 33) {
+            $multiplier = 1/3;
+        } else if ($autoearnpc == 33) {
+            $multiplier = 2/3;
+        }
+
+        return floor($coins * $multiplier);
+    }
+
+    /**
      * Get the account ID.
      *
      * @return string|false
