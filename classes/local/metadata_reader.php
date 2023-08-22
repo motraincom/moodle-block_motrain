@@ -67,22 +67,40 @@ class metadata_reader {
     }
 
     /**
-     * Get the icon double URL.
+     * Get the account.
      *
-     * @return string|null
+     * @return object|null
      */
-    public function get_icon_double_url() {
-        $key = 'icon_double';
+    protected function get_account() {
+        $key = 'account';
         if (($val = $this->cache->get($key)) === false) {
             try {
-                $branding = $this->manager->get_client()->get_account_branding();
-                $val = $branding->icon_double;
+                $val = $this->manager->get_client()->get_account();
             } catch (client_exception $e) {
                 $val = null;
             }
             $this->cache->set($key, $val);
         }
         return $val;
+    }
+
+    /**
+     * Get the branding.
+     *
+     * @return object|null
+     */
+    protected function get_branding() {
+        return $this->get_account()->branding ?? null;
+    }
+
+    /**
+     * Get the icon double URL.
+     *
+     * @return string|null
+     */
+    public function get_icon_double_url() {
+        $branding = $this->get_branding();
+        return $branding->icon_double ?? null;
     }
 
     /**
@@ -144,21 +162,66 @@ class metadata_reader {
     }
 
     /**
+     * Get the tickets icon URL.
+     *
+     * @return object|null
+     */
+    protected function get_team($teamid) {
+        $key = 'team_' . $teamid;
+        if (($val = $this->cache->get($key)) === false) {
+            try {
+                $val = $this->manager->get_client()->get_team($teamid);
+            } catch (client_exception $e) {
+                $val = null;
+            }
+            $this->cache->set($key, $val);
+        }
+        return $val;
+    }
+
+    /**
+     * Get the tickets icon URL.
+     *
+     * @return string|null
+     */
+    public function get_tickets_icon_url() {
+        $branding = $this->get_branding();
+        return $branding->tickets_icon ?? null;
+    }
+
+    /**
+     * Whether tickets are enabled.
+     *
+     * @param string $teamid The team ID.
+     * @return bool
+     */
+    public function has_tickets_enabled_in_account() {
+        return $this->get_account()->tickets_enabled ?? false;
+    }
+
+    /**
+     * Whether tickets are enabled.
+     *
+     * @param string $teamid The team ID.
+     * @return bool
+     */
+    public function has_tickets_enabled_in_team($teamid) {
+        return $this->get_team($teamid)->tickets_enabled ?? false;
+    }
+
+    /**
      * Is the account leaderboard enabled.
      *
      * @return bool
      */
     public function is_account_leaderboard_enabled() {
-        $key = 'account_leaderboard_enabled';
-        if (($val = $this->cache->get($key)) === false) {
-            try {
-                $val = (int) $this->manager->get_client()->is_account_leaderboard_enabled();
-            } catch (client_exception $e) {
-                $val = 0;
+        $leaderboards = $this->get_account()->leaderboards ?? [];
+        foreach ($leaderboards as $leaderboard) {
+            if ($leaderboard->id === 'svs') {
+                return (bool) $leaderboard->enabled;
             }
-            $this->cache->set($key, $val);
         }
-        return (bool) $val;
+        return false;
     }
 
     /**
@@ -168,16 +231,13 @@ class metadata_reader {
      * @return bool
      */
     public function is_team_leaderboard_enabled($teamid) {
-        $key = 'team_leaderboard_enabled:' . $teamid;
-        if (($val = $this->cache->get($key)) === false) {
-            try {
-                $val = (int) $this->manager->get_client()->is_team_leaderboard_enabled($teamid);
-            } catch (client_exception $e) {
-                $val = 0;
+        $leaderboards = $this->get_team($teamid)->leaderboards ?? [];
+        foreach ($leaderboards as $leaderboard) {
+            if ($leaderboard->id === 'individual') {
+                return (bool) $leaderboard->enabled;
             }
-            $this->cache->set($key, $val);
         }
-        return (bool) $val;
+        return false;
     }
 
     /**

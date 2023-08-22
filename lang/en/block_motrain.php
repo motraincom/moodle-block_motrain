@@ -217,6 +217,7 @@ $string['templatetyperafflewon'] = 'Raffle won';
 $string['templatetyperedemptionrequestaccepted'] = 'Order request approved';
 $string['templatetyperedemptionselfcompleted'] = 'Automatic order completed';
 $string['templatex'] = 'Template: {$a}';
+$string['tickets'] = 'Tickets';
 $string['unknownactivityn'] = 'Unknown activity {$a}';
 $string['unknowncoursen'] = 'Unknown course {$a}';
 $string['unknownprogramn'] = 'Unknown program {$a}';

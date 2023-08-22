@@ -62,7 +62,17 @@ class balance_proxy {
      * @return int
      */
     public function get_balance($userorid) {
-        return $this->get_player_coins($userorid)->coins;
+        return $this->get_player_coins_cached($userorid)->coins;
+    }
+
+    /**
+     * Get the tickets.
+     *
+     * @param object|int The user, or its ID.
+     * @return int
+     */
+    public function get_tickets($userorid) {
+        return $this->get_player_coins_cached($userorid)->tickets;
     }
 
     /**
@@ -72,17 +82,17 @@ class balance_proxy {
      * @return int
      */
     public function get_total_earned($userorid) {
-        return $this->get_player_coins($userorid)->coins_earned_lifetime;
+        return $this->get_player_coins_cached($userorid)->coins_earned_lifetime;
     }
 
     /**
      * Get the coins from server.
      *
      * @param int|object $userorid The user, or its ID.
-     * @return object With coins, and coins_earned_lifetime.
+     * @return object With coins, coins_earned_lifetime, and tickets.
      */
-    protected function get_player_coins($userorid) {
-        $default = (object) ['coins' => 0, 'coins_earned_lifetime' => 0];
+    protected function get_player_balance($userorid) {
+        $default = (object) ['coins' => 0, 'coins_earned_lifetime' => 0, 'tickets' => 0];
         $manager = $this->manager;
 
         $userid = $userorid;
@@ -109,6 +119,7 @@ class balance_proxy {
             return (object) [
                 'coins' => (int) ($player->coins ?? 0),
                 'coins_earned_lifetime' => (int) ($player->coins_earned_lifetime ?? 0),
+                'tickets' => (int) ($player->tickets ?? 0),
             ];
         } catch (api_error $e) {
             return $default;
@@ -131,7 +142,7 @@ class balance_proxy {
         $userid = (int) $userid;
 
         if (($data = $this->coinscache->get($userid)) === false) {
-            $data = $this->get_player_coins($userorid);
+            $data = $this->get_player_balance($userorid);
             $this->coinscache->set($userid, $data);
         }
 

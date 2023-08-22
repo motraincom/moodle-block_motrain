@@ -94,9 +94,13 @@
     border-radius: 16px;
     padding: 16px;
 }
-.block_motrain-wallet .block_motrain-wallet-balance {
+.block_motrain-wallet .block_motrain-wallet-balances {
     padding-top: 4px;
     margin-bottom: 16px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 /** Wallet balance, re-usable */

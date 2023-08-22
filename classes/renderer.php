@@ -90,6 +90,7 @@ class block_motrain_renderer extends plugin_renderer_base {
             'thousandssep' => get_string('thousandssep', 'langconfig'),
             'pointsimageurl' => $manager->get_coins_image_url()->out(false),
             'icondoubleurl' => $manager->get_metadata_reader()->get_icon_double_url(),
+            'iconticketsurl' => $manager->get_metadata_reader()->get_tickets_icon_url(),
         ];
     }
 
@@ -134,6 +135,9 @@ class block_motrain_renderer extends plugin_renderer_base {
 
         $coins = $manager->get_balance_proxy()->get_balance($USER);
         $level = $manager->get_level_proxy()->get_level($USER);
+        $hasticketsenabled = $manager->has_tickets_enabled($USER->id);
+        $tickets = $hasticketsenabled ? $manager->get_balance_proxy()->get_tickets($USER) : 0;
+
         if ($level) {
             $level->coins_remaining_formatted = $this->coin_amount($level->coins_remaining);
             $level->levelnstr = get_string('leveln', 'block_motrain', $level->level);
@@ -182,6 +186,9 @@ class block_motrain_renderer extends plugin_renderer_base {
         return $this->render_from_template('block_motrain/block', [
             'coins' => $coins,
             'coins_formatted' => $this->coin_amount($coins),
+            'tickets' => $tickets,
+            'tickets_formatted' => $this->coin_amount($tickets),
+            'showtickets' => $hasticketsenabled,
             'level' => $level,
             'infourl' => $infourl->out(false),
             'storeurl' => $storeurl->out(false),

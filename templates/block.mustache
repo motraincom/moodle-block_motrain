@@ -7,11 +7,19 @@
 <div class="block_motrain-wrapper">
     <div class="block_motrain-content">
         <div class="block_motrain-wallet">
-            {{> block_motrain/wallet-balance }}
+            <div class="block_motrain-wallet-balances">
+                {{> block_motrain/wallet-balance }}
+                {{#showtickets}}
+                    {{> block_motrain/wallet-ticket-balance }}
+                {{/showtickets}}
+            </div>
             <div class="wallet-action">
                 <a href="{{ storeurl }}" class="">
                     <div>{{#str}} spend, block_motrain {{/str}}</div>
                     <div class="action-pic">{{> block_motrain/icon-coins }}</div>
+                    {{#showtickets}}
+                        / <div class="action-pic">{{> block_motrain/icon-tickets }}</div>
+                    {{/showtickets}}
                 </a>
             </div>
         </div>

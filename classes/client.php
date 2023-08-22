@@ -156,6 +156,10 @@ class client {
         return $resp->url;
     }
 
+    public function get_team($teamid) {
+        return $this->get("/v2/teams/$teamid");
+    }
+
     public function get_teams() {
         return $this->get('/v2/accounts/' . $this->accountid . '/teams');
     }
