@@ -60,7 +60,7 @@ class adhoc_update_webhook extends \core\task\adhoc_task {
         try {
             $manager->setup_webhook();
         } catch (\moodle_exception $e) {
-            mtrace('Update of existing webhook ' . $webhookid . ' failed.');
+            mtrace('Update of existing webhook failed.');
         }
     }
 

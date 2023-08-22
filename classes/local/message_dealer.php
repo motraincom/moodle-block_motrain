@@ -46,6 +46,7 @@ class message_dealer {
     const TYPE_USER_AUCTION_WON = 'user_auction_won';
     const TYPE_USER_MANUAL_AWARD = 'user_manual_award';
     const TYPE_USER_RAFFLE_WON = 'user_raffle_won';
+    const TYPE_USER_SWEEPSTAKES_WON = 'user_sweepstakes_won';
 
     /** @var string[] List of TYPE_* constant values. */
     protected $knowntypes;
@@ -129,6 +130,17 @@ class message_dealer {
                 ],
                 'name' => new lang_string('templatetyperafflewon', 'block_motrain'),
             ],
+            static::TYPE_USER_SWEEPSTAKES_WON => (object) [
+                'code' => static::TYPE_USER_SWEEPSTAKES_WON,
+                'placeholders' => [
+                    (object) [
+                        'tag' => 'itemname',
+                        'description' => new lang_string('placeholderitemname', 'block_motrain'),
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
+                    ],
+                ],
+                'name' => new lang_string('templatetypesweepstakeswon', 'block_motrain'),
+            ],
         ];
         $this->knowntypes = array_keys($this->types);
     }
@@ -200,6 +212,11 @@ class message_dealer {
         } else if ($type === static::TYPE_USER_RAFFLE_WON) {
             $subject = "It's time to celebrate! You won a raffle draw";
             $content = markdown_to_html("Hi [firstname],\n\nIt's your lucky day! You are the winner of the [itemname] raffle draw. "
+                . "To get it, please go to \"Pending Orders\" and complete the order.");
+
+        } else if ($type === static::TYPE_USER_SWEEPSTAKES_WON) {
+            $subject = "It's time to celebrate! You won a sweepstakes draw!";
+            $content = markdown_to_html("Hi [firstname],\n\nIt's your lucky day! You are the winner of the [itemname] sweepstakes draw. "
                 . "To get it, please go to \"Pending Orders\" and complete the order.");
 
         } else {

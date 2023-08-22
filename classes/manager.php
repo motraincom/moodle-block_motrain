@@ -684,6 +684,7 @@ class manager {
                 'user.leveledUp',
                 'user.manuallyAwardedCoins',
                 'user.raffleWon',
+                'user.sweepstakesWon',
             ]
         ];
 
