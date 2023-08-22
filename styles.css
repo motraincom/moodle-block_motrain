@@ -122,7 +122,6 @@
 
 .block_motrain-wallet .wallet-action a {
     background: var(--motrain-accent-color);
-    box-shadow: 5px 5px 10px rgba(7, 200, 243, 0.25);
     border-radius: 16px;
     display: flex;
     justify-content: center;
@@ -138,7 +137,6 @@
 }
 .block_motrain-wallet .wallet-action a:hover {
     text-decoration: none;
-    box-shadow: none;
     color: #fff;
     opacity: 0.9;
 }
