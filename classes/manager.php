@@ -167,7 +167,7 @@ class manager {
         $multiplier = $autoearnpc / 100;
         if ($autoearnpc == 33) {
             $multiplier = 1/3;
-        } else if ($autoearnpc == 33) {
+        } else if ($autoearnpc == 66) {
             $multiplier = 2/3;
         }
 
