@@ -29,7 +29,6 @@ use block_motrain\local\api_error;
 use block_motrain\local\client_exception;
 use block_motrain\local\reason\lang_reason;
 use curl;
-use moodle_exception;
 use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
@@ -128,6 +127,14 @@ class client {
 
     public function get_player_by_email($teamid, $email) {
         $resp = $this->get('/v2/teams/' . $teamid . '/users', ['email' => $email]);
+        if (!empty($resp)) {
+            return $resp[0];
+        }
+        return null;
+    }
+
+    public function get_player_by_email_in_account($email) {
+        $resp = $this->get("/v2/accounts/{$this->accountid}/users", ['email' => $email]);
         if (!empty($resp)) {
             return $resp[0];
         }

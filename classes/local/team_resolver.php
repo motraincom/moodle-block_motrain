@@ -104,4 +104,34 @@ class team_resolver {
         return $this->userteamcache[$userid] ? $this->userteamcache[$userid] : null;
     }
 
+    /**
+     * Return the list of potential teams.
+     *
+     * @param int $userid The user ID.
+     * @return object[] Contains local_name, and team_id.
+     */
+    public function get_team_candidates_for_user($userid) {
+        global $DB;
+
+        if (!$this->isusingcohorts) {
+            return [(object) [
+                'local_name' => get_string('system', 'core'),
+                'team_id' => $this->get_global_team_id(),
+            ]];
+        }
+
+        $sql = 'SELECT t.id AS _id, t.teamid AS team_id, c.name AS local_name
+                  FROM {cohort_members} cm
+                  JOIN {block_motrain_teammap} t
+                    ON t.cohortid = cm.cohortid
+                  JOIN {cohort} c
+                    ON c.id = cm.cohortid
+                 WHERE cm.userid = :userid
+                   AND t.accountid = :accountid
+              ORDER BY cm.cohortid ASC';
+        return $DB->get_records_sql($sql, [
+            'userid' => $userid,
+            'accountid' => $this->accountid
+        ]);
+    }
 }

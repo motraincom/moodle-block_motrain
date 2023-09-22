@@ -28,7 +28,6 @@ namespace block_motrain\output;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
 
-use action_link;
 use block_motrain\manager;
 use stdClass;
 use table_sql;
@@ -106,6 +105,10 @@ class players_mapping_table extends table_sql {
                 new confirm_action(get_string('areyousure', 'core'))
             );
         }
+        $actions[] = $this->renderer->action_icon(
+            new moodle_url($this->baseurl, ['action' => 'inspect', 'useridoremail' => $row->id, 'sesskey' => sesskey()]),
+            new pix_icon('i/info', get_string('inspect', 'block_motrain'))
+        );
         $actions[] = $this->renderer->action_icon(
             new moodle_url($this->baseurl, ['action' => 'delete', 'userid' => $row->id, 'sesskey' => sesskey()]),
             new pix_icon('t/delete', get_string('delete', 'core')),

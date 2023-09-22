@@ -281,3 +281,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.block_motrain-heading {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.block_motrain-heading a {
+    padding: 0.5rem;
+    border-radius: 100%;
+    margin-right: 0.5rem;
+    display: inline-block;
+    background: #f8f9fa;
+    color: inherit;
+}
