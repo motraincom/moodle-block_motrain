@@ -66,6 +66,15 @@ if ($action === 'delete' && confirm_sesskey()) {
 } else if ($action === 'reset' && confirm_sesskey()) {
     $playermap->unblock_user($userid);
     redirect($baseurl);
+} else if ($action === 'refresh' && confirm_sesskey()) {
+    $playermap->remove_user($userid);
+    if ($userid) {
+        $teamid = $teamresolver->get_team_id_for_user($userid);
+        if ($teamid) {
+            $playermap->get_player_id($userid, $teamid);
+        }
+    }
+    redirect(new moodle_url($baseurl, ['useridoremail' => $userid, 'action' => 'inspect']));
 }
 
 // Display the page.
@@ -221,6 +230,12 @@ if ($action === 'inspect') {
             }
             echo html_writer::table($table);
         }
+
+        echo $output->single_button(
+            new moodle_url($baseurl, ['action' => 'refresh', 'userid' => $userid, 'sesskey' => sesskey()]),
+            get_string('resyncnow', 'block_motrain'),
+            'get'
+        );
     }
 
 } else {

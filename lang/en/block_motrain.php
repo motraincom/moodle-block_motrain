@@ -178,6 +178,7 @@ $string['purgecache'] = 'Purge cache';
 $string['reallydeleteassociation'] = 'Do you really want to delete the association?';
 $string['refresh'] = 'Refresh';
 $string['result'] = 'Result';
+$string['resyncnow'] = 'Resync now';
 $string['saverules'] = "Save rules";
 $string['saving'] = "Saving...";
 $string['secondaryteam'] = 'Secondary team {$a}';
