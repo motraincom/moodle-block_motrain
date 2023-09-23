@@ -105,8 +105,6 @@ if ($motrainteamid !== null) {
             }
         }
 
-        // TODO We do not support updates yet.
-
         redirect($PAGE->url, get_string('teamassociationcreated', 'block_motrain'));
 
     } else if ($form->is_cancelled()) {
@@ -139,6 +137,17 @@ if ($motrainteamid !== null) {
             '',
             ['style' => 'margin: 0 0 1rem']
         );
+    }
+
+    if ($isusingcohorts) {
+        $mixedteamsusers = $manager->get_team_resolver()->count_users_in_multiple_teams();
+        if ($mixedteamsusers > 0) {
+            $inspectlink = html_writer::link(new moodle_url('/blocks/motrain/settings_teams_mismatch.php'),
+                get_string('viewlist', 'block_motrain'));
+            $notif = new notification(get_string('therearexusersinmultipleteams', 'block_motrain', $mixedteamsusers)
+                . ' ' . $inspectlink, notification::NOTIFY_WARNING, false);
+            echo $output->render($notif);
+        }
     }
 
     $sql = "SELECT mt.*, c.name AS cohortname

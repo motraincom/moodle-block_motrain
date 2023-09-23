@@ -58,6 +58,28 @@ class team_resolver {
     }
 
     /**
+     * Count users in multiple teams.
+     *
+     * @return int
+     */
+    public function count_users_in_multiple_teams() {
+        global $DB;
+
+        if (!$this->isusingcohorts) {
+            return 0;
+        }
+        $sql = 'SELECT COUNT(q.userid) FROM (
+                SELECT DISTINCT cm.userid
+                  FROM {cohort_members} cm
+                  JOIN {block_motrain_teammap} t
+                    ON t.cohortid = cm.cohortid
+                 WHERE t.accountid = :accountid
+              GROUP BY cm.userid
+                HAVING COUNT(t.id) > 1) q';
+        return $DB->count_records_sql($sql, ['accountid' => $this->accountid]);
+    }
+
+    /**
      * Get the global team ID.
      *
      * @return string|null
