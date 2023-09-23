@@ -72,6 +72,7 @@ class users_multi_teams_table extends table_sql {
             'fullname' => get_string('fullname', 'core'),
             'email' => get_string('email', 'core'),
             'cohorts' => get_string('cohorts', 'core_cohort'),
+            'actions' => '',
         ];
         $this->define_columns(array_keys($columns));
         $this->define_headers(array_values($columns));
@@ -98,6 +99,20 @@ class users_multi_teams_table extends table_sql {
         $this->sortable(true, 'lastname', SORT_ASC);
         $this->no_sorting('cohorts');
         $this->collapsible(false);
+    }
+
+    /**
+     * Column.
+     *
+     * @param stdClass $row Table row.
+     * @return string Output produced.
+     */
+    protected function col_actions($row) {
+        return $this->renderer->action_icon(
+            new moodle_url('/blocks/motrain/settings_players.php', ['action' => 'inspect',
+                'useridoremail' => $row->id, 'sesskey' => sesskey()]),
+            new pix_icon('i/info', get_string('inspect', 'block_motrain'))
+        );
     }
 
     /**

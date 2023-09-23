@@ -277,6 +277,16 @@ class player_mapper {
     }
 
     /**
+     * Remove the mappings for a team.
+     *
+     * @param int $teamid The team ID.
+     */
+    public function remove_team($teamid) {
+        global $DB;
+        $DB->delete_records('block_motrain_playermap', ['accountid' => $this->accountid, 'teamid' => $teamid]);
+    }
+
+    /**
      * Remove the mapping for user.
      *
      * @param int $userid The user ID.

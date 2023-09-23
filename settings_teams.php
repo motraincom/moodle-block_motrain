@@ -31,6 +31,7 @@ require_once(__DIR__ . '/../../config.php');
 
 $motrainteamid = optional_param('id', null, PARAM_INT);
 $deleteid = optional_param('delete', null, PARAM_INT);
+$refreshid = optional_param('refresh', null, PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
 require_login();
@@ -60,8 +61,20 @@ if ($motrainteamid !== null) {
     $currenturl->param('id', $motrainteamid);
 }
 
+// Handle refresh.
+if ($refreshid && confirm_sesskey()) {
+    $teammap = $DB->get_record('block_motrain_teammap', ['id' => $refreshid], '*', MUST_EXIST);
+    $manager->get_player_mapper()->remove_team($teammap->teamid);
+    if ($manager->is_automatic_push_enabled() && $teammap->cohortid > 0) {
+        $manager->schedule_cohort_sync($teammap->cohortid);
+    }
+    redirect($PAGE->url);
+}
+
 // Handle deletion.
 if ($deleteid && confirm_sesskey()) {
+    $teamid = $DB->get_field('block_motrain_teammap', 'teamid', ['id' => $deleteid]) ?: '';
+    $manager->get_player_mapper()->remove_team($teamid);
     $DB->delete_records('block_motrain_teammap', ['id' => $deleteid]);
     redirect($PAGE->url);
 }
@@ -165,21 +178,30 @@ if ($motrainteamid !== null) {
     $records = $DB->get_records_sql($sql, $params);
 
     $table = new html_table();
-    $table->head = [get_string('cohort', 'block_motrain'), get_string('team', 'block_motrain'), ''];
-    $table->data = array_map(function($record) use ($teamsbyid, $PAGE, $output) {
+    $table->head = [get_string('cohort', 'block_motrain'), get_string('team', 'block_motrain'), '', ''];
+    $table->data = array_map(function($record) use ($teamsbyid, $PAGE, $output, $manager) {
         $cohortname = get_string('nocohortallusers', 'block_motrain');
+        $cohorturl = null;
+        $refreshmsg = 'areyousurerefreshallinteam';
         if ($record->cohortid > 0) {
             $cohortname = !empty($record->cohortname) ? $record->cohortname : '?';
             $cohortname = format_string($cohortname, true, ['context' => context_system::instance()]);
+            $cohorturl = new moodle_url('/cohort/assign.php', ['id' => $record->cohortid]);
+            if ($manager->is_automatic_push_enabled()) {
+                $refreshmsg = 'areyousurerefreshandpushallinteam';
+            }
         }
-
         $teamname = isset($teamsbyid[$record->teamid]) ? $teamsbyid[$record->teamid] : $record->teamid;
         return [
-            $cohortname,
+            $cohorturl ? html_writer::link($cohorturl, $cohortname) : $cohortname,
             // html_writer::link(new moodle_url($PAGE->url, ['id' => $record->id]), $cohortname),
-            html_writer::span($teamname, '', ['title' => $record->teamid]),
+            html_writer::span(s($teamname), '', ['title' => $record->teamid]),
+            s($record->teamid),
+            $output->action_icon(new moodle_url($PAGE->url, ['refresh' => $record->id, 'sesskey' => sesskey()]),
+                new pix_icon('i/reload', get_string('refresh', 'block_motrain')),
+                new confirm_action(get_string($refreshmsg, 'block_motrain'))),
             $output->action_icon(new moodle_url($PAGE->url, ['delete' => $record->id, 'sesskey' => sesskey()]),
-                new pix_icon('i/delete', get_string('delete')), new confirm_action(get_string('areyousure', 'core')))
+                new pix_icon('i/delete', get_string('delete')), new confirm_action(get_string('areyousure', 'core'))),
         ];
     }, $records);
 

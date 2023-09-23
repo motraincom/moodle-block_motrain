@@ -152,9 +152,7 @@ class user_pusher {
      * @return void
      */
     protected function push_user($user) {
-        if (!empty($user->playerid)) {
-            return false;
-        } else if ($user->deleted || $user->suspended || !$user->confirmed) {
+        if ($user->deleted || $user->suspended || !$user->confirmed) {
             return false;
         }
 
@@ -197,7 +195,7 @@ class user_pusher {
                 SELECT cm.userid
                   FROM {cohort_members} cm
                  WHERE cm.cohortid = :cohortid";
-        $DB->execute($sql, ['cohortid' => $cohortid, 'accountid' => $this->accountid]);
+        $DB->execute($sql, ['cohortid' => $cohortid]);
     }
 
     /**

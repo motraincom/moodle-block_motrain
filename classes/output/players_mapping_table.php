@@ -69,6 +69,7 @@ class players_mapping_table extends table_sql {
         $columns = [
             'fullname' => get_string('fullname', 'core'),
             'playerid' => get_string('playerid', 'block_motrain'),
+            'teamid' => get_string('team', 'block_motrain'),
             'blocked' => get_string('error', 'core'),
             'actions' => ''
         ];
@@ -77,8 +78,8 @@ class players_mapping_table extends table_sql {
 
         // Define SQL.
         $this->sql = new stdClass();
-        $this->sql->fields = 'u.id, pm.playerid AS pmplayerid, pm.blocked AS pmblocked, pm.blockedreason AS pmblockedreason, '
-                             . user_utils::name_fields('u');
+        $this->sql->fields = 'u.id, pm.playerid AS pmplayerid, pm.teamid AS pmteamid, pm.blocked AS pmblocked, '
+            . 'pm.blockedreason AS pmblockedreason, ' . user_utils::name_fields('u');
         $this->sql->from = '{block_motrain_playermap} pm JOIN {user} u ON pm.userid = u.id';
         $this->sql->where = 'pm.accountid = :accountid';
         $this->sql->params = ['accountid' => $manager->get_account_id()];
@@ -145,6 +146,19 @@ class players_mapping_table extends table_sql {
             $row->pmplayerid,
             ['target' => '_blank']
         );
+    }
+
+    /**
+     * Column.
+     *
+     * @param stdClass $row Table row.
+     * @return string Output produced.
+     */
+    protected function col_teamid($row) {
+        if (empty($row->pmteamid)) {
+            return '-';
+        }
+        return s($row->pmteamid);
     }
 
     /**
