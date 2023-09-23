@@ -136,7 +136,7 @@ class player_mapper {
         }
 
         // If the player metadata is stale, update the player.
-        if (!empty($mapping) && !empty($mapping->metadatastale) && $this->syncmetadata) {
+        if (!empty($mapping) && $mapping->playerid && !empty($mapping->metadatastale) && $this->syncmetadata) {
             $user = $user ? $user : $this->get_user($userid);
             [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
 
