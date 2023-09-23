@@ -81,7 +81,7 @@ try {
         $url = $client->get_store_login_url($playerid, $landingpage);
     } catch (api_error $e) {
         // It would appear that the player is not found. That is likely because we have a mapping that
-        // is no tied to a player that has been deleted. In this case, we delete the mapping and retry.
+        // is now tied to a player that has been deleted. In this case, we delete the mapping and retry.
         if ($e->get_http_code() == 404 && $playerid && !$retry) {
             $manager->get_player_mapper()->remove_user($USER->id);
             $retryurl = new moodle_url($PAGE->url, ['retry' => 1, 'sesskey' => sesskey()]);
@@ -90,7 +90,6 @@ try {
         throw $e;
     }
 } catch (moodle_exception $e) {
-    $PAGE->set_pagelayout('standard');
     throw $e;
 }
 
