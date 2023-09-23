@@ -115,7 +115,7 @@ class team_resolver {
 
         if (!$this->isusingcohorts) {
             return [(object) [
-                'local_name' => get_string('system', 'core'),
+                'local_name' => get_string('coresystem', 'core'),
                 'team_id' => $this->get_global_team_id(),
             ]];
         }

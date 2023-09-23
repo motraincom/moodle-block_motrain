@@ -180,6 +180,7 @@ $string['sendlocalnotificationsdisabledwithwebhooks'] = 'Sending local notificat
 $string['sendlocalnotificationsnotenabledseesettings'] = 'Sending local notifications is not enabled, please see settings.';
 $string['sendpreview'] = 'Send preview';
 $string['setup'] = 'Set-up';
+$string['sourcex'] = 'Source: {$a}';
 $string['spend'] = 'Spend';
 $string['store'] = 'Store';
 $string['taskpushusers'] = 'Push users to dashboard';

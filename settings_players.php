@@ -26,7 +26,6 @@
 use block_motrain\form\user_form;
 use block_motrain\manager;
 use block_motrain\output\players_mapping_table;
-use core\output\notification;
 
 require_once(__DIR__ . '/../../config.php');
 
@@ -74,6 +73,9 @@ echo $output->header();
 echo $output->heading(get_string('pluginname', 'block_motrain'));
 echo $output->navigation_for_managers($manager, 'players');
 
+$validflag = $output->pix_icon('i/valid', '✅') . '<span class="sr-only">✅</span>';
+$invalidflag = $output->pix_icon('i/invalid', '❌') . '<span class="sr-only">❌</span>';
+
 if ($action === 'inspect') {
     echo $output->render_from_template('block_motrain/heading', [
         'backurl' => $baseurl->out(false),
@@ -103,9 +105,10 @@ if ($action === 'inspect') {
             $table->data[] = [get_string('email', 'core'), s($localuser->email)];
             $table->data[] = [get_string('accountid', 'block_motrain'), $manager->get_account_id() ?: '-'];
 
+            // Resolve the potential teams.
             $teamid = $teamresolver->get_team_id_for_user($userid);
-            $otherteams = [];
             $team = null;
+            $otherteams = [];
             foreach ($teamresolver->get_team_candidates_for_user($userid) as $candidate) {
                 if ($candidate->team_id == $teamid) {
                     $team = $candidate;
@@ -113,13 +116,20 @@ if ($action === 'inspect') {
                 }
                 $otherteams[] = $candidate;
             }
+            $outputteamflag = function($otherteamid) use ($teamid, $validflag, $invalidflag) {
+                if (!$teamid || !$otherteamid) {
+                    return '';
+                }
+                return ' ' . ($otherteamid == $teamid ? $validflag : $invalidflag);
+            };
 
+            // Output the primary and secondary teams.
             if ($team) {
                 $table->data[] = [
                     get_string('primaryteam', 'block_motrain'),
                     html_writer::div(
-                        html_writer::div(s($team->local_name)) .
-                        html_writer::div(s($team->team_id))
+                        html_writer::div(s($team->team_id)) .
+                        html_writer::div(get_string('sourcex', 'block_motrain', s($team->local_name)))
                     )
                 ];
                 foreach ($otherteams as $i => $otherteam) {
@@ -127,8 +137,8 @@ if ($action === 'inspect') {
                     $table->data[] = [
                         get_string('secondaryteam', 'block_motrain', $n),
                         html_writer::div(
-                            html_writer::div(s($otherteam->local_name)) .
-                            html_writer::div(s($otherteam->team_id))
+                            html_writer::div(s($otherteam->team_id) . '‼️') .
+                            html_writer::div(get_string('sourcex', 'block_motrain', s($otherteam->local_name)))
                         )
                     ];
                 }
@@ -136,14 +146,17 @@ if ($action === 'inspect') {
                 $table->data[] = [get_string('primaryteam', 'block_motrain'), '-'];
             }
 
-            $playermap->set_local_only(true);
-            $playerid = $playermap->get_player_id($userid, $teamid);
-            $playermap->set_local_only(false);
+            // Retrieve the local mapping.
+            $playerid = null;
+            if ($teamid) {
+                $playermap->set_local_only(true);
+                $playerid = $playermap->get_player_id($userid, $teamid);
+            }
             $table->data[] = [get_string('playerid', 'block_motrain'), $playerid ?? '-'];
-
             echo $OUTPUT->heading(get_string('local', 'core'), 4);
             echo html_writer::table($table);
 
+            // Retrieve remote information by player ID.
             $table = new html_table();
             if ($playerid) {
                 echo $OUTPUT->heading(get_string('motrainidlookup', 'block_motrain'), 4);
@@ -151,10 +164,17 @@ if ($action === 'inspect') {
                 try {
                     $remoteplayer = $manager->get_client()->get_player($playerid);
                     if ($remoteplayer) {
+                        $playeremailflag = '';
+                        if ($localuser->email != $remoteplayer->email) {
+                            $playeremailflag = $invalidflag;
+                        } else if ($localuser->email == $remoteplayer->email) {
+                            $playeremailflag = $validflag;
+                        }
                         $table->data[] = [get_string('name', 'core'), s($remoteplayer->firstname)
                             . ' ' . s($remoteplayer->lastname)];
-                        $table->data[] = [get_string('email', 'core'), s($remoteplayer->email)];
-                        $table->data[] = [get_string('team', 'block_motrain'), s($remoteplayer->team_id)];
+                        $table->data[] = [get_string('email', 'core'), s($remoteplayer->email) . ' ' . $playeremailflag];
+                        $table->data[] = [get_string('team', 'block_motrain'), s($remoteplayer->team_id)
+                            . $outputteamflag($remoteplayer->team_id)];
                     } else {
                         $table->data[] = [get_string('result', 'block_motrain'), get_string('notfound', 'block_motrain')];
                     }
@@ -165,16 +185,24 @@ if ($action === 'inspect') {
                 echo html_writer::table($table);
             }
 
+            // Retrieve remote information by email.
             echo $OUTPUT->heading(get_string('motrainemaillookup', 'block_motrain'), 4);
             $table = new html_table();
             $table->data[] = [get_string('email', 'core'), s($localuser->email)];
             try {
                 $remoteplayer = $manager->get_client()->get_player_by_email_in_account($localuser->email);
                 if ($remoteplayer) {
-                    $table->data[] = ['ID', s($remoteplayer->id)];
+                    $playeridflag = '';
+                    if ($playerid && $remoteplayer->id != $playerid) {
+                        $playeridflag = $invalidflag;
+                    } else if ($playerid && $remoteplayer->id == $playerid) {
+                        $playeridflag = $validflag;
+                    }
+                    $table->data[] = ['ID', s($remoteplayer->id) . ' ' . $playeridflag];
                     $table->data[] = [get_string('name', 'core'), s($remoteplayer->firstname)
                         . ' ' . s($remoteplayer->lastname)];
-                    $table->data[] = [get_string('team', 'block_motrain'), s($remoteplayer->team_id)];
+                    $table->data[] = [get_string('team', 'block_motrain'), s($remoteplayer->team_id)
+                        . $outputteamflag($remoteplayer->team_id)];
                 } else {
                     $table->data[] = [get_string('result', 'block_motrain'), get_string('notfound', 'block_motrain')];
                 }
