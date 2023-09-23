@@ -306,6 +306,9 @@ class manager {
             $this->playermapper = new player_mapper($this->get_client(), $this->get_account_id());
             $this->playermapper->set_local_only($this->is_paused());
             $this->playermapper->set_sync_metadata($this->is_player_metadata_sync_enabled());
+            // When local team management is enabled, we enable both of these.
+            $this->playermapper->set_accept_foreign_teams($this->is_local_team_management_enabled());
+            $this->playermapper->set_allow_team_change($this->is_local_team_management_enabled());
         }
         return $this->playermapper;
     }
@@ -453,6 +456,15 @@ class manager {
             return false;
         }
         return $this->is_setup();
+    }
+
+    /**
+     * Whether local team management is enabled.
+     *
+     * @return bool
+     */
+    public function is_local_team_management_enabled() {
+        return (bool) get_config('block_motrain', 'localteammgmt');
     }
 
     /**

@@ -195,6 +195,10 @@ class client {
         return true;
     }
 
+    public function set_player_team($playerid, $teamid) {
+        return $this->put("/v2/users/{$playerid}/team", ['team_id' => $teamid]);
+    }
+
     public function update_player($playerid, $data) {
         return $this->patch('/v2/users/' . $playerid, $data);
     }

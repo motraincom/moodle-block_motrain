@@ -104,6 +104,10 @@ $setting = new admin_setting_configcheckbox('block_motrain/usecohorts', get_stri
     get_string('usecohorts_help', 'block_motrain'), true);
 $settingspage->add($setting);
 
+$setting = new admin_setting_configcheckbox('block_motrain/localteammgmt', get_string('localteammgmt', 'block_motrain'),
+    get_string('localteammgmt_help', 'block_motrain'), false);
+$settingspage->add($setting);
+
 $setting = new admin_setting_configcheckbox('block_motrain/sendlocalnotifications',
     get_string('sendlocalnotifications', 'block_motrain'), get_string('sendlocalnotifications_help', 'block_motrain'), false);
 $setting->set_updatedcallback('block_motrain_sendlocalnotifications_updated_hook');

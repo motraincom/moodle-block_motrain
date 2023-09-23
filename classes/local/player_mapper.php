@@ -41,11 +41,15 @@ class player_mapper {
 
     /** @var string The account ID. */
     protected $accountid;
+    /** @var bool Whether we accept remote players from foreign teams. */
+    protected $acceptforeignteams = true;
+    /** @var bool Whether we can change a person's team. */
+    protected $allowteamchange = true;
     /** @var bool Whether the mapping only considers local data. */
     protected $localonly = false;
     /** @var bool Whether we support synchronising metadata. */
     protected $syncmetadata = false;
-    /** @var client The client. */
+    /** @var \block_motrain\client The client. */
     protected $client;
 
     /**
@@ -84,16 +88,22 @@ class player_mapper {
             $userid = $user->id;
         }
 
-        $mapping = $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
+        $mapping = $this->get_player_mapping($userid);
         if ((empty($mapping) || (empty($mapping->playerid) && !$mapping->blocked)) && !$this->localonly) {
             $user = $user ? $user : $this->get_user($userid);
             $playerid = null;
             $blockedreason = null;
+            $actualteamid = null;
 
             // Attempt to resolve user on dashboard.
-            $player = $this->client->get_player_by_email($teamid, $user->email);
+            if ($this->acceptforeignteams) {
+                $player = $this->client->get_player_by_email_in_account($user->email);
+            } else {
+                $player = $this->client->get_player_by_email($teamid, $user->email);
+            }
             if ($player) {
                 $playerid = $player->id;
+                $actualteamid = $player->team_id;
             }
 
             // Prepare to maybe creating the user.
@@ -106,6 +116,7 @@ class player_mapper {
                 try {
                     $player = $this->client->create_player($teamid, $playermetadata);
                     $playerid = $player->id;
+                    $actualteamid = $player->team_id;
                     $hasbeencreated = true;
                 } catch (api_error $e) {
                     $playerid = null;
@@ -124,6 +135,7 @@ class player_mapper {
             }
 
             $mapping->playerid = $playerid;
+            $mapping->teamid = $actualteamid;
             $mapping->metadatahash = $metadatahash;
             $mapping->metadatastale = $hasbeencreated ? 0 : 1;
             $mapping->blocked = !empty($blockedreason);
@@ -135,8 +147,36 @@ class player_mapper {
             }
         }
 
+        // Add the teamid to older records created before teamid was added, and where it is undefined.
+        if (!empty($mapping) && $mapping->playerid && !$mapping->teamid) {
+            $mapping->teamid = $teamid;
+            $DB->update_record('block_motrain_playermap', $mapping);
+        }
+
+        // If there is a discrepancy between the mapped team, and the team we expect, we update it.
+        if (!empty($mapping) && $mapping->playerid && $mapping->teamid !== $teamid
+                && $this->allowteamchange && !$mapping->blocked && !$this->localonly) {
+
+            $blockedreason = null;
+            try {
+                $this->client->set_player_team($mapping->playerid, $teamid);
+            } catch (api_error $e) {
+                $blockedreason = $e->get_error_code();
+            } catch (client_exception $e) {
+                $blockedreason = $e->errorcode;
+            }
+
+            if (!$blockedreason) {
+                $mapping->teamid = $teamid;
+            }
+            $mapping->blocked = !empty($blockedreason);
+            $mapping->blockedreason = $blockedreason;
+            $DB->update_record('block_motrain_playermap', $mapping);
+        }
+
         // If the player metadata is stale, update the player.
-        if (!empty($mapping) && $mapping->playerid && !empty($mapping->metadatastale) && $this->syncmetadata) {
+        if (!empty($mapping) && $mapping->playerid && !empty($mapping->metadatastale)
+                && $this->syncmetadata && !$this->localonly) {
             $user = $user ? $user : $this->get_user($userid);
             [$playermetadata, $metadatahash] = $this->get_user_metadata($user);
 
@@ -162,6 +202,18 @@ class player_mapper {
         }
 
         return $mapping ? $mapping->playerid : null;
+    }
+
+    /**
+     * Get player mapping.
+     *
+     * @param int $userid The user ID.
+     * @return object|null The mapping.
+     */
+    public function get_player_mapping($userid) {
+        global $DB;
+        $record =  $DB->get_record('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
+        return $record ?: null;
     }
 
     /**
@@ -225,6 +277,34 @@ class player_mapper {
     }
 
     /**
+     * Remove the mapping for user.
+     *
+     * @param int $userid The user ID.
+     */
+    public function remove_user($userid) {
+        global $DB;
+        $DB->delete_records('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
+    }
+
+    /**
+     * Whether we accept foreign teams.
+     *
+     * @param bool $acceptforeignteams Accept foreign teams.
+     */
+    public function set_accept_foreign_teams($acceptforeignteams) {
+        $this->acceptforeignteams = (bool) $acceptforeignteams;
+    }
+
+    /**
+     * Whether we allow team changes.
+     *
+     * @param bool $allowteamchange Accept team change.
+     */
+    public function set_allow_team_change($allowteamchange) {
+        $this->allowteamchange = (bool) $allowteamchange;
+    }
+
+    /**
      * Whether the mapping only considers local data.
      *
      * @param bool $localonly Local only.
@@ -240,16 +320,6 @@ class player_mapper {
      */
     public function set_sync_metadata($syncmetadata) {
         $this->syncmetadata = (bool) $syncmetadata;
-    }
-
-    /**
-     * Remove the mapping for user.
-     *
-     * @param int $userid The user ID.
-     */
-    public function remove_user($userid) {
-        global $DB;
-        $DB->delete_records('block_motrain_playermap', ['accountid' => $this->accountid, 'userid' => $userid]);
     }
 
     /**

@@ -169,5 +169,20 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2023082202, 'motrain');
     }
 
+    if ($oldversion < 2023082702) {
+
+        // Define field teamid to be added to block_motrain_playermap.
+        $table = new xmldb_table('block_motrain_playermap');
+        $field = new xmldb_field('teamid', XMLDB_TYPE_CHAR, '128', null, null, null, null, 'playerid');
+
+        // Conditionally launch add field teamid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Motrain savepoint reached.
+        upgrade_block_savepoint(true, 2023082702, 'motrain');
+    }
+
     return true;
 }

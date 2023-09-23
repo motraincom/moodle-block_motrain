@@ -103,7 +103,6 @@ if ($action === 'inspect') {
             $table->data[] = ['ID', $localuser->id];
             $table->data[] = [get_string('fullname', 'core'), s(fullname($localuser))];
             $table->data[] = [get_string('email', 'core'), s($localuser->email)];
-            $table->data[] = [get_string('accountid', 'block_motrain'), $manager->get_account_id() ?: '-'];
 
             // Resolve the potential teams.
             $teamid = $teamresolver->get_team_id_for_user($userid);
@@ -145,15 +144,25 @@ if ($action === 'inspect') {
             } else {
                 $table->data[] = [get_string('primaryteam', 'block_motrain'), '-'];
             }
+            echo $OUTPUT->heading(get_string('local', 'core'), 4);
+            echo html_writer::table($table);
 
             // Retrieve the local mapping.
-            $playerid = null;
-            if ($teamid) {
-                $playermap->set_local_only(true);
-                $playerid = $playermap->get_player_id($userid, $teamid);
-            }
+            $playermap->set_local_only(true);
+            $playermapping = $playermap->get_player_mapping($userid);
+            $playerid = $playermapping->playerid ?? null;
+            $table = new html_table();
+            $table->data[] = [get_string('accountid', 'block_motrain'), $manager->get_account_id() ?: '-'];
             $table->data[] = [get_string('playerid', 'block_motrain'), $playerid ?? '-'];
-            echo $OUTPUT->heading(get_string('local', 'core'), 4);
+            $table->data[] = [get_string('team', 'block_motrain'), ($playermapping->teamid ?? '-')
+                . $outputteamflag($playermapping->teamid ?? null)];
+            if ($playermapping->blocked ?? false) {
+                $table->data[] = [get_string('blocked', 'block_motrain'), get_string('yes', 'core') . '. '
+                    . s($playermapping->blockedreason ?? '-')];
+            } else {
+                $table->data[] = [get_string('blocked', 'block_motrain'), get_string('no', 'core')];
+            }
+            echo $OUTPUT->heading(get_string('playermapping', 'block_motrain'), 4);
             echo html_writer::table($table);
 
             // Retrieve remote information by player ID.
