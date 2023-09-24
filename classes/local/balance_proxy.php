@@ -89,9 +89,10 @@ class balance_proxy {
      * Get the coins from server.
      *
      * @param int|object $userorid The user, or its ID.
+     * @param bool $hasretried Whether we have retried.
      * @return object With coins, coins_earned_lifetime, and tickets.
      */
-    protected function get_player_balance($userorid) {
+    protected function get_player_balance($userorid, $hasretried = false) {
         $default = (object) ['coins' => 0, 'coins_earned_lifetime' => 0, 'tickets' => 0];
         $manager = $this->manager;
 
@@ -122,6 +123,10 @@ class balance_proxy {
                 'tickets' => (int) ($player->tickets ?? 0),
             ];
         } catch (api_error $e) {
+            if ($e->get_http_code() == 404 && $playerid && !$hasretried) {
+                $manager->get_player_mapper()->remove_user($userid);
+                return $this->get_player_balance($userid, true);
+            }
             return $default;
         } catch (client_exception $e) {
             return $default;
