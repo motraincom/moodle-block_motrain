@@ -695,6 +695,7 @@ class manager {
             'event_types' => [
                 'redemption.requestAccepted',
                 'redemption.selfCompleted',
+                'redemption.shippingOrderSubmitted',
                 'user.auctionWon',
                 'user.leveledUp',
                 'user.manuallyAwardedCoins',

@@ -103,6 +103,7 @@ class processor {
         $supported = [
             'redemption.requestAccepted',
             'redemption.selfCompleted',
+            'redemption.shippingOrderSubmitted',
             'user.auctionWon',
             'user.manuallyAwardedCoins',
             'user.raffleWon'
@@ -142,6 +143,21 @@ class processor {
                 'itemname' => $metadatareader->get_item_name($payload->item_id),
                 'message' => $metadatareader->get_item_redemption_message($payload->item_id)
                     ?? get_string('noredemptionessagefound', 'block_motrain'),
+            ];
+
+        } else if ($type == 'redemption.shippingOrderSubmitted') {
+            if (count($payload->items) === 1) {
+                $item = $payload->items[0];
+                $qtyprefix = $item->quantity > 1 ? "{$item->quantity}x " : '';
+                $itemnames = $qtyprefix . $metadatareader->get_item_name($item->id);
+            } else {
+                $itemnames = implode(', ', array_map(function($item) use ($metadatareader) {
+                    return "{$item->quantity}x " . $metadatareader->get_item_name($item->id);
+                }, $payload->items));
+            }
+            $code = message_dealer::TYPE_REDEMPTION_SHIPPING_ORDER_SUBMITTED;
+            $data = [
+                'itemname' => $itemnames
             ];
 
         } else if ($type == 'user.auctionWon') {
