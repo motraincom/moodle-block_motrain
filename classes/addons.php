@@ -70,8 +70,9 @@ class addons {
      * @param string $functionname The function name.
      */
     public static function get_list_with_function($functionname) {
-        return array_filter(get_plugin_list_with_function('local', $functionname), function($pluginname, $functionname) {
-            return strpos($pluginname, 'local_motrainaddon') === 0;
+        return array_filter(get_plugin_list_with_function('local', $functionname), function($functionname, $pluginname) {
+            return strpos($pluginname, 'local_motrainaddon') === 0
+                && (bool) get_config($pluginname, 'enabled');
         }, ARRAY_FILTER_USE_BOTH);
     }
 
