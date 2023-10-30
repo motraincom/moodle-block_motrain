@@ -25,6 +25,7 @@
 
 use block_motrain\addons;
 use block_motrain\manager;
+use block_motrain\output\block_content;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -86,11 +87,14 @@ class block_motrain_renderer extends plugin_renderer_base {
      */
     public function get_appearance_settings() {
         $manager = manager::instance();
+        // No keys can be removed from here, addons may rely on them.
         return (object) [
             'thousandssep' => get_string('thousandssep', 'langconfig'),
-            'pointsimageurl' => $manager->get_coins_image_url()->out(false),
             'icondoubleurl' => $manager->get_metadata_reader()->get_icon_double_url(),
             'iconticketsurl' => $manager->get_metadata_reader()->get_tickets_icon_url(),
+
+            // Deprecated.
+            'pointsimageurl' => $manager->get_coins_image_url()->out(false),
         ];
     }
 
@@ -127,78 +131,25 @@ class block_motrain_renderer extends plugin_renderer_base {
      * @return string
      */
     public function main_block_content(manager $manager, $config) {
-        global $USER;
+        $renderable = new block_content($manager, $config);
 
-        $infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
-        $storeurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'shop']);
-        $leaderboardsurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'leaderboards']);
-
-        $coins = $manager->get_balance_proxy()->get_balance($USER);
-        $level = $manager->get_level_proxy()->get_level($USER);
-        $hasticketsenabled = $manager->has_tickets_enabled($USER->id);
-        $tickets = $hasticketsenabled ? $manager->get_balance_proxy()->get_tickets($USER) : 0;
-
-        if ($level) {
-            $level->coins_remaining_formatted = $this->coin_amount($level->coins_remaining);
-            $level->levelnstr = get_string('leveln', 'block_motrain', $level->level);
-        }
-
-        $playernav = [];
-        if ($manager->has_leaderboard_access($USER->id)) {
-            $playernav[] = [
-                'icon' => $this->render_from_template('block_motrain/nav-icon-leaderboard', []),
-                'label' => get_string('leaderboard', 'block_motrain'),
-                'url' => $leaderboardsurl->out(false),
-            ];
-        }
-
-        $managernav = [];
-        if (has_capability('block/motrain:accessdashboard', context_system::instance())) {
-            $managernav[] = [
-                'icon' => $this->render_from_template('block_motrain/nav-icon-dashboard', []),
-                'label' => get_string('dashboard', 'block_motrain'),
-                'url' => $manager->get_dashboard_url()->out(false),
-            ];
-        }
-        if ($manager->can_manage()) {
-            $url = new moodle_url('/blocks/motrain/settings_config.php');
-            $managernav[] = [
-                'icon' => $this->render_from_template('block_motrain/nav-icon-settings', []),
-                'label' => get_string('settings', 'core'),
-                'url' => $url->out(false),
-            ];
-        }
-
-        // Extend player navigation from addons.
-        $addonplayernav = [];
-        $addons = addons::get_list_with_function('extend_block_motrain_player_navigation');
-        foreach ($addons as $pluginname => $functionname) {
-            $candidates = component_callback($pluginname, 'extend_block_motrain_player_navigation', [$manager, $this], []);
-            if (empty($candidates)) {
-                continue;
+        // Let an addon return another template if they want to. The first addon to
+        // return a valid template will take over the rendering.
+        $templatename = null;
+        $extracontext = [];
+        $plugins = addons::get_list_with_function('alternate_block_template');
+        foreach ($plugins as $pluginname => $functionname) {
+            $val = component_callback($pluginname, 'alternate_block_template', [$renderable, $this], '');
+            if (is_array($val) && count($val) == 2 && is_string($val[0])) {
+                [$templatename, $extracontext] = $val;
+                break;
             }
-            $addonplayernav = array_merge($addonplayernav, array_values(array_filter($candidates, function($item) {
-                return !empty($item['url']) && !empty($item['label']);
-            })));
         }
-        $playernav = array_merge($playernav, $addonplayernav);
 
-        return $this->render_from_template('block_motrain/block', [
-            'coins' => $coins,
-            'coins_formatted' => $this->coin_amount($coins),
-            'tickets' => $tickets,
-            'tickets_formatted' => $this->coin_amount($tickets),
-            'showtickets' => $hasticketsenabled,
-            'level' => $level,
-            'infourl' => $infourl->out(false),
-            'storeurl' => $storeurl->out(false),
-            'hasplayernav' => !empty($playernav),
-            'playernav' => $playernav,
-            'hasmanagernav' => !empty($managernav),
-            'managernav' => $managernav,
-            'accentcolor' => $config->accentcolor ?? '',
-            'bgcolor' => $config->bgcolor ?? '',
-        ] + (array) $this->get_appearance_settings());
+        return $this->render_from_template(
+            $templatename ?? 'block_motrain/block',
+            array_merge((array) $renderable->export_for_template($this), (array) $extracontext)
+        );
     }
 
     /**
