@@ -120,10 +120,6 @@ $setting = new admin_setting_configcheckbox('block_motrain/autopush', get_string
     get_string('autopush_help', 'block_motrain'), false);
 $settingspage->add($setting);
 
-$setting = new admin_setting_configstoredfile('block_motrain/coinsimage', get_string('coinsimage', 'block_motrain'),
-    get_string('coinsimage_help', 'block_motrain'), 'coinsimage', 0, ['accepted_types' => ['image']]);
-$settingspage->add($setting);
-
 // Save the data.
 if ($data = data_submitted() and confirm_sesskey()) {
     $data = array_filter((array) $data, function($key) {

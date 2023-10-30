@@ -211,6 +211,9 @@ class manager {
     /**
      * Get the coins image URL.
      *
+     * This is deprecated as it provides an image that used to be defined in the admin settings, and fails
+     * to return the image from the dashboard. Instead, refer to the appearance settings, see renderer.
+     *
      * @return moodle_url
      */
     public static function get_coins_image_url() {
