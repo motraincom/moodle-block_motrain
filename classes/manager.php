@@ -33,6 +33,7 @@ use block_motrain\local\level_proxy;
 use block_motrain\local\message_dealer;
 use block_motrain\local\metadata_reader;
 use block_motrain\local\player_mapper;
+use block_motrain\local\purchase_proxy;
 use block_motrain\local\team_resolver;
 use block_motrain\local\user_pusher;
 use block_motrain\task\adhoc_queue_cohort_members_for_push;
@@ -75,6 +76,8 @@ class manager {
     protected $metadatareader;
     /** @var player_mapper|null The player mapper. */
     protected $playermapper;
+    /** @var purchase_proxy|null The purchase proxy. */
+    protected $purchaseproxy;
     /** @var team_resolver|null The team resolver. */
     protected $teamresolver;
     /** @var user_pusher|null The user pusher. */
@@ -314,6 +317,18 @@ class manager {
             $this->playermapper->set_allow_team_change($this->is_local_team_management_enabled());
         }
         return $this->playermapper;
+    }
+
+    /**
+     * Get the purchase proxy.
+     *
+     * @return purchase_proxy
+     */
+    public function get_purchase_proxy() {
+        if (!$this->purchaseproxy) {
+            $this->purchaseproxy = new purchase_proxy($this);
+        }
+        return $this->purchaseproxy;
     }
 
     /**

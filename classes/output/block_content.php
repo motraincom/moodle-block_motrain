@@ -61,6 +61,8 @@ class block_content implements templatable {
     /** @var moodle_url The url. */
     public $leaderboardsurl;
     /** @var moodle_url The url. */
+    public $purchasesurl;
+    /** @var moodle_url The url. */
     public $settingsurl;
 
     /**
@@ -82,6 +84,7 @@ class block_content implements templatable {
         $this->dashboardurl = $manager->get_dashboard_url();
         $this->storeurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'shop']);
         $this->leaderboardsurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'leaderboards']);
+        $this->purchasesurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'purchases']);
         $this->settingsurl = new moodle_url('/blocks/motrain/settings_config.php');;
     }
 
@@ -130,6 +133,7 @@ class block_content implements templatable {
         $level = $this->get_level_data($output);
         $hasticketsenabled = $manager->has_tickets_enabled($userid);
         $tickets = $hasticketsenabled ? $manager->get_balance_proxy()->get_tickets($userid) : 0;
+        $purchasespendingredeem = $manager->get_purchase_proxy()->count_awaiting_redemption($userid);
 
         $playernav = $this->get_player_nav_items($output);
         $managernav = $this->get_manager_nav_items($output);
@@ -146,6 +150,10 @@ class block_content implements templatable {
             'level' => $level,
             'showlevel' => !empty($level),
 
+            'purchasespendingredeem' => $purchasespendingredeem,
+            'haspurchasespendingredeem' => $purchasespendingredeem > 0,
+            'haspurchasespendingredeemmorethan9' => $purchasespendingredeem > 9,
+
             'canaccessdashboard' => $this->canaccessdashboard,
             'canaccessleaderboards' => $manager->has_leaderboard_access($this->userid),
             'canmanage' => $manager->can_manage($this->userid),
@@ -158,6 +166,7 @@ class block_content implements templatable {
             'infourl' => $this->infourl->out(false),
             'storeurl' => $this->storeurl->out(false),
             'leaderboardsurl' => $this->leaderboardsurl->out(false),
+            'purchasesurl' => $this->purchasesurl->out(false),
             'dashboardurl' => $this->dashboardurl->out(false),
             'settingsurl' => $this->settingsurl->out(false),
 

@@ -46,4 +46,10 @@ $definitions = [
         'simplekeys' => true,
         'staticacceleration' => true
     ),
+    'purchasemetadata' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'ttl' => 3600,
+    ),
 ];

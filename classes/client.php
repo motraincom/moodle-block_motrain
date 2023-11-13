@@ -141,6 +141,11 @@ class client {
         return null;
     }
 
+    public function get_player_purchases_count($playerid, $filters) {
+        $resp = $this->request_advanced('GET', '/v2/users/' . $playerid . '/purchases/count', $filters);
+        return $this->decode_json_response($resp);
+    }
+
     public function get_player_redemptions($playerid, $filters) {
         $resp = $this->request_advanced('GET', '/v2/users/' . $playerid . '/redemptions', $filters);
         if (!empty($resp->headers['Link']) || !empty($resp->headers['link'])) {

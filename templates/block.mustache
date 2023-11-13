@@ -13,14 +13,27 @@
                     {{> block_motrain/wallet-ticket-balance }}
                 {{/showtickets}}
             </div>
-            <div class="wallet-action">
-                <a href="{{ storeurl }}" class="">
-                    <div>{{#str}} spend, block_motrain {{/str}}</div>
-                    <div class="action-pic">{{> block_motrain/icon-coins }}</div>
-                    {{#showtickets}}
-                        / <div class="action-pic">{{> block_motrain/icon-tickets }}</div>
-                    {{/showtickets}}
-                </a>
+            <div class="wallet-actions">
+                <div class="wallet-action">
+                    <a href="{{ storeurl }}" class="">
+                        <div>{{#str}} spend, block_motrain {{/str}}</div>
+                        <div class="action-pic">{{> block_motrain/icon-coins }}</div>
+                        {{#showtickets}}
+                            / <div class="action-pic">{{> block_motrain/icon-tickets }}</div>
+                        {{/showtickets}}
+                    </a>
+                </div>
+                {{# haspurchasespendingredeem }}
+                <div class="wallet-action icon-only">
+                    <a href="{{ purchasesurl }}" class="" title="{{# str }} pendingorders, block_motrain {{/ str }}">
+                        <div class="wallet-action-badge">
+                            {{^haspurchasespendingredeemmorethan9}}{{purchasespendingredeem}}{{/haspurchasespendingredeemmorethan9}}
+                            {{#haspurchasespendingredeemmorethan9}}9+{{/haspurchasespendingredeemmorethan9}}
+                        </div>
+                        <div class="action-pic">{{> block_motrain/icon-pending-orders }}</div>
+                    </a>
+                </div>
+                {{/ haspurchasespendingredeem }}
             </div>
         </div>
 

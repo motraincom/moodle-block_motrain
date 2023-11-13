@@ -86,6 +86,8 @@ function block_motrain_ispaused_updated_hook() {
     $manager = manager::instance();
     $balanceproxy = $manager->get_balance_proxy();
     $balanceproxy->invalidate_all();
+    $purchaseproxy = $manager->get_purchase_proxy();
+    $purchaseproxy->invalidate_all();
 };
 
 /**

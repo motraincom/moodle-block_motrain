@@ -120,9 +120,19 @@
     height: 22px;
 }
 
+.block_motrain-wallet .wallet-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.block_motrain-wallet .wallet-action {
+    flex: 1 1 auto;
+}
+
 .block_motrain-wallet .wallet-action a {
+    position: relative;
     background: var(--motrain-accent-color);
-    border-radius: 16px;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,6 +152,36 @@
 }
 .block_motrain-wallet .wallet-action .action-pic {
     height: 16px;
+}
+
+.block_motrain-wallet .wallet-action.icon-only {
+    flex: 0 0 42px;
+    width: 42px;
+}
+.block_motrain-wallet .wallet-action.icon-only a {
+    background: #000;
+    color: #fff;
+}
+.block_motrain-wallet .wallet-action.icon-only .action-pic {
+    height: 24px;
+}
+
+.block_motrain-wallet .wallet-action-badge {
+    height: 16px;
+    width: 16px;
+    background: red;
+    color: white;
+    border-radius: 100%;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    text-align: center;
+    overflow: hidden;
 }
 
 /** Level on block */

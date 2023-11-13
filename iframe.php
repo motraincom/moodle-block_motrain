@@ -93,7 +93,8 @@ try {
     throw $e;
 }
 
-// Invalid the balance when loading the iframe.
+// Invalid the balance, and purchases, when loading the iframe.
 $manager->get_balance_proxy()->invalidate_balance($USER->id);
+$manager->get_purchase_proxy()->invalidate_user($USER->id);
 
 redirect($url);
