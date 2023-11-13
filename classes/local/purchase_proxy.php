@@ -68,7 +68,7 @@ class purchase_proxy {
         }
         $userid = (int) $userid;
 
-        $cachekey = "made-$userid";
+        $cachekey = "made_$userid";
         if (($data = $this->cache->get($cachekey)) === false) {
             $data = $this->fetch_awaiting_redemption_count($userorid);
             $this->cache->set($cachekey, $data);
@@ -133,7 +133,7 @@ class purchase_proxy {
      */
     public function invalidate_user($userid) {
         $keys = [
-            "made-$userid",
+            "made_$userid",
         ];
         foreach ($keys as $key) {
             return $this->cache->delete($key);
