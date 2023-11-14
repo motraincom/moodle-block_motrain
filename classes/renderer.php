@@ -68,16 +68,8 @@ class block_motrain_renderer extends plugin_renderer_base {
         }
         $this->appearancepagerequirementset = true;
 
-        $id = html_writer::random_id();
         $data = $this->get_appearance_settings();
-        $this->page->requires->js_amd_inline('
-            require(["jquery", "block_motrain/appearance"], function($, Appearance) {
-                var data = JSON.parse($("#' . $id . '").text());
-                Appearance.setup(data);
-            });
-        ');
-
-        return $this->json_script($data, $id);
+        return $this->json_script($data, 'block_motrain-appearance-settings-data');
     }
 
     /**

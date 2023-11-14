@@ -21,13 +21,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- define(['core/log'], function(log) {
+define(['core/log'], function(log) {
 
     var wasSetup = false;
 
     // Should contain all the values we may be using.
     var appearance = {
-        thousandsep: ',',
+        thousandssep: ',',
         pointsimageurl: M.util.image_url('coins', 'block_motrain'),
     };
 
@@ -38,30 +38,52 @@
      * @return {String}
      */
     function formatCoins(amount) {
-        if (!wasSetup) {
-            log.warn('The appearance was not setup, make sure you used \'get_appearance_page_requirements\'.');
-        }
+        ensureConfigLoaded();
 
         var coins = amount;
-        var thousandsep = appearance.thousandsep;
+        var thousandssep = appearance.thousandssep;
 
         // Credit: https://stackoverflow.com/a/2901298/867720
-        return coins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandsep);
+        return coins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, thousandssep);
+    }
+
+    /**
+     * Ensure the config is loaded.
+     */
+    function ensureConfigLoaded() {
+        if (wasSetup) {
+            return;
+        }
+        loadConfig();
+        wasSetup = true;
+    }
+
+    /**
+     * Load the config.
+     */
+    function loadConfig() {
+        var node = document.getElementById('block_motrain-appearance-settings-data');
+        try {
+            var config = JSON.parse(node.textContent);
+            appearance = Object.assign({}, appearance, config);
+        } catch (e) {
+            log.warn('Could not load appearance settings');
+        }
     }
 
     /**
      * Setup.
      *
-     * @param {Object} appearanceSettings The settings.
+     * @deprecated Since Motrain v1.12.1, the config auto loads.
      */
-    function setup(appearanceSettings) {
-        appearance = Object.assign({}, appearance, appearanceSettings);
-        wasSetup = true;
+    function setup() {
+        ensureConfigLoaded();
     }
 
     return {
         formatCoins: formatCoins,
         getSettings: function() {
+            ensureConfigLoaded();
             return appearance;
         },
         setup: setup,
