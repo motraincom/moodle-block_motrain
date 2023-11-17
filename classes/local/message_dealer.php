@@ -401,6 +401,7 @@ class message_dealer {
         [$subject, $html] = $this->generate_content($template, $user, (object) $data);
 
         $message = new \core\message\message();
+        $message->courseid          = SITEID; // Needed for Totara.
         $message->component         = 'block_motrain';
         $message->name              = 'notification';
         $message->notification      = 1;
