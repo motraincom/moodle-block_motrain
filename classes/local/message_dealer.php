@@ -44,6 +44,7 @@ class message_dealer {
     const TYPE_REDEMPTION_REQUEST_ACCEPTED = 'redemption_request_accepted';
     const TYPE_REDEMPTION_SELF_COMPLETED = 'redemption_self_completed';
     const TYPE_REDEMPTION_SHIPPING_ORDER_SUBMITTED = 'redemption_shipping_order_submit';
+    const TYPE_REDEMPTION_VOUCHER_CLAIMED = 'redemption_voucher_claimed';
     const TYPE_USER_AUCTION_WON = 'user_auction_won';
     const TYPE_USER_MANUAL_AWARD = 'user_manual_award';
     const TYPE_USER_RAFFLE_WON = 'user_raffle_won';
@@ -103,6 +104,22 @@ class message_dealer {
                     ]
                 ],
                 'name' => new lang_string('templatetyperedemptionshippingordersubmitted', 'block_motrain'),
+            ],
+            static::TYPE_REDEMPTION_VOUCHER_CLAIMED => (object) [
+                'code' => static::TYPE_REDEMPTION_VOUCHER_CLAIMED,
+                'placeholders' => [
+                    (object) [
+                        'tag' => 'itemname',
+                        'description' => new lang_string('placeholderitemname', 'block_motrain'),
+                        'example' => new lang_string('placeholderitemnameexample', 'block_motrain')
+                    ],
+                    (object) [
+                        'tag' => 'vouchercode',
+                        'description' => new lang_string('placeholdervouchercode', 'block_motrain'),
+                        'example' => new lang_string('placeholdervouchercodeexample', 'block_motrain')
+                    ]
+                ],
+                'name' => new lang_string('templatetyperedemptionvoucherclaimed', 'block_motrain'),
             ],
             static::TYPE_USER_AUCTION_WON => (object) [
                 'code' => static::TYPE_USER_AUCTION_WON,
@@ -216,6 +233,10 @@ class message_dealer {
             $subject = 'Order processed';
             $content = markdown_to_html("It's time to start checking your mailbox! Your order "
                 . "for [itemname] was successfully sent.");
+
+        } else if ($type === static::TYPE_REDEMPTION_VOUCHER_CLAIMED) {
+            $subject = 'Here is your voucher';
+            $content = markdown_to_html("Here is your voucher for [itemname]:\n\n[vouchercode]");
 
         } else if ($type === static::TYPE_USER_AUCTION_WON) {
             $subject = 'You are the highest bidder! You win!';

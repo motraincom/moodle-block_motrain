@@ -104,6 +104,7 @@ class processor {
             'redemption.requestAccepted',
             'redemption.selfCompleted',
             'redemption.shippingOrderSubmitted',
+            'redemption.voucherClaimed',
             'user.auctionWon',
             'user.manuallyAwardedCoins',
             'user.raffleWon'
@@ -158,6 +159,13 @@ class processor {
             $code = message_dealer::TYPE_REDEMPTION_SHIPPING_ORDER_SUBMITTED;
             $data = [
                 'itemname' => $itemnames
+            ];
+
+        } else if ($type == 'redemption.voucherClaimed') {
+            $code = message_dealer::TYPE_REDEMPTION_VOUCHER_CLAIMED;
+            $data = [
+                'itemname' => $metadatareader->get_item_name($payload->item_id),
+                'vouchercode' => $payload->voucher_code,
             ];
 
         } else if ($type == 'user.auctionWon') {

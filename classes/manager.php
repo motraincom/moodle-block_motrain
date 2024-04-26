@@ -711,6 +711,7 @@ class manager {
                 'redemption.requestAccepted',
                 'redemption.selfCompleted',
                 'redemption.shippingOrderSubmitted',
+                'redemption.voucherClaimed',
                 'user.auctionWon',
                 'user.leveledUp',
                 'user.manuallyAwardedCoins',

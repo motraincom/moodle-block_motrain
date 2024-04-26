@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['accountid_desc'] = 'The ID of the account.';
 $string['accountid'] = 'Account ID';
+$string['accountidmismatch'] = 'Accounts IDs do not match.';
 $string['addactivityellipsis'] = 'Add activity...';
 $string['addcourseellipsis'] = 'Add course...';
 $string['addprogramellipsis'] = 'Add program...';
@@ -135,6 +136,8 @@ $string['placeholderitemsexample'] = '1x Fictitious Item Name, 2x Other Item Nam
 $string['placeholdermessage'] = 'A message associated with this event.';
 $string['placeholdermessageexample'] = 'A message associated with this event.';
 $string['placeholderoptionalmessagefromadmin'] = 'An optional message from the admin.';
+$string['placeholdervouchercode'] = 'The voucher code that was claimed.';
+$string['placeholdervouchercodeexample'] = 'ABC123';
 $string['playerid'] = 'Player ID';
 $string['playeridnotfound'] = 'The player associated with the current user could not be found, please contact the adminstrator.';
 $string['playermappingintro'] = 'A player mapping is the association between a local user and a player on the Motrain dashboard. You can find the list of known mappings below. Mappings with an error will not be re-attempted, please fix the issue and reset the mapping.';
@@ -239,6 +242,7 @@ $string['templatetyperafflewon'] = 'Raffle won';
 $string['templatetyperedemptionrequestaccepted'] = 'Order request approved';
 $string['templatetyperedemptionselfcompleted'] = 'Automatic order completed';
 $string['templatetyperedemptionshippingordersubmitted'] = 'Shipping order submitted';
+$string['templatetyperedemptionvoucherclaimed'] = 'Voucher claimed';
 $string['templatetypesweepstakeswon'] = 'Sweepstakes won';
 $string['templatex'] = 'Template: {$a}';
 $string['tickets'] = 'Tickets';
