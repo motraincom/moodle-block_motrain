@@ -219,8 +219,10 @@ The content of the message to send.
 
 The following placeholders are available:
 
-- `[message]`: An optional associated message (e.g. order approval, automatic order), if any.
+- `[coins]`: The number of coins received, if any.
 - `[itemname]`: The name of the associated item, if any.
+- `[message]`: An optional associated message (e.g. order approval, automatic order), if any.
+- `[vouchercode]`: The voucher code that was claimed, if any.
 - `[firstname]`: The first name of the player.
 - `[lastname]`: The last name of the player.
 - `[fullname]`: The full name of the player.
