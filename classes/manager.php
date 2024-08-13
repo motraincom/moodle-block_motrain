@@ -597,7 +597,11 @@ class manager {
         $apikey = get_config('block_motrain', 'apikey');
         $apihost = get_config('block_motrain', 'apihost');
         $accountid = get_config('block_motrain', 'accountid');
-        return new client($apihost, $apikey, $accountid);
+
+        $client = new client($apihost, $apikey, $accountid);
+        $client->set_is_totara($this->is_totara());
+
+        return $client;
     }
 
     /**

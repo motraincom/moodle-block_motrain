@@ -56,6 +56,9 @@ class client {
     /** @var string The language. */
     protected $lang;
 
+    /** @var bool Whether we're in Totara. */
+    protected $istotara = false;
+
     /**
      * Constructor.
      *
@@ -273,7 +276,11 @@ class client {
             ]);
         } else if ($method === 'PUT') {
             $url = new moodle_url($this->apihost . $uri);
-            $response = $curl->put($url, $data ? json_encode($data) : '');
+            if (!$this->istotara) {
+                $response = $curl->put($url, $data ? json_encode($data) : '');
+            } else {
+                $response = $curl->put_data($url, $data ? json_encode($data) : '');
+            }
         } else if ($method === 'GET') {
             $url = new moodle_url($this->apihost . $uri, $data);
             $response = $curl->get($url->out(false));
@@ -308,6 +315,10 @@ class client {
             'http_code' => $curl->info['http_code'],
             'headers' => $curl->getResponse(),
         ];
+    }
+
+    public function set_is_totara($istotara) {
+        $this->istotara = (bool) $istotara;
     }
 
     public function set_observer($observer) {
