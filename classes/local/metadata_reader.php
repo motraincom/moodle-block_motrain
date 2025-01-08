@@ -189,6 +189,15 @@ class metadata_reader {
     }
 
     /**
+     * Whether store elements are enabled.
+     *
+     * @return bool
+     */
+    public function has_store() {
+        return $this->get_branding()->has_store ?? true;
+    }
+
+    /**
      * Get the tickets icon URL.
      *
      * @return string|null

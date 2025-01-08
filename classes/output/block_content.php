@@ -51,6 +51,8 @@ class block_content implements templatable {
 
     /** @var bool Whether can access dashboard. */
     public $canaccessdashboard;
+    /** @var bool Whether store elements are enabled. */
+    public $hasstore;
 
     /** @var moodle_url The url. */
     public $dashboardurl;
@@ -79,6 +81,7 @@ class block_content implements templatable {
         $this->userid = (int) $USER->id;
 
         $this->canaccessdashboard = has_capability('block/motrain:accessdashboard', context_system::instance());
+        $this->hasstore = $manager->has_store();
 
         $this->infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
         $this->dashboardurl = $manager->get_dashboard_url();
@@ -133,7 +136,7 @@ class block_content implements templatable {
         $level = $this->get_level_data($output);
         $hasticketsenabled = $manager->has_tickets_enabled($userid);
         $tickets = $hasticketsenabled ? $manager->get_balance_proxy()->get_tickets($userid) : 0;
-        $purchasespendingredeem = $manager->get_purchase_proxy()->count_awaiting_redemption($userid);
+        $purchasespendingredeem = $this->hasstore ? $manager->get_purchase_proxy()->count_awaiting_redemption($userid) : 0;
 
         $playernav = $this->get_player_nav_items($output);
         $managernav = $this->get_manager_nav_items($output);
@@ -150,6 +153,7 @@ class block_content implements templatable {
             'level' => $level,
             'showlevel' => !empty($level),
 
+            'showstore' => $this->hasstore,
             'purchasespendingredeem' => $purchasespendingredeem,
             'haspurchasespendingredeem' => $purchasespendingredeem > 0,
             'haspurchasespendingredeemmorethan9' => $purchasespendingredeem > 9,

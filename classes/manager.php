@@ -420,6 +420,15 @@ class manager {
     }
 
     /**
+     * Whether store elements are enabled.
+     *
+     * @return bool
+     */
+    public function has_store() {
+        return $this->get_metadata_reader()->has_store();
+    }
+
+    /**
      * Whether user has tickets enabled.
      *
      * @param int $userid The user ID.
