@@ -6,7 +6,7 @@
 </style>
 <div class="block_motrain-wrapper">
     <div class="block_motrain-content">
-        <div class="block_motrain-wallet">
+        <div class="block_motrain-wallet block_motrain-container">
             <div class="block_motrain-wallet-balances">
                 {{> block_motrain/wallet-balance }}
                 {{#showtickets}}
@@ -38,6 +38,22 @@
             </div>
             {{/ showstore }}
         </div>
+
+        {{# showbrava }}
+        <div class="block_motrain-container">
+            <div style="block_motrain-brava-given">
+                <div class="block_motrain-brava-given-amount">{{ bravagiven_formatted }} / {{ bravatogive_formatted }}</div>
+                <div class="block_motrain-brava-given-label">{{#str}} giventhismonth, block_motrain {{/str}}</div>
+            </div>
+            <div class="wallet-actions">
+                <div class="wallet-action">
+                    <a href="{{ bravaurl }}" class="">
+                        <div>{{#str}} brava, block_motrain {{/str}}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{/ showbrava }}
 
         {{#level}}
         <div class="block_motrain-level">

@@ -88,15 +88,36 @@
     flex: 1 1 296px;
 }
 
-/** Wallet on block */
-.block_motrain-wallet {
+/** Block highlight container */
+.block_motrain-container {
     background: var(--motrain-bg-color);
     border-radius: 16px;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
+
+.block_motrain-brava-given {
+    flex-grow: 1;
+}
+.block_motrain-brava-given-amount {
+    line-height: 1;
+    font-weight: bold;
+    font-size: 32px;
+    text-align: center;
+}
+.block_motrain-brava-given-label {
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+    color: #474747;
+    margin-top: 2px;
+}
+
+/** Wallet on block */
 .block_motrain-wallet .block_motrain-wallet-balances {
-    padding-top: 4px;
-    margin-bottom: 16px;
+    flex-grow: 1;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
@@ -120,16 +141,16 @@
     height: 22px;
 }
 
-.block_motrain-wallet .wallet-actions {
+.block_motrain-container .wallet-actions {
     display: flex;
     gap: 8px;
 }
 
-.block_motrain-wallet .wallet-action {
+.block_motrain-container .wallet-action {
     flex: 1 1 auto;
 }
 
-.block_motrain-wallet .wallet-action a {
+.block_motrain-container .wallet-action a {
     position: relative;
     background: var(--motrain-accent-color);
     border-radius: 8px;
@@ -145,28 +166,28 @@
     min-height: 40px;
     line-height: 1;
 }
-.block_motrain-wallet .wallet-action a:hover {
+.block_motrain-container .wallet-action a:hover {
     text-decoration: none;
     color: #fff;
     opacity: 0.9;
 }
-.block_motrain-wallet .wallet-action .action-pic {
+.block_motrain-container .wallet-action .action-pic {
     height: 16px;
 }
 
-.block_motrain-wallet .wallet-action.icon-only {
+.block_motrain-container .wallet-action.icon-only {
     flex: 0 0 42px;
     width: 42px;
 }
-.block_motrain-wallet .wallet-action.icon-only a {
+.block_motrain-container .wallet-action.icon-only a {
     background: #000;
     color: #fff;
 }
-.block_motrain-wallet .wallet-action.icon-only .action-pic {
+.block_motrain-container .wallet-action.icon-only .action-pic {
     height: 24px;
 }
 
-.block_motrain-wallet .wallet-action-badge {
+.block_motrain-container .wallet-action-badge {
     height: 16px;
     width: 16px;
     background: red;

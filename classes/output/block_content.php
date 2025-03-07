@@ -55,6 +55,8 @@ class block_content implements templatable {
     public $hasstore;
 
     /** @var moodle_url The url. */
+    public $bravaurl;
+    /** @var moodle_url The url. */
     public $dashboardurl;
     /** @var moodle_url The url. */
     public $infourl;
@@ -85,6 +87,7 @@ class block_content implements templatable {
 
         $this->infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
         $this->dashboardurl = $manager->get_dashboard_url();
+        $this->bravaurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'brava']);
         $this->storeurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'shop']);
         $this->leaderboardsurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'leaderboards']);
         $this->purchasesurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'purchases']);
@@ -134,9 +137,12 @@ class block_content implements templatable {
 
         $coins = $manager->get_balance_proxy()->get_balance($userid);
         $level = $this->get_level_data($output);
+        $hasbravaenabled = $manager->has_brava_enabled($userid);
         $hasticketsenabled = $manager->has_tickets_enabled($userid);
         $tickets = $hasticketsenabled ? $manager->get_balance_proxy()->get_tickets($userid) : 0;
         $purchasespendingredeem = $this->hasstore ? $manager->get_purchase_proxy()->count_awaiting_redemption($userid) : 0;
+        $bravagiven = $hasbravaenabled ? $manager->get_balance_proxy()->get_brava_given($userid) : 0;
+        $bravaallowance = $hasbravaenabled ? $manager->get_balance_proxy()->get_brava_allowance($userid) : 0;
 
         $playernav = $this->get_player_nav_items($output);
         $managernav = $this->get_manager_nav_items($output);
@@ -158,6 +164,12 @@ class block_content implements templatable {
             'haspurchasespendingredeem' => $purchasespendingredeem > 0,
             'haspurchasespendingredeemmorethan9' => $purchasespendingredeem > 9,
 
+            'showbrava' => $hasbravaenabled,
+            'bravagiven' => $bravagiven,
+            'bravagiven_formatted' => $output->coin_amount($bravagiven),
+            'bravatogive' => $bravaallowance,
+            'bravatogive_formatted' => $output->coin_amount($bravaallowance),
+
             'canaccessdashboard' => $this->canaccessdashboard,
             'canaccessleaderboards' => $manager->has_leaderboard_access($this->userid),
             'canmanage' => $manager->can_manage($this->userid),
@@ -168,6 +180,7 @@ class block_content implements templatable {
             'managernav' => $managernav,
 
             'infourl' => $this->infourl->out(false),
+            'bravaurl' => $this->bravaurl->out(false),
             'storeurl' => $this->storeurl->out(false),
             'leaderboardsurl' => $this->leaderboardsurl->out(false),
             'purchasesurl' => $this->purchasesurl->out(false),

@@ -164,7 +164,7 @@ class client {
 
     public function get_store_login_url($playerid, $landingpage = null) {
         $params = null;
-        if (in_array($landingpage, ['shop', 'info', 'leaderboards', 'purchases', 'activity'])) {
+        if (in_array($landingpage, ['shop', 'info', 'leaderboards', 'purchases', 'activity', 'brava'])) {
             $params = ['landing_page' => $landingpage];
         }
         $resp = $this->post('/v2/users/' . $playerid . '/store_login_url', $params);

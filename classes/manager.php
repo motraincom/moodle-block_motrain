@@ -389,6 +389,30 @@ class manager {
     }
 
     /**
+     * Whether user has brava enabled.
+     *
+     * @param int $userid The user ID.
+     * @return bool
+     */
+    public function has_brava_enabled($userid) {
+        $teamid = $this->get_team_resolver()->get_team_id_for_user($userid);
+        if (!$teamid && !$this->can_manage($userid)) {
+            return false;
+        }
+
+        $metadata = $this->get_metadata_reader();
+        if ($metadata->has_brava_enabled_in_team($teamid)) {
+            return true;
+        }
+
+        if (!$this->can_manage($userid)) {
+            return false;
+        }
+
+        return $metadata->has_brava_enabled_in_account();
+    }
+
+    /**
      * Whether user has access to a leaderboard.
      *
      * @return bool

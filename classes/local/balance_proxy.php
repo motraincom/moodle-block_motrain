@@ -56,6 +56,26 @@ class balance_proxy {
     }
 
     /**
+     * Get Brava allowance.
+     *
+     * @param object|int The user, or its ID.
+     * @return object
+     */
+    public function get_brava_allowance($userorid) {
+        return $this->get_player_coins_cached($userorid)->brava_allowance;
+    }
+
+    /**
+     * Get Brava given.
+     *
+     * @param object|int The user, or its ID.
+     * @return object
+     */
+    public function get_brava_given($userorid) {
+        return $this->get_player_coins_cached($userorid)->brava_given;
+    }
+
+    /**
      * Get the balance.
      *
      * @param object|int The user, or its ID.
@@ -93,7 +113,14 @@ class balance_proxy {
      * @return object With coins, coins_earned_lifetime, and tickets.
      */
     protected function get_player_balance($userorid, $hasretried = false) {
-        $default = (object) ['coins' => 0, 'coins_earned_lifetime' => 0, 'tickets' => 0];
+        $default = (object) [
+            'coins' => 0,
+            'coins_earned_lifetime' => 0,
+            'tickets' => 0,
+            'brava_given' => 0,
+            'brava_remaining' => 0,
+            'brava_allowance' => 0
+        ];
         $manager = $this->manager;
 
         $userid = $userorid;
@@ -121,6 +148,9 @@ class balance_proxy {
                 'coins' => (int) ($player->coins ?? 0),
                 'coins_earned_lifetime' => (int) ($player->coins_earned_lifetime ?? 0),
                 'tickets' => (int) ($player->tickets ?? 0),
+                'brava_given' => (int) ($player->brava->given ?? 0),
+                'brava_remaining' => (int) ($player->brava->remaining ?? 0),
+                'brava_allowance' => (int) ($player->brava->allowance ?? 0),
             ];
         } catch (api_error $e) {
             if ($e->get_http_code() == 404 && $playerid && !$hasretried) {

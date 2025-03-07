@@ -189,6 +189,26 @@ class metadata_reader {
     }
 
     /**
+     * Whether brava are enabled.
+     *
+     * @param string $teamid The team ID.
+     * @return bool
+     */
+    public function has_brava_enabled_in_account() {
+        return $this->get_account()->brava_enabled ?? false;
+    }
+
+    /**
+     * Whether brava are enabled.
+     *
+     * @param string $teamid The team ID.
+     * @return bool
+     */
+    public function has_brava_enabled_in_team($teamid) {
+        return $this->get_team($teamid)->brava_enabled ?? false;
+    }
+
+    /**
      * Whether store elements are enabled.
      *
      * @return bool
