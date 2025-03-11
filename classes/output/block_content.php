@@ -124,7 +124,7 @@ class block_content implements templatable {
     /**
      * Renderer.
      *
-     * @param renderer_base $output Motrain renderer.
+     * @param renderer_base $output Incentli renderer.
      * @return array
      */
     public function export_for_template(renderer_base $output) {
@@ -195,7 +195,7 @@ class block_content implements templatable {
     /**
      * Get the level data.
      *
-     * @param renderer_base $output Motrain renderer.
+     * @param renderer_base $output Incentli renderer.
      * @return object|null
      */
     protected function get_level_data(renderer_base $output) {
@@ -210,7 +210,7 @@ class block_content implements templatable {
     /**
      * Get the manager navigation items.
      *
-     * @param renderer_base $output Motrain renderer.
+     * @param renderer_base $output Incentli renderer.
      * @return array
      */
     protected function get_manager_nav_items(renderer_base $output) {
@@ -235,7 +235,7 @@ class block_content implements templatable {
     /**
      * Get the player navigation items.
      *
-     * @param renderer_base $output Motrain renderer.
+     * @param renderer_base $output Incentli renderer.
      * @return array
      */
     protected function get_player_nav_items(renderer_base $output) {

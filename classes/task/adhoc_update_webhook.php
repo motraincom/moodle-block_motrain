@@ -47,7 +47,7 @@ class adhoc_update_webhook extends \core\task\adhoc_task {
 
         $manager = manager::instance();
         if (!$manager->is_enabled()) {
-            mtrace('Motrain is not enabled.');
+            mtrace('Incentli is not enabled.');
             return;
         }
 

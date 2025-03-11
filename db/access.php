@@ -63,7 +63,7 @@ $capabilities = [
         ],
     ],
 
-    // Whether the user can manage Motrain.
+    // Whether the user can manage Incentli.
     'block/motrain:manage' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

@@ -79,7 +79,7 @@ if ($deleteid && confirm_sesskey()) {
     redirect($PAGE->url);
 }
 
-// Get the teams from Motrain.
+// Get the teams from Incentli.
 $teams = $manager->get_client()->get_teams();
 core_collator::asort_objects_by_property($teams, 'name', core_collator::SORT_NATURAL);
 $teamsbyid = array_reduce($teams, function($carry, $item) {

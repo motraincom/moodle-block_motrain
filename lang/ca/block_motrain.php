@@ -44,7 +44,7 @@ $string['apikey_desc'] = 'La clau de l’API per autenticar -se amb l’API.';
 $string['areyousurerefreshallinteam'] = 'Estàs segur que vols actualitzar tots els jugadors de l\'equip? Això eliminarà totes les assignacions.';
 $string['areyousurerefreshandpushallinteam'] = 'Estàs segur que vols actualitzar tots els jugadors de l\'equip? Això eliminarà tots els mapes i enviarà tots els usuaris al tauler de control.';
 $string['autopush'] = 'Afegir automàticament els usuaris';
-$string['autopush_help'] = 'Quan està habilitat, els usuaris s’afegiran automàticament com a jugadors del Motrain Dashboard, fins i tot abans que comencin a guanyar monedes. Aquest procés es fa quan passa el cron, els jugadors poden trigar diversos minuts a aparèixer al tauler. Tingueu en compte que això no s\'aplica a les associacions d\'equips de cohort existents, només els nous membres i les noves associacions.';
+$string['autopush_help'] = 'Quan està habilitat, els usuaris s’afegiran automàticament com a jugadors del Incentli Dashboard, fins i tot abans que comencin a guanyar monedes. Aquest procés es fa quan passa el cron, els jugadors poden trigar diversos minuts a aparèixer al tauler. Tingueu en compte que això no s\'aplica a les associacions d\'equips de cohort existents, només els nous membres i les noves associacions.';
 $string['blocked'] = 'Bloquejat';
 $string['butpaused'] = 'Però s\'ha aturat';
 $string['cachedef_coins'] = 'Monedes d\'usuari';
@@ -75,7 +75,7 @@ $string['coursecompletion'] = 'Finalització del curs';
 $string['createassociation'] = 'Crear associació';
 $string['dashboard'] = 'Dashboard';
 $string['defaultparens'] = '(per defecte)';
-$string['defaulttitle'] = 'Motrain';
+$string['defaulttitle'] = 'Incentli';
 $string['disabled'] = 'Desactivat';
 $string['disconnect'] = 'Desconnectar';
 $string['editassociation'] = 'Editar l\'associació';
@@ -94,31 +94,31 @@ $string['invalidcoinamount'] = 'Quantitat no vàlida de monedes';
 $string['isenabled'] = 'Plugin habilitat';
 $string['isenabled_desc'] = 'Per habilitar el complement, empleneu la configuració següent amb la informació correcta. Sempre que els detalls de l’API siguin correctes, el complement s’activarà.';
 $string['ispaused'] = 'Pausar el plugin';
-$string['ispaused_help'] = 'Quan es pausi, el plugin no enviarà informació al tauler de Motrain. No s’atorgaran monedes i els jugadors no es crearan. A més, els usuaris no poden veure el bloc i no poden accedir a la botiga. És possible que vulgueu marcar el complement com a pausa fins que s\'hagi configurat completament (regles, mapatges) o durant una migració del compte.';
+$string['ispaused_help'] = 'Quan es pausi, el plugin no enviarà informació al tauler de Incentli. No s’atorgaran monedes i els jugadors no es crearan. A més, els usuaris no poden veure el bloc i no poden accedir a la botiga. És possible que vulgueu marcar el complement com a pausa fins que s\'hagi configurat completament (regles, mapatges) o durant una migració del compte.';
 $string['lastwebhooktime'] = 'Darrer webhook rebut: {$a}';
 $string['leaderboard'] = 'Taula de classificació';
 $string['level'] = 'Nivell';
 $string['leveln'] = 'Nivell {$a}';
 $string['localteammgmt'] = 'Gestió d\'equips locals';
-$string['localteammgmt_help'] = 'Quan s\'habilita, l\'equip d\'un jugador serà dictat per la configuració a Moodle i es reflectirà al tauler de control de Motrain. Això permet gestionar els equips localment. Tingues en compte que, en algunes circumstàncies, quan els jugadors migren a un equip diferent, poden perdre el seu lloc dins del rànquing de classificació.';
+$string['localteammgmt_help'] = 'Quan s\'habilita, l\'equip d\'un jugador serà dictat per la configuració a Moodle i es reflectirà al tauler de control de Incentli. Això permet gestionar els equips localment. Tingues en compte que, en algunes circumstàncies, quan els jugadors migren a un equip diferent, poden perdre el seu lloc dins del rànquing de classificació.';
 $string['manageaddons'] = 'Gestiona els complements';
 $string['maximumlevel'] = 'Nivell màxim';
-$string['messageprovider:notification'] = 'Notificacions en relació a Motrain';
+$string['messageprovider:notification'] = 'Notificacions en relació a Incentli';
 $string['messagetemplates'] = 'Plantilles de missatges';
 $string['messagetemplatesintro'] = 'Les plantilles següents s\'utilitzen quan s\'envien notificacions als jugadors des d\'aquesta pàgina. El sistema triarà l\'idioma de la plantilla que millor s\'ajusti a l\'idioma del destinatari o utilitzarà la plantilla alternativa quan no n\'hi hagi cap que encaixi.';
 $string['metadatacache'] = 'Cache de metadades';
-$string['metadatacache_help'] = 'El plugin manté una memòria cau d\'alguns metadades de l\'API per millorar el rendiment. Emmagatzema informació com ara quines taules de classificació estan habilitades, etc. Després de fer alguns canvis al tauler de Motrain, potser haureu de purgar manualment aquesta memòria cau. Podeu fer-ho fent clic a l’enllaç anterior.';
+$string['metadatacache_help'] = 'El plugin manté una memòria cau d\'alguns metadades de l\'API per millorar el rendiment. Emmagatzema informació com ara quines taules de classificació estan habilitades, etc. Després de fer alguns canvis al tauler de Incentli, potser haureu de purgar manualment aquesta memòria cau. Podeu fer-ho fent clic a l’enllaç anterior.';
 $string['metadatasyncdisabled'] = 'La sincronització de metadades està desactivada.';
-$string['motrain:accessdashboard'] = 'Accedir al tauler de Motrain';
-$string['motrain:addinstance'] = 'Afegir un nou bloc de Motrain';
+$string['motrain:accessdashboard'] = 'Accedir al tauler de Incentli';
+$string['motrain:addinstance'] = 'Afegir un nou bloc de Incentli';
 $string['motrain:awardcoins'] = 'Afegir monedes a altres usuaris';
 $string['motrain:earncoins'] = 'Guanyar monedes';
-$string['motrain:manage'] = 'Gestiona aspectes de la integració de Motrain.';
-$string['motrain:myaddinstance'] = 'Afegir el bloc Motrain al tauler';
-$string['motrain:view'] = 'Consultar el contingut del bloc Motrain';
-$string['motrainaddons'] = 'Complements Motrain';
-$string['motrainemaillookup'] = 'Motrain (cerca de correu electrònic)';
-$string['motrainidlookup'] = 'Motrain (cerca d\'identificador)';
+$string['motrain:manage'] = 'Gestiona aspectes de la integració de Incentli.';
+$string['motrain:myaddinstance'] = 'Afegir el bloc Incentli al tauler';
+$string['motrain:view'] = 'Consultar el contingut del bloc Incentli';
+$string['motrainaddons'] = 'Complements Incentli';
+$string['motrainemaillookup'] = 'Incentli (cerca de correu electrònic)';
+$string['motrainidlookup'] = 'Incentli (cerca d\'identificador)';
 $string['multiteamsusers'] = 'Usuaris de múltiples equips';
 $string['nextlevelin'] = 'Següent nivell en';
 $string['noaddoninstalled'] = 'Encara no hi ha complements instal·lats.';
@@ -142,11 +142,11 @@ $string['placeholdervouchercodeexample'] = 'ABC123';
 $string['playerid'] = 'ID del jugador';
 $string['playeridnotfound'] = 'No s\'ha pogut trobar el jugador associat a l\'usuari actual, poseu-vos en contacte amb l\'administrador.';
 $string['playermapping'] = 'Mapping dels jugadors';
-$string['playermappingintro'] = 'Un mapping de jugadors és l’associació entre un usuari local i un jugador al tauler de Motrain. Podeu trobar la llista de associacions conegudes a continuació. Les associacions amb un error no es tornaran a intentar, solucioneu el problema i restableixi l\'associació.';
+$string['playermappingintro'] = 'Un mapping de jugadors és l’associació entre un usuari local i un jugador al tauler de Incentli. Podeu trobar la llista de associacions conegudes a continuació. Les associacions amb un error no es tornaran a intentar, solucioneu el problema i restableixi l\'associació.';
 $string['playersmapping'] = 'Mapping dels jugadors';
 $string['pleasewait'] = 'Si us plau, espereu...';
 $string['pluginispaused'] = 'Actualment, el plugin està en pausa.';
-$string['pluginname'] = 'Motrain';
+$string['pluginname'] = 'Incentli';
 $string['pluginnotenabledseesettings'] = 'El plugin no està habilitat, consulteu la seva configuració.';
 $string['previewemail'] = 'Envia un correu electrònic de previsualització a';
 $string['previewemail_help'] = 'El correu electrònic al qual s\'envia la previsualització. Aquest valor no s\'ha desat.';
@@ -165,17 +165,17 @@ $string['privacy:metadata:log:contextid'] = 'L\'identificador de context';
 $string['privacy:metadata:log:timebroadcasted'] = 'El moment en què es va emetre el registre';
 $string['privacy:metadata:log:timecreated'] = 'El moment en què es va crear el registre';
 $string['privacy:metadata:log:userid'] = 'L\'identificador d\'usuari';
-$string['privacy:metadata:playermap'] = 'Mapping d’usuaris locals i jugadors Motrain';
-$string['privacy:metadata:playermap:accountid'] = 'L\'identificador del compte Motrain';
+$string['privacy:metadata:playermap'] = 'Mapping d’usuaris locals i jugadors Incentli';
+$string['privacy:metadata:playermap:accountid'] = 'L\'identificador del compte Incentli';
 $string['privacy:metadata:playermap:blocked'] = 'Si aquest mapping està bloquejat';
 $string['privacy:metadata:playermap:blockedreason'] = 'El motiu del bloqueig';
-$string['privacy:metadata:playermap:playerid'] = 'L\'identificador del jugador Motrain';
+$string['privacy:metadata:playermap:playerid'] = 'L\'identificador del jugador Incentli';
 $string['privacy:metadata:playermap:userid'] = 'L\'identificador d\'usuari';
-$string['privacy:metadata:remoteplayer'] = 'Informació intercanviada o identificar un jugador Motrain.';
+$string['privacy:metadata:remoteplayer'] = 'Informació intercanviada o identificar un jugador Incentli.';
 $string['privacy:metadata:remoteplayer:email'] = 'Correu electrònic';
 $string['privacy:metadata:remoteplayer:firstname'] = 'Nom';
 $string['privacy:metadata:remoteplayer:lastname'] = 'Cognom';
-$string['privacy:metadata:userspush'] = 'Una cua d’usuaris per ser afegits al tauler de Motrain.';
+$string['privacy:metadata:userspush'] = 'Una cua d’usuaris per ser afegits al tauler de Incentli.';
 $string['privacy:metadata:userspush:userid'] = 'L\'identificador d\'usuari';
 $string['privacy:path:logs'] = 'Registres';
 $string['privacy:path:mappings'] = 'Mappings';
@@ -190,7 +190,7 @@ $string['saverules'] = 'Desar les regles';
 $string['saving'] = 'Guardant ...';
 $string['secondaryteam'] = 'Equip secundari {$a}';
 $string['sendlocalnotifications'] = 'Envia notificacions locals';
-$string['sendlocalnotifications_help'] = 'Quan s\'habilita, Moodle lliurarà missatges als jugadors en lloc de Motrain. Per evitar que els missatges s\'enviïn dues vegades, cal desactivar les "Comunicacions sortints al jugador" des del tauler de control de Motrain. Els missatges enviats als jugadors es poden personalitzar a la pàgina de configuració "Plantilles de missatges". Els webhooks són necessaris perquè això funcioni.';
+$string['sendlocalnotifications_help'] = 'Quan s\'habilita, Moodle lliurarà missatges als jugadors en lloc de Incentli. Per evitar que els missatges s\'enviïn dues vegades, cal desactivar les "Comunicacions sortints al jugador" des del tauler de control de Incentli. Els missatges enviats als jugadors es poden personalitzar a la pàgina de configuració "Plantilles de missatges". Els webhooks són necessaris perquè això funcioni.';
 $string['sendlocalnotificationsdisabledrequiresenabled'] = 'L\'enviament de notificacions locals s\'ha desactivat, no es pot activar abans que el propi connector estigui habilitat.';
 $string['sendlocalnotificationsdisabledwithwebhooks'] = 'L\'enviament de notificacions locals s\'ha desactivat, requereix webhooks per funcionar.';
 $string['sendlocalnotificationsnotenabledseesettings'] = 'L\'enviament de notificacions locals no està activat; revisa, si us plau, la configuració.';
@@ -201,15 +201,15 @@ $string['spend'] = 'Gastar';
 $string['store'] = 'Botiga';
 $string['taskpushusers'] = 'Empènyer els usuaris al tauler';
 $string['team'] = 'Equip';
-$string['team_help'] = 'L’equip de Motrain al qual s’associarà la cohort.';
+$string['team_help'] = 'L’equip de Incentli al qual s’associarà la cohort.';
 $string['teamassociationcreated'] = 'Associació d\'equip creada.';
 $string['teamassociations'] = 'Associacions d’equips';
 $string['teams'] = 'Equips';
 $string['templatecontent'] = 'Contingut';
 $string['templatecontent_help'] = 'El contingut del missatge a enviar.
- 
+
  Els següents marcadors de posició estan disponibles:
- 
+
  - `[monedes]`: el nombre de monedes rebudes, si n\'hi ha.
  - `[itemname]`: el nom de l\'element associat, si n\'hi ha.
  - `[missatge]`: un missatge associat opcional (per exemple, aprovació de la comanda, comanda automàtica), si n\'hi ha.
@@ -227,9 +227,9 @@ $string['templatelanguageanyfallback'] = 'Tots els idiomes (alternativa)';
 $string['templatesaved'] = 'S\'ha desat la plantilla.';
 $string['templatesubject'] = 'Assumpte';
 $string['templatesubject_help'] = 'L\'assumpte del missatge a enviar.
- 
+
  Els següents marcadors de posició estan disponibles:
- 
+
  - `[itemname]`: el nom de l\'element associat, si n\'hi ha.
  - `[firstname]`: el primer nom del jugador.
  - `[cognom]`: el cognom del jugador.
@@ -258,5 +258,5 @@ $string['usernotplayer'] = 'L’usuari no compleix els criteris per ser un jugad
 $string['userteamnotfound'] = 'No s\'ha pogut trobar l\'equip de l\'usuari actual, poseu -vos en contacte amb l\'administrador.';
 $string['viewlist'] = 'Veure llista';
 $string['webhooksconnected'] = 'Webhooks connectats';
-$string['webhooksconnected_help'] = 'Els webhooks s\'utilitzen per permetre que Motrain es comuniqui directament amb Moodle. Per exemple, s\'utilitzen per enviar notificacions locals als jugadors. Els webhooks no es processen quan el connector no està habilitat o està en pausa.';
+$string['webhooksconnected_help'] = 'Els webhooks s\'utilitzen per permetre que Incentli es comuniqui directament amb Moodle. Per exemple, s\'utilitzen per enviar notificacions locals als jugadors. Els webhooks no es processen quan el connector no està habilitat o està en pausa.';
 $string['webhooksdisconnected'] = 'Webhooks desconnectats';

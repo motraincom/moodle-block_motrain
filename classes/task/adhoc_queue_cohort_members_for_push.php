@@ -49,7 +49,7 @@ class adhoc_queue_cohort_members_for_push extends \core\task\adhoc_task {
 
         $manager = manager::instance();
         if (!$manager->is_enabled()) {
-            mtrace('Motrain is not enabled.');
+            mtrace('Incentli is not enabled.');
             return;
         } else if (!$manager->is_using_cohorts()) {
             mtrace('System does not use cohorts.');

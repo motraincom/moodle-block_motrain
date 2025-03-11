@@ -73,7 +73,7 @@ class helper {
      * via a JSON script tag, the HTML entities do not need to be escaped if the
      * JavaScript framework does the escaping for us.
      *
-     * As of today, there are two places in Motrain where this is happening:
+     * As of today, there are two places in Incentli where this is happening:
      *
      * - On the rules screen, the list of courses is passed to a JSON script which
      *   is then loaded and rendered by a React app, which does the safeguarding.

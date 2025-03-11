@@ -47,10 +47,10 @@ class users_push extends \core\task\scheduled_task {
 
         $manager = manager::instance();
         if (!$manager->is_enabled()) {
-            mtrace('Motrain is not enabled.');
+            mtrace('Incentli is not enabled.');
             return;
         } else if ($manager->is_paused()) {
-            mtrace('Motrain is paused.');
+            mtrace('Incentli is paused.');
             return;
         }
 

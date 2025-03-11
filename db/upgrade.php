@@ -49,7 +49,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2022072100, 'motrain');
     }
 
@@ -64,7 +64,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2022072101, 'motrain');
     }
 
@@ -79,7 +79,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2022072102, 'motrain');
     }
 
@@ -105,7 +105,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023012100, 'motrain');
     }
 
@@ -120,7 +120,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023012101, 'motrain');
     }
 
@@ -145,7 +145,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023012301, 'motrain');
     }
 
@@ -155,7 +155,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
         $task = new \block_motrain\task\adhoc_update_webhook();
         \core\task\manager::queue_adhoc_task($task, true);
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023052801, 'motrain');
     }
 
@@ -165,7 +165,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
         $task = new \block_motrain\task\adhoc_update_webhook();
         \core\task\manager::queue_adhoc_task($task, true);
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023082202, 'motrain');
     }
 
@@ -180,7 +180,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023082702, 'motrain');
     }
 
@@ -190,7 +190,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
         $task = new \block_motrain\task\adhoc_update_webhook();
         \core\task\manager::queue_adhoc_task($task, true);
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2023103002, 'motrain');
     }
 
@@ -200,7 +200,7 @@ function xmldb_block_motrain_upgrade($oldversion) {
         $task = new \block_motrain\task\adhoc_update_webhook();
         \core\task\manager::queue_adhoc_task($task, true);
 
-        // Motrain savepoint reached.
+        // Incentli savepoint reached.
         upgrade_block_savepoint(true, 2024042600, 'motrain');
     }
 
