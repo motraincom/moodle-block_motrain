@@ -87,7 +87,7 @@ class block_content implements templatable {
 
         $this->infourl = new moodle_url('/blocks/motrain/index.php', ['page' => 'info']);
         $this->dashboardurl = $manager->get_dashboard_url();
-        $this->bravaurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'brava']);
+        $this->bravaurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'celebrio']);
         $this->storeurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'shop']);
         $this->leaderboardsurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'leaderboards']);
         $this->purchasesurl = new moodle_url('/blocks/motrain/index.php', ['page' => 'purchases']);
