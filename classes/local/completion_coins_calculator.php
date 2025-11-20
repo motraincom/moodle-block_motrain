@@ -40,6 +40,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class completion_coins_calculator {
 
+    /** @var cache */
+    protected $cache;
+
     /**
      * Constructor.
      */
