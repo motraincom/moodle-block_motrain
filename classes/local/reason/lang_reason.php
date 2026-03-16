@@ -50,7 +50,7 @@ class lang_reason {
      * @param string $string The lang string.
      * @param stdClass $args The arguments.
      */
-    public function __construct($string, stdClass $args = null) {
+    public function __construct($string, ?stdClass $args = null) {
         $this->string = $string;
         $this->args = $args;
     }

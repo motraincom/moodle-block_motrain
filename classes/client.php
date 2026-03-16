@@ -73,7 +73,7 @@ class client {
         $this->lang = current_language();
     }
 
-    public function add_coins($playerid, $coins, lang_reason $reason = null) {
+    public function add_coins($playerid, $coins, ?lang_reason $reason = null) {
         $data = ['coins' => $coins];
         if ($reason) {
             $data['reason'] = [

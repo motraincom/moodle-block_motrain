@@ -271,7 +271,7 @@ class message_dealer {
      * @param object $targetuser The target user.
      * @param object|null $data The data of additional placeholders
      */
-    public function generate_content($template, $targetuser, object $data = null) {
+    public function generate_content($template, $targetuser, ?object $data = null) {
         $userplaceholders = [
             '[firstname]' => s($targetuser->firstname),
             '[lastname]' => s($targetuser->lastname),

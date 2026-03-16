@@ -89,7 +89,7 @@ class award {
      * @param int $coins The number of coins.
      * @param lang_reason|null $reason The reason.
      */
-    protected function award_coins($coins, lang_reason $reason = null) {
+    protected function award_coins($coins, ?lang_reason $reason = null) {
         $manager = manager::instance();
         $manager->require_enabled();
         $manager->require_not_paused();
@@ -177,7 +177,7 @@ class award {
      * @param lang_reason|null $reason The reason.
      * @return bool True when successfully awarded.
      */
-    public function give($coins, lang_reason $reason = null) {
+    public function give($coins, ?lang_reason $reason = null) {
         global $DB;
 
         $broadcasted = time();
