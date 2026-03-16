@@ -219,7 +219,7 @@ class award {
         ]));
 
         if ($rethrow) {
-            throw $e;
+            throw $rethrow;
         }
 
         $success = !empty($broadcasted);
