@@ -26,7 +26,7 @@
 use block_motrain\addons;
 use block_motrain\manager;
 
-require_once(__DIR__ . ' /../../config.php');
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 require_login();

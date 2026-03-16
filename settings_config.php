@@ -121,6 +121,7 @@ $setting = new admin_setting_configcheckbox('block_motrain/autopush', get_string
 $settingspage->add($setting);
 
 // Save the data.
+$errormsg = null;
 if ($data = data_submitted() and confirm_sesskey()) {
     $data = array_filter((array) $data, function($key) {
         return strpos($key, 's_') === 0;

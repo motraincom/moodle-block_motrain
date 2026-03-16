@@ -102,7 +102,7 @@ $importer->init();
 while ($row = $importer->next()) {
     $identifier = $row[0];
     foreach ($row as $i => $str) {
-        if ($i < 2 || empty($str)) {
+        if ($i < 2 || empty($str) || !isset($otherlangs[$i])) {
             continue;
         }
         $lang = $otherlangs[$i];

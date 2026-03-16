@@ -189,7 +189,7 @@ if ($action === 'edit') {
 
     foreach ($sortedtypes as $typedata) {
         $code = $typedata->code;
-        $templates = $alltemplates[$code];
+        $templates = $alltemplates[$code] ?? [];
 
         echo $output->heading($typedata->name, 3);
 

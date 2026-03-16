@@ -65,7 +65,7 @@ function block_motrain_pluginfile($course, $bi, $context, $filearea, $args, $for
 function block_motrain_accountid_updated_hook() {
     cache_helper::purge_by_definition('block_motrain', 'metadata');
     block_motrain_check_enabled_state();
-};
+}
 
 /**
  * Check enabled state.

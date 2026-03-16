@@ -26,7 +26,7 @@
 use block_motrain\manager;
 use core\notification;
 
-require_once(__DIR__ . ' /../../config.php');
+require_once(__DIR__ . '/../../config.php');
 
 $action = required_param('action', PARAM_LOCALURL);
 $returnurl = required_param('returnurl', PARAM_LOCALURL);
