@@ -25,6 +25,7 @@
 
 namespace block_motrain\local\setting;
 
+use block_motrain\local\compat\admin_setting;
 use block_motrain\manager;
 use html_writer;
 
@@ -40,7 +41,7 @@ require_once($CFG->libdir . '/adminlib.php');
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class is_enabled extends \admin_setting {
+class is_enabled extends admin_setting {
 
     /**
      * Constructor.
@@ -95,9 +96,12 @@ class is_enabled extends \admin_setting {
             $content .= ' (' . get_string('butpaused', 'block_motrain') . ')';
         }
 
-        return format_admin_setting($this, $this->visiblename,
-            $content,
-            get_string('isenabled_desc', 'block_motrain'),
-            false);
+        if (method_exists($this, 'render')) {
+            return $this->render($query, $content, null, false, '', $this->visiblename,
+                get_string('isenabled_desc', 'block_motrain'));
+        }
+
+        return format_admin_setting($this, $this->visiblename, $content,
+            get_string('isenabled_desc', 'block_motrain'), false);
     }
 }

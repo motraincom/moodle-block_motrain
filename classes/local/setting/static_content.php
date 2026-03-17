@@ -26,6 +26,8 @@
 namespace block_motrain\local\setting;
 defined('MOODLE_INTERNAL') || die();
 
+use block_motrain\local\compat\admin_setting;
+
 /**
  * Static config.
  *
@@ -34,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class static_content extends \admin_setting {
+class static_content extends admin_setting {
 
     /** @var bool No save. */
     public $nosave = true;
@@ -79,6 +81,10 @@ class static_content extends \admin_setting {
      * @return string
      */
     public function output_html($data, $query = '') {
+        if (method_exists($this, 'render')) {
+            return $this->render($query, $this->content, null, true, '', $this->visiblename, $this->description);
+        }
+
         return format_admin_setting($this, $this->visiblename, $this->content, $this->description, true, '', null, $query);
     }
 

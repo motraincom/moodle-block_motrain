@@ -23,6 +23,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\local\compat\admin_functions;
+use block_motrain\local\compat\admin_setting_configcheckbox;
+use block_motrain\local\compat\admin_setting_configpasswordunmask;
+use block_motrain\local\compat\admin_setting_configselect;
+use block_motrain\local\compat\admin_setting_configtext;
+use block_motrain\local\compat\admin_settingpage;
 use block_motrain\local\setting\static_content;
 use block_motrain\manager;
 
@@ -127,7 +133,7 @@ if ($data = data_submitted() and confirm_sesskey()) {
         return strpos($key, 's_') === 0;
     }, ARRAY_FILTER_USE_KEY);
 
-    $adminroot = admin_get_root();
+    $adminroot = admin_functions::get_root();
     $count = 0;
     foreach ($settingspage->settings as $setting) {
         $fullname = $setting->get_full_name();
@@ -156,7 +162,7 @@ if ($data = data_submitted() and confirm_sesskey()) {
         redirect($PAGE->url);
     }
 
-    admin_get_root(true);
+    admin_functions::get_root(true);
     $errormsg = get_string('errorwithsettings', 'admin');
 }
 

@@ -23,6 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use block_motrain\local\compat\admin_category;
+use block_motrain\local\compat\admin_externalpage;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
