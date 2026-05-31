@@ -56,7 +56,12 @@ class addons {
      */
     public static function add_admin_page($adminroot, $page) {
         if (!$adminroot->locate('block_motrain_category')) {
-            $adminroot->add('localplugins', new admin_category('block_motrain_category', get_string('pluginname', 'block_motrain')));
+            // Totara does not declare localplugins when the user does not have site:config.
+            $parent = $adminroot->locate('localplugins') ? 'localplugins' : 'modules';
+            if (!$adminroot->locate($parent)) {
+                return;
+            }
+            $adminroot->add($parent, new admin_category('block_motrain_category', get_string('pluginname', 'block_motrain')));
         }
 
         if (!$adminroot->locate('block_motrain_addons')) {
