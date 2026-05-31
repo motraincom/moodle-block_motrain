@@ -25,7 +25,9 @@
 
 namespace block_motrain;
 
+use block_motrain\local\compat\admin_category;
 use core_plugin_manager;
+use lang_string;
 use moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,6 +41,31 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addons {
+
+    /**
+     * Add a page to the Motrain add-ons admin category.
+     *
+     * The block settings tree is not loaded by Moodle for users without moodle/site:config, even when they have
+     * block/motrain:manage. This ensures the add-on category exists before an add-on registers its page.
+     *
+     * In normal circumstances, the block settings are loaded first, so the block itself does not need to
+     * validate whether the categories have already been added or not. Only addons should.
+     *
+     * @param \parentable_part_of_admin_tree $adminroot The admin tree root.
+     * @param \part_of_admin_tree $page The admin tree page to add.
+     */
+    public static function add_admin_page($adminroot, $page) {
+        if (!$adminroot->locate('block_motrain_category')) {
+            $adminroot->add('localplugins', new admin_category('block_motrain_category', get_string('pluginname', 'block_motrain')));
+        }
+
+        if (!$adminroot->locate('block_motrain_addons')) {
+            $addoncategory = new admin_category('block_motrain_addons', new lang_string('motrainaddons', 'block_motrain'));
+            $adminroot->add('block_motrain_category', $addoncategory);
+        }
+
+        $adminroot->add('block_motrain_addons', $page);
+    }
 
     /**
      * Get the list of addons.
