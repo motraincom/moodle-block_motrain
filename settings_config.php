@@ -67,8 +67,8 @@ $setting->set_updatedcallback('block_motrain_accountid_updated_hook');
 $settingspage->add($setting);
 
 $hosts = [
-    'https://api.motrainapp.com' => 'api.motrainapp.com',
-    'https://api.eu.motrainapp.com' => 'api.eu.motrainapp.com'
+    'https://api.incentli.com' => 'api.incentli.com (Global)',
+    'https://api.eu.incentli.com' => 'api.eu.incentli.com (Europe)'
 ];
 $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
     get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts);
@@ -182,5 +182,4 @@ echo $output->render_from_template('block_motrain/settings_page', [
 ]);
 
 echo $output->footer();
-
 

@@ -254,7 +254,8 @@ class message_dealer {
 
         } else if ($type === static::TYPE_USER_SWEEPSTAKES_WON) {
             $subject = "It's time to celebrate! You won a sweepstakes draw!";
-            $content = markdown_to_html("Hi [firstname],\n\nIt's your lucky day! You are the winner of the [itemname] sweepstakes draw. "
+            $content = markdown_to_html("Hi [firstname],\n\nIt's your lucky day! You are the winner of the "
+                . "[itemname] sweepstakes draw. "
                 . "To get it, please go to \"Pending Orders\" and complete the order.");
 
         } else {
