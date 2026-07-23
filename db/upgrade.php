@@ -204,5 +204,30 @@ function xmldb_block_motrain_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2024042600, 'motrain');
     }
 
+    if ($oldversion < 2026071700) {
+
+        $apihost = get_config('block_motrain', 'apihost');
+        if ($apihost === 'https://api.motrainapp.com') {
+            set_config('apihost', 'https://api.incentli.com', 'block_motrain');
+        } else if ($apihost === 'https://api.eu.motrainapp.com') {
+            set_config('apihost', 'https://api.eu.incentli.com', 'block_motrain');
+        }
+
+        // Incentli savepoint reached.
+        upgrade_block_savepoint(true, 2026071700, 'motrain');
+    }
+
+    if ($oldversion < 2026071701) {
+
+        // Incentli savepoint reached.
+        upgrade_block_savepoint(true, 2026071701, 'motrain');
+    }
+
+    if ($oldversion < 2026071702) {
+
+        // Incentli savepoint reached.
+        upgrade_block_savepoint(true, 2026071702, 'motrain');
+    }
+
     return true;
 }
