@@ -263,7 +263,7 @@ class client {
 
         $curl = new curl();
         $curl->setHeader('Content-Type: application/json');
-        $curl->setHeader('Accept-Language', $this->lang);
+        $curl->setHeader('Accept-Language:' . $this->lang);
         $curl->setHeader('Authorization: Bearer ' . $this->apikey);
 
         if ($method === 'POST') {
