@@ -97,7 +97,7 @@ class award {
         $coins = (int) $coins;
         $userid = $this->userid;
 
-        if ($coins <= 0) {
+        if (!$coins) {
             throw new moodle_exception('invalidcoinamount', 'block_motrain');
         }
 
@@ -173,7 +173,7 @@ class award {
      *
      * In strict mode nothing is recorded to the logs upon any failure.
      *
-     * @param int $coins The number of coins.
+     * @param int $coins The number of coins. Negative amounts are allowed.
      * @param lang_reason|null $reason The reason.
      * @return bool True when successfully awarded.
      */
