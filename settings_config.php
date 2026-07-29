@@ -68,6 +68,7 @@ $settingspage->add($setting);
 
 $hosts = [
     'https://api.incentli.com' => 'api.incentli.com (Global)',
+    'https://api.dev.incentli.com' => 'api.dev.incentli.com (Development)',
     'https://api.eu.incentli.com' => 'api.eu.incentli.com (Europe)'
 ];
 $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
