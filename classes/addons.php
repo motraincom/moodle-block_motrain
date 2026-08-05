@@ -78,12 +78,22 @@ class addons {
      * @return object[] The addons.
      */
     public static function get_addons() {
-        $plugins = core_plugin_manager::instance()->get_plugins_of_type('local');
+        $plugins = array_merge(
+            array_values(core_plugin_manager::instance()->get_plugins_of_type('local')),
+            array_values(core_plugin_manager::instance()->get_plugins_of_type('block'))
+        );
+
         $addons = array_map(function($plugin) {
-            $hassettings = file_exists($plugin->full_path('settings.php'));
-            $settingsurl = new moodle_url('/admin/settings.php', ['section' => $plugin->component]);
-            if ($hassettings && component_callback_exists($plugin->component, 'get_settings_page_url')) {
-                $settingsurl = component_callback($plugin->component, 'get_settings_page_url');
+            $settingsurl = $plugin->get_settings_url();
+            $hassettings = !empty($settingsurl);
+
+            // Block settings are absent without site:config, so a fallback URL would be inaccessible.
+            if (!$settingsurl && $plugin->type === 'local') {
+                $hassettings = file_exists($plugin->full_path('settings.php'));
+                $settingsurl = new moodle_url('/admin/settings.php', ['section' => $plugin->component]);
+                if ($hassettings && component_callback_exists($plugin->component, 'get_settings_page_url')) {
+                    $settingsurl = component_callback($plugin->component, 'get_settings_page_url');
+                }
             }
             return (object) [
                 'component' => $plugin->component,
@@ -94,31 +104,6 @@ class addons {
         }, array_filter($plugins, function($plugin) {
             return strpos($plugin->name, 'motrainaddon') === 0;
         }));
-
-        $blockaddons = [
-            'motrainaddonchallenge' => (object) [
-                'displayname' => get_string('addonchallenges', 'block_motrain'),
-                'settingsurl' => new moodle_url('/blocks/motrainaddonchallenge/admin/index.php'),
-            ],
-            'motrainaddonstreak' => (object) [
-                'displayname' => get_string('addonstreak', 'block_motrain'),
-                'settingsurl' => new moodle_url('/admin/settings.php', ['section' => 'blocksettingmotrainaddonstreak']),
-            ],
-        ];
-
-        foreach ($blockaddons as $name => $addon) {
-            $component = 'block_' . $name;
-            if (!core_plugin_manager::instance()->get_plugin_info($component)) {
-                continue;
-            }
-
-            $addons[] = (object) [
-                'component' => $component,
-                'displayname' => $addon->displayname,
-                'enabled' => get_config($component, 'enabled') !== '0',
-                'settingsurl' => $addon->settingsurl,
-            ];
-        }
 
         return $addons;
     }
