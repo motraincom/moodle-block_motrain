@@ -215,7 +215,7 @@ class award {
             'coins' => $coins,
             'timecreated' => time(),
             'timebroadcasted' => $broadcasted,
-            'broadcasterror' => $broadcasterror
+            'broadcasterror' => $broadcasterror === null ? null : \core_text::substr($broadcasterror, 0, 512)
         ]));
 
         if ($rethrow) {
