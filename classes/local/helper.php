@@ -38,6 +38,29 @@ use context;
 class helper {
 
     /**
+     * Format a string for external use.
+     *
+     * @param string $content The content.
+     * @param context|int $contextorid The context, or its ID.
+     * @param bool $striplinks Whether to strip links.
+     * @param array $options Formatting options.
+     * @return string
+     */
+    public static function external_format_string($content, $contextorid, $striplinks = true, $options = []) {
+        global $CFG;
+
+        if (method_exists(\core_external\util::class, 'format_string')) {
+            return \core_external\util::format_string($content, $contextorid, $striplinks, $options);
+        }
+
+        require_once($CFG->libdir . '/externallib.php');
+
+        // Older Moodle versions, including 3.4, require a context ID rather than an object.
+        $contextid = $contextorid instanceof context ? $contextorid->id : $contextorid;
+        return external_format_string($content, $contextid, $striplinks, $options);
+    }
+
+    /**
      * External format string, but unescaped.
      *
      * See {@link self::format_string_unescaped} for reasoning.
@@ -46,7 +69,7 @@ class helper {
      * @param context|int $contextorid The context, or its ID.
      */
     public static function external_format_string_unescaped($content, $contextorid) {
-        $text = external_format_string($content, $contextorid, true, ['escape' => false]);
+        $text = static::external_format_string($content, $contextorid, true, ['escape' => false]);
 
         // Reverts Totara 13+ forced escaping of entities.
         $trans = [
