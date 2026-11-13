@@ -799,4 +799,16 @@ class manager {
         return static::$instance;
     }
 
+    /**
+     * Reset the manager instance during testing.
+     *
+     * @throws \coding_exception When called outside Behat or PHPUnit.
+     */
+    public static function reset_instance(): void {
+        if (!(defined('PHPUNIT_TEST') && PHPUNIT_TEST) && !defined('BEHAT_TEST') && !defined('BEHAT_SITE_RUNNING')) {
+            throw new \coding_exception('The manager instance can only be reset during testing.');
+        }
+        static::$instance = null;
+    }
+
 }
