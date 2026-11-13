@@ -28,6 +28,7 @@ namespace block_motrain;
 use block_motrain\local\award\award;
 use block_motrain\local\compat\external_api;
 use block_motrain\local\compat\external_function_parameters;
+use block_motrain\local\compat\external_multiple_structure;
 use block_motrain\local\compat\external_single_structure;
 use block_motrain\local\compat\external_value;
 use block_motrain\local\completion_coins_calculator;
@@ -37,11 +38,8 @@ use completion_info;
 use context_course;
 use context_system;
 use course_modinfo;
-use external_multiple_structure;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * External.
