@@ -80,8 +80,8 @@ Feature: Earn coins for completion
       | user    | course | role    |
       | learner | C2     | student |
     And the following "activities" exist:
-      | activity | course | name              | completion | completionview |
-      | page     | C2     | Read the handbook | 2          | 1              |
+      | activity | course | name              | idnumber | completion | completionview |
+      | page     | C2     | Read the handbook | handbook | 2          | 1              |
     And the following "blocks" exist:
       | blockname | contextlevel | reference | pagetypepattern | defaultregion |
       | motrain   | Course       | C2        | course-view-*   | side-pre      |

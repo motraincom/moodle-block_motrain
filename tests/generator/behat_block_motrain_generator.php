@@ -16,6 +16,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Totara uses the core Behat context to dispatch plugin generators.
+if (class_exists('behat_generator_base')) {
+    class_alias('behat_generator_base', 'block_motrain_behat_generator_base');
+} else {
+    class_alias('behat_data_generators', 'block_motrain_behat_generator_base');
+}
+
 /**
  * Motrain Behat generator.
  *
@@ -25,7 +32,16 @@ defined('MOODLE_INTERNAL') || die();
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class behat_block_motrain_generator extends behat_generator_base {
+final class behat_block_motrain_generator extends block_motrain_behat_generator_base {
+
+    /**
+     * Register the entities with Totara's core Behat generator.
+     */
+    public function register(): void {
+        foreach ($this->get_creatable_entities() as $name => $definition) {
+            self::$elements['block_motrain > ' . $name] = ['plugin' => 'block_motrain'] + $definition;
+        }
+    }
 
     /**
      * Get creatable entities.
@@ -41,7 +57,7 @@ final class behat_block_motrain_generator extends behat_generator_base {
             'completion rules' => [
                 'datagenerator' => 'completion_rule',
                 'required' => ['coins'],
-                'switchids' => ['course' => 'courseid', 'activity' => 'cmid'],
+                'switchids' => ['course' => 'courseid'],
             ],
             'message templates' => [
                 'datagenerator' => 'message_template',

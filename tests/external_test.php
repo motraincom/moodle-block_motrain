@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \block_motrain\external::award_coins
  */
+#[\PHPUnit\Framework\Attributes\CoversMethod(\block_motrain\external::class, 'award_coins')]
 final class external_test extends tests\base_testcase {
 
     /**

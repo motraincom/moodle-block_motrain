@@ -30,22 +30,62 @@ use Behat\Gherkin\Node\TableNode;
  */
 final class behat_block_motrain extends behat_base {
 
+    /** @var BeforeScenarioScope Pending scenario setup. */
+    protected $scenarioscope;
+
     /**
-     * Before scenario.
+     * Remember the scenario so setup can run before its first step.
+     *
+     * Moodle runs core's BeforeScenario hooks first, but Totara can run ours before
+     * core resets the database. Configuring the plugin here would therefore have
+     * that configuration erased by Totara's reset. Defer setup to BeforeStep,
+     * after all BeforeScenario hooks have finished.
      *
      * @BeforeScenario
      * @param BeforeScenarioScope $scope The scenario scope.
      */
     public function before_scenario(BeforeScenarioScope $scope): void {
+        $this->scenarioscope = $scope;
+    }
+
+    /**
+     * Apply the pending setup once, immediately before the scenario's first step.
+     *
+     * Core's database reset has finished on both Moodle and Totara by this point.
+     * Clearing the saved scope prevents subsequent steps from repeating setup or
+     * resetting the API server's state.
+     *
+     * @BeforeStep
+     */
+    public function before_step(): void {
+        if (!$this->scenarioscope) {
+            return;
+        }
+        $scope = $this->scenarioscope;
+        $this->scenarioscope = null;
+        $this->setup_scenario($scope);
+    }
+
+    /**
+     * Set up the scenario.
+     *
+     * @param BeforeScenarioScope $scope The scenario scope.
+     */
+    protected function setup_scenario(BeforeScenarioScope $scope): void {
         global $CFG;
 
         $tags = array_merge($scope->getFeature()->getTags(), $scope->getScenario()->getTags());
-        if (!preg_grep('/^@?(block_motrain|local_motrainaddon\w*)$/', $tags)) {
+        if (!preg_grep('/^@?(block_motrain|(?:local|block)_motrainaddon\w*)$/', $tags)) {
             return;
         }
 
         if (empty($CFG->behat_block_motrain_apihost)) {
             throw new \coding_exception('Set behat_block_motrain_apihost in config.php.');
+        }
+
+        if (!file_exists($CFG->libdir . '/behat/classes/behat_generator_base.php')) {
+            require_once(__DIR__ . '/../generator/behat_block_motrain_generator.php');
+            (new behat_block_motrain_generator())->register();
         }
 
         set_config('apikey', 'test-key', 'block_motrain');

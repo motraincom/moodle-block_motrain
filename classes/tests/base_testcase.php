@@ -18,6 +18,12 @@ namespace block_motrain\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
+if (class_exists(\core_phpunit\testcase::class)) {
+    class_alias(\core_phpunit\testcase::class, __NAMESPACE__ . '\\phpunit_testcase');
+} else {
+    class_alias(\advanced_testcase::class, __NAMESPACE__ . '\\phpunit_testcase');
+}
+
 /**
  * Base testcase.
  *
@@ -26,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class base_testcase extends \advanced_testcase {
+abstract class base_testcase extends phpunit_testcase {
 
     /**
      * Set up.

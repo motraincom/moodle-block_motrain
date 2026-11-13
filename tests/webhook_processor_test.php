@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \block_motrain\local\webhook\processor
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\block_motrain\local\webhook\processor::class)]
 final class webhook_processor_test extends tests\base_testcase {
 
     /**
@@ -81,6 +82,7 @@ final class webhook_processor_test extends tests\base_testcase {
      * @param string $type Webhook type.
      * @dataProvider ignored_notification_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('ignored_notification_provider')]
     public function test_ignored_notification($enabled, $playerid, $type) {
         set_config('accountid', 'account-one', 'block_motrain');
         set_config('sendlocalnotifications', $enabled, 'block_motrain');

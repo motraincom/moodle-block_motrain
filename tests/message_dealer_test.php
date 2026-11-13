@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \block_motrain\local\message_dealer
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\block_motrain\local\message_dealer::class)]
 final class message_dealer_test extends tests\base_testcase {
 
     /**
@@ -50,6 +51,7 @@ final class message_dealer_test extends tests\base_testcase {
      * @param string $expected Expected template.
      * @dataProvider resolve_best_template_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolve_best_template_provider')]
     public function test_resolve_best_template($lang, $enabled, $expected) {
         $dg = $this->getDataGenerator();
         $generator = $dg->get_plugin_generator('block_motrain');

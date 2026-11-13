@@ -9,8 +9,8 @@ Feature: Configure coin rules
       | fullname       | shortname | enablecompletion |
       | Learning coins | C1        | 1                |
     And the following "activities" exist:
-      | activity | course | name             | completion |
-      | page     | C1     | Read the guide   | 1          |
+      | activity | course | name           | idnumber | completion |
+      | page     | C1     | Read the guide | guide    | 1          |
     And I log in as "admin"
     And I navigate to "Plugins > Blocks > Incentli > Coin rules" in site administration
 

@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \block_motrain\local\completion_coins_calculator
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\block_motrain\local\completion_coins_calculator::class)]
 final class completion_coins_calculator_test extends tests\base_testcase {
 
     /**
@@ -60,6 +61,7 @@ final class completion_coins_calculator_test extends tests\base_testcase {
      * @param int $activitycoins Activity award.
      * @dataProvider specific_rules_override_global_rules_provider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('specific_rules_override_global_rules_provider')]
     public function test_specific_rules_override_global_rules($coursecoins, $activitycoins) {
         $dg = $this->getDataGenerator();
         $generator = $dg->get_plugin_generator('block_motrain');
