@@ -18,6 +18,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Motrain Behat setup.
@@ -68,6 +69,36 @@ final class behat_block_motrain extends behat_base {
         global $CFG;
 
         $this->execute('behat_forms::i_set_the_field_to', ['API endpoint', $CFG->behat_block_motrain_apihost]);
+    }
+
+    /**
+     * Disable add-ons.
+     *
+     * @Given /^I disable the following Incentli addons:$/
+     * @param TableNode $addons Short add-on names, such as welcomecoins.
+     */
+    public function i_disable_the_following_incentli_addons(TableNode $addons): void {
+        $pluginmanager = \core_plugin_manager::instance();
+        foreach ($addons->getColumn(0) as $name) {
+            foreach (['local', 'block'] as $type) {
+                $component = $type . '_motrainaddon' . $name;
+                if ($pluginmanager->get_plugin_info($component) && get_config($component, 'enabled')) {
+                    set_config('enabled', 0, $component);
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove coin rules.
+     *
+     * @Given /^I remove all Incentli coin rules$/
+     */
+    public function i_remove_all_incentli_coin_rules(): void {
+        global $DB;
+
+        $DB->delete_records('block_motrain_comprules');
+        (new \block_motrain\local\completion_coins_calculator())->purge_cache();
     }
 
     /**
