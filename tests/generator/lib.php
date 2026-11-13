@@ -44,6 +44,71 @@ final class block_motrain_generator extends testing_block_generator {
     }
 
     /**
+     * Create a completion rule.
+     *
+     * @param object|array $record The rule data. Omit courseid for a global rule.
+     * @return object The rule.
+     */
+    public function create_completion_rule($record): object {
+        global $DB;
+
+        $record = (object) $record;
+        $rule = (object) [
+            'courseid' => $record->courseid ?? 0,
+            'cmid' => $record->cmid ?? 0,
+            'modname' => $record->modname ?? null,
+            'coins' => $record->coins,
+        ];
+        if ($rule->cmid) {
+            $rule->courseid = $DB->get_field('course_modules', 'course', ['id' => $rule->cmid], MUST_EXIST);
+        }
+        $rule->id = $DB->insert_record('block_motrain_comprules', $rule);
+        (new \block_motrain\local\completion_coins_calculator())->purge_cache();
+        return $rule;
+    }
+
+    /**
+     * Create a message template.
+     *
+     * @param object|array $record The template data.
+     * @return object The template.
+     */
+    public function create_message_template($record): object {
+        global $DB;
+
+        $record = (object) $record;
+        $template = (object) [
+            'code' => $record->code,
+            'lang' => $record->lang ?? null,
+            'subject' => $record->subject ?? 'Congratulations [firstname]!',
+            'content' => $record->content ?? '<p>[message]</p>',
+            'contentformat' => $record->contentformat ?? FORMAT_HTML,
+            'enabled' => $record->enabled ?? 1,
+        ];
+        $template->id = $DB->insert_record('block_motrain_msgtpl', $template);
+        return $template;
+    }
+
+    /**
+     * Create a local player mapping.
+     *
+     * @param object|array $record The mapping data.
+     * @return object The mapping.
+     */
+    public function create_player_mapping($record): object {
+        global $DB;
+
+        $record = (object) $record;
+        $mapping = (object) [
+            'userid' => $record->userid,
+            'accountid' => $record->accountid ?? get_config('block_motrain', 'accountid'),
+            'playerid' => $record->playerid,
+        ];
+        $mapping->id = $DB->insert_record('block_motrain_playermap', $mapping);
+        return $mapping;
+    }
+
+    /**
      * Create a team mapping.
      *
      * @param object|array $record The mapping data. Omit cohortid for the global association.

@@ -59,4 +59,29 @@ final class behat_block_motrain extends behat_base {
         \block_motrain\manager::instance()->check_enabled_state();
     }
 
+    /**
+     * Select the test API endpoint.
+     *
+     * @When /^I set the Incentli API endpoint to the test server$/
+     */
+    public function i_set_the_api_endpoint_to_the_test_server(): void {
+        global $CFG;
+
+        $this->execute('behat_forms::i_set_the_field_to', ['API endpoint', $CFG->behat_block_motrain_apihost]);
+    }
+
+    /**
+     * Click in a message template section.
+     *
+     * @When /^I click on "([^"]*)" "([^"]*)" in the "([^"]*)" message template section$/
+     * @param string $element The element to click.
+     * @param string $selectortype The selector type.
+     * @param string $section The section heading.
+     */
+    public function i_click_in_message_template_section($element, $selectortype, $section): void {
+        $heading = behat_context_helper::escape($section);
+        $xpath = "//table[preceding::h3[1][normalize-space(.)=$heading]]";
+        $this->execute('behat_general::i_click_on_in_the', [$element, $selectortype, $xpath, 'xpath_element']);
+    }
+
 }

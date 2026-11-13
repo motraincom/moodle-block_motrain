@@ -70,6 +70,9 @@ $hosts = [
     'https://api.incentli.com' => 'api.incentli.com (Global)',
     'https://api.eu.incentli.com' => 'api.eu.incentli.com (Europe)'
 ];
+if (defined('BEHAT_SITE_RUNNING') && !empty($CFG->behat_block_motrain_apihost)) {
+    $hosts[$CFG->behat_block_motrain_apihost] = $CFG->behat_block_motrain_apihost;
+}
 $setting = new admin_setting_configselect('block_motrain/apihost', get_string('apihost', 'block_motrain'),
     get_string('apihost_desc', 'block_motrain'), array_keys($hosts)[0], $hosts);
 $setting->set_updatedcallback('block_motrain_check_enabled_state');

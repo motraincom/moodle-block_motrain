@@ -26,6 +26,10 @@
 namespace block_motrain;
 
 use block_motrain\local\award\award;
+use block_motrain\local\compat\external_api;
+use block_motrain\local\compat\external_function_parameters;
+use block_motrain\local\compat\external_single_structure;
+use block_motrain\local\compat\external_value;
 use block_motrain\local\completion_coins_calculator;
 use block_motrain\local\helper;
 use block_motrain\local\program_coins_calculator;
@@ -33,11 +37,7 @@ use completion_info;
 use context_course;
 use context_system;
 use course_modinfo;
-use external_api;
-use external_function_parameters;
 use external_multiple_structure;
-use external_single_structure;
-use external_value;
 
 defined('MOODLE_INTERNAL') || die();
 

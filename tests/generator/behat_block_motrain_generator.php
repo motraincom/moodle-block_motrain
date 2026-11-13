@@ -38,6 +38,15 @@ final class behat_block_motrain_generator extends behat_generator_base {
                 'datagenerator' => 'account_setting',
                 'required' => ['name', 'value'],
             ],
+            'completion rules' => [
+                'datagenerator' => 'completion_rule',
+                'required' => ['coins'],
+                'switchids' => ['course' => 'courseid', 'activity' => 'cmid'],
+            ],
+            'message templates' => [
+                'datagenerator' => 'message_template',
+                'required' => ['code'],
+            ],
             'team mappings' => [
                 'datagenerator' => 'team_mapping',
                 'required' => ['team_id'],

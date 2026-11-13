@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace block_motrain;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -33,6 +35,8 @@ use core_privacy\tests\request\approved_contextlist;
 use block_motrain\privacy\provider;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
+use context_course;
+use context_system;
 
 /**
  * Privacy provider testcase.
@@ -42,7 +46,7 @@ use core_privacy\local\request\userlist;
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_motrain_privacy_provider_testcase extends \advanced_testcase {
+final class privacy_provider_test extends tests\base_testcase {
 
     public function test_get_metadata() {
         if (!class_exists('core_privacy\manager')) {
