@@ -229,7 +229,7 @@ if ($action === 'edit') {
             ];
         }
 
-        echo html_writer::table($table);
+        echo html_writer::div(html_writer::table($table), 'mb-3');
     }
 
 }
